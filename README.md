@@ -1,73 +1,88 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# AI Agents Monorepo — Multi-Tenant LLM Framework
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This project implements a modular AI agent platform designed for automating domain-specific workflows such as procurement, customer support, compliance, and more.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🧠 Project Goal
 
-## Description
+Build an LLM-powered, multi-tenant agent framework that:
+- Parses incoming data (e.g. emails, messages)
+- Extracts structured information based on configurable logic
+- Interfaces with internal systems (e.g. inventory, CRM, ticketing)
+- Generates outputs like quotes, confirmations, summaries, or follow-ups
+- Supports reusable prompt templates per tenant and use case
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Installation
+## 📦 Project Structure
 
-```bash
-$ npm install
+```
+apps/
+  api/                → NestJS backend for tenant and agent API
+  email-listener/     → Email ingestion app (polling or webhook)
+libs/
+  agents/             → LangGraph/LLM agent workflows
+  db/                 → MongoDB connection and schemas
+  tenants/            → Tenant metadata, loader utils
+  prompts/            → Prompt templates (Handlebars) and PromptBuilder classes
+  common/             → Shared types, decorators, utilities
 ```
 
-## Running the app
+---
 
-```bash
-# development
-$ npm run start
+## 🧱 Prompt Design
 
-# watch mode
-$ npm run start:dev
+Prompts are structured as modular Handlebars (`.hbs`) templates and organized per use case under:
 
-# production mode
-$ npm run start:prod
+```
+libs/prompts/src/llmPrompts/<useCase>/templates/
 ```
 
-## Test
+Each prompt consists of the following components:
 
-```bash
-# unit tests
-$ npm run test
+| Type              | File Name Example                   | Description                            |
+|-------------------|--------------------------------------|----------------------------------------|
+| System Prompt     | `generate-quote.system.hbs`         | Sets role/persona for LLM              |
+| User Prompt       | `generate-quote.user.hbs`           | Task-specific instructions             |
+| Description       | `generate-quote.description.hbs`    | What the prompt does (doc/dev use)     |
+| Response Format   | `generate-quote.response-format.hbs`| Optional output structure guidance     |
+| Example Input     | `generate-quote.example-input.hbs`  | (optional) Sample input                |
+| Example Output    | `generate-quote.example-output.hbs` | (optional) Sample response             |
 
-# e2e tests
-$ npm run test:e2e
+These are compiled into structured `PromptBody` objects using builder classes like:
 
-# test coverage
-$ npm run test:cov
+```
+libs/prompts/src/llmPrompts/<useCase>/PromptBuilder.ts
 ```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 🧑‍💻 Supported Agents (Examples)
 
-## Stay in touch
+- 🛒 **Procurement Agent** – Email parsing, supplier quoting, order confirmations
+- 💬 **Customer Support Agent** – Ticket classification, suggested replies
+- 📄 **Compliance Agent** – Policy interpretation, document flagging
+- 🔧 Easily extendable with new agents per use case
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## 🚧 Status
 
-Nest is [MIT licensed](LICENSE).
+- ✅ Monorepo scaffolded (NestJS CLI)
+- ✅ Tenants and prompts structured
+- ✅ Prompt builders implemented
+- ✅ Handlebars templates supported
+
+---
+
+## 🛠️ Next Steps
+
+- Integrate LangGraph flows for advanced agent reasoning
+- Implement Temporal-based background orchestration
+- Add Slack/email hooks for notifications
+- Build UI/CLI for configuring agents per tenant
+
+---
+
+## 👥 Authors
+
+Built by [Derese](https://www.linkedin.com/in/derese-g-56a72061/), powered by LLMs 🧠

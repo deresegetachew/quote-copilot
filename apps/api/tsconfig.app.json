@@ -4,6 +4,9 @@
     "declaration": false,
     "outDir": "../../dist/apps/api"
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.json"
+  ],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

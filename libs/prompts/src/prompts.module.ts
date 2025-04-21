@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { PromptsService } from './prompts.service';
+import { PromptsService } from './services/prompts.service';
+import { PromptFactory } from './promptFactory';
 
 @Module({
-  providers: [PromptsService],
-  exports: [PromptsService],
+  providers: [PromptsService, PromptFactory],
+  exports: [PromptsService, PromptFactory],
 })
 export class PromptsModule {}
