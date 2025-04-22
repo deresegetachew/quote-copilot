@@ -18,7 +18,7 @@ export const ConfigSchema = z.object({
           password: z.string(),
           database: z.string(),
           enableMigration: z.boolean(),
-          replicaSet: z.string(),
+          replicaSet: z.string().optional(),
           useSSL: z.boolean(),
         })
         .optional(),

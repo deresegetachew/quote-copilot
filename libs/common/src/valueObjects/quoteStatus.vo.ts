@@ -1,0 +1,7 @@
+export enum QuoteStatus {
+  READY_FOR_REVIEW = 'READY_FOR_REVIEW',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  SENT = 'SENT',
+  CANCELED = 'CANCELED',
+}

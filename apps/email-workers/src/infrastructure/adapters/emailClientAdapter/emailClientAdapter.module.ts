@@ -9,6 +9,7 @@ import { EmailClientFactoryPort } from '../../../application/ports/outgoing/emai
   providers: [
     GmailClient,
     GmailAuth,
+
     {
       provide: EmailClientFactoryPort,
       useClass: EmailClientAdapterFactory,

@@ -56,3 +56,6 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 *.config.yml
+
+# Ignore MongoDB local volume
+mongodb_data/

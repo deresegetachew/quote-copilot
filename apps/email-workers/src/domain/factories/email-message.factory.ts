@@ -1,7 +1,13 @@
-import { EmailMessage } from '../entities/email-message.entity';
+import { gmail_v1 } from 'googleapis';
+import { EmailMessageAggregate } from '../entities/emailMessage.aggregate';
+import { EmailEntity } from '../entities/email.entity';
+import { EmailThreadStatusVO } from '../valueObjects/emailThreadStatus.vo';
+import { DateTime } from 'luxon';
 
 export class EmailMessageFactory {
-  static createFromGmailMessage(gmailMessage: any): EmailMessage {
+  static createFromGmailMessage(
+    gmailMessage: gmail_v1.Schema$Message,
+  ): EmailMessageAggregate {
     const payload = gmailMessage.payload;
     const headers = payload.headers;
 
@@ -9,18 +15,28 @@ export class EmailMessageFactory {
     const messageId = gmailMessage.id || '';
     const from =
       headers.find((header: any) => header.name === 'From')?.value || '';
+    const to = headers.find((header: any) => header.name === 'To')?.value || '';
     const subject =
       headers.find((header: any) => header.name === 'Subject')?.value || '';
     const body = this.extractBody(payload);
-    const receivedAt = new Date(parseInt(gmailMessage.internalDate, 10));
+    const receivedAt = DateTime.fromMillis(
+      parseInt(gmailMessage.internalDate || '0', 10),
+    );
 
-    return new EmailMessage(
-      threadId,
+    const email = new EmailEntity({
       messageId,
+      threadId,
       from,
+      to,
       subject,
       body,
       receivedAt,
+    });
+
+    return new EmailMessageAggregate(
+      threadId,
+      [email],
+      EmailThreadStatusVO.initial(),
     );
   }
 
