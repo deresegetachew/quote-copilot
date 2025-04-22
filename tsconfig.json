@@ -47,6 +47,12 @@
       ],
       "@common/*": [
         "libs/common/src/*"
+      ],
+      "@app-config/config": [
+        "libs/config/src"
+      ],
+      "@app-config/config/*": [
+        "libs/config/src/*"
       ]
     }
   }

@@ -1,14 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/api/src",
-  "compilerOptions": {
-    "deleteOutDir": true,
-    "webpack": true,
-    "tsConfigPath": "apps/api/tsconfig.app.json"
-  },
   "monorepo": true,
-  "root": "apps/api",
+  "root": "",
+  "defaultProject": "email-workers",
   "projects": {
     "api": {
       "type": "application",
@@ -16,25 +11,12 @@
       "entryFile": "main",
       "sourceRoot": "apps/api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/api/tsconfig.app.json"
-      }
-    },
-    "workers": {
-      "type": "application",
-      "root": "apps/workers",
-      "entryFile": "main",
-      "sourceRoot": "apps/workers/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/workers/tsconfig.app.json"
-      }
-    },
-    "db": {
-      "type": "library",
-      "root": "libs/db",
-      "entryFile": "index",
-      "sourceRoot": "libs/db/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/db/tsconfig.lib.json"
+        "tsConfigPath": "apps/api/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "**/*.yml"
+          }
+        ]
       }
     },
     "agents": {
@@ -71,6 +53,66 @@
       "sourceRoot": "libs/common/src",
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    },
+    "email-workers": {
+      "type": "application",
+      "root": "apps/email-workers",
+      "entryFile": "main",
+      "sourceRoot": "apps/email-workers/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/email-workers/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "**/*.yml"
+          }
+        ]
+      }
+    },
+    "whatsapp-workers": {
+      "type": "application",
+      "root": "apps/whatsapp-workers",
+      "entryFile": "main",
+      "sourceRoot": "apps/whatsapp-workers/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/whatsapp-workers/tsconfig.app.json"
+      }
+    },
+    "telegram-workers": {
+      "type": "application",
+      "root": "apps/telegram-workers",
+      "entryFile": "main",
+      "sourceRoot": "apps/telegram-workers/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/telegram-workers/tsconfig.app.json"
+      }
+    },
+    "config": {
+      "type": "library",
+      "root": "libs/config",
+      "entryFile": "index",
+      "sourceRoot": "libs/config/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/config/tsconfig.lib.json",
+        "assets": [
+          {
+            "include": "**/*.yml",
+            "watchAssets": true
+          },
+          {
+            "include": "local.config.yml",
+            "watchAssets": true
+          }
+        ]
+      }
+    },
+    "tooling-cli": {
+      "type": "application",
+      "root": "apps/tooling-cli",
+      "entryFile": "main",
+      "sourceRoot": "apps/tooling-cli/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/tooling-cli/tsconfig.app.json"
       }
     }
   }

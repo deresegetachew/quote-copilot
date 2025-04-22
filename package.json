@@ -1,17 +1,21 @@
 {
-  "name": "api",
+  "name": "ai-agents",
   "version": "0.0.1",
   "description": "",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
-    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+    "copy:config": "npx ts-node scripts/copy-config.ts",
+    "prebuild": "npm run copy:config",
+    "build": "nest build && npm run copy:config",
     "start": "nest start",
+    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+    "prestart:dev": "npm run copy:config",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/api/main",
+    "start:tooling": "npx ts-node apps/tooling-cli/src/main.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -21,11 +25,17 @@
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/cqrs": "^11.0.3",
     "@nestjs/platform-express": "^10.0.0",
+    "googleapis": "^148.0.0",
     "handlebars": "^4.7.8",
+    "nest-commander": "^3.17.0",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "yaml": "^2.7.1",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -33,7 +43,7 @@
     "@nestjs/testing": "^10.0.0",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
-    "@types/node": "^20.3.1",
+    "@types/node": "^20.17.30",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -75,7 +85,8 @@
       "^@agents/agents(|/.*)$": "<rootDir>/libs/agents/src/$1",
       "^@prompts/prompts(|/.*)$": "<rootDir>/libs/prompts/src/$1",
       "^@tenants/tenants(|/.*)$": "<rootDir>/libs/tenants/src/$1",
-      "^@common/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+      "^@common/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app-config/config(|/.*)$": "<rootDir>/libs/config/src/$1"
     }
   }
 }
