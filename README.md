@@ -32,9 +32,9 @@ These messages contain requests that must be understood, acted on, and tracked, 
 - High operational overhead
 - Inconsistent responses and tracking
 
-## 🚨 Case in Point: Procurement in Aircraft Maintenance
+## 🚨 Case in Point: Procurement in Maintenance
 
-When a customer sends an email requesting aircraft parts, a specialist must:
+When a customer sends an email requesting  parts, a specialist must:
 
 1. Parse what is being asked (e.g. part number, quantity, deadline)
 2. Check if the part is available internally
