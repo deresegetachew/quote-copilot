@@ -241,7 +241,7 @@ Libraries are located under the `libs/` directory. To build a specific library:
 
 ### Environment Configuration
 
-Each app may require specific environment variables. Ensure you have the necessary `.env` files or configuration files (e.g., `local.config.yml`) in place before running the apps.
+The project uses a centralized configuration file located in the `libs/config` library. Ensure you have the `local.config.yml` file in place under `libs/config/src` before running the apps.
 
 ---
 
