@@ -1,4 +1,4 @@
-import { GetUnreadEmailsUseCase } from '../application/useCases/getUnreadEmails.useCase';
+import { GetUnreadEmailsUseCase } from '../application/useCases/emailUsecases/getUnreadEmails.useCase';
 
 export class GmailPoller {
   constructor(

@@ -70,13 +70,16 @@ export const ConfigSchema = z.object({
       port: z.number(),
     }),
   }),
-
   gmailConfig: z.object({
     clientId: z.string(),
     clientSecret: z.string(),
     redirectUri: z.string(),
     refreshToken: z.string(),
     scopes: z.array(z.string()),
+  }),
+  temporalConfig: z.object({
+    namespace: z.string(),
+    address: z.string(),
   }),
 });
 

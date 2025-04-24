@@ -12,7 +12,7 @@ export class EmailMessageAggregate {
     return this.threadId;
   }
 
-  getEmails(): ReadonlyArray<EmailEntity> {
+  getEmails(): Array<EmailEntity> {
     return [...this.emails];
   }
 

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:latest
@@ -12,7 +10,47 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: secret
     volumes:
       - ./mongodb_data:/data/db
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_DB: temporal
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
 
+  temporal:
+    image: temporalio/auto-setup:1.20
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: temporal
+      POSTGRES_SEEDS: postgres
+      TEMPORAL_DATABASE: temporal
+      TEMPORAL_NAMESPACE: default
+      TEMPORAL_ADDRESS: 0.0.0.0:7233
+    ports:
+      - 7233:7233
+    depends_on:
+      - postgres
+  temporal-web:
+    image: temporalio/ui:2.37.1
+    platform: linux/amd64
+    ports:
+      - '8080:8080'
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_UI_PORT=8080
+      - TEMPORAL_CSRF_COOKIE_NAME=temporal-csrf
+      - TEMPORAL_PERMIT_WRITE_API=true
+      - TEMPORAL_UI_ENABLED=true
+    depends_on:
+      - temporal
 volumes:
+  postgres_data:
+    driver: local
   mongodb_data:
     driver: local

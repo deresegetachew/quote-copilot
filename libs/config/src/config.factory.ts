@@ -53,6 +53,10 @@ export class EnvConfigFactory extends ConfigFactory {
           port: parseInt(process.env.APP_PORT, 10),
         },
       },
+      temporalConfig: {
+        namespace: process.env.TEMPORAL_NAMESPACE,
+        address: process.env.TEMPORAL_ADDRESS,
+      },
     };
   }
 }

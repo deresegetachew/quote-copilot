@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { EmailMessageAggregate } from '../../domain/entities/emailMessage.aggregate';
-import { GetUnreadEmailsQuery } from '../../application/ports/incoming/getUnreadEmails.query';
+import { GetUnreadEmailsQuery } from '../../application/ports/incoming/query/getUnreadEmails.query';
 
 @Controller('email-workers')
 export class EmailWorkersController {

@@ -114,6 +114,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/tooling-cli/tsconfig.app.json"
       }
+    },
+    "agent-orchestrator": {
+      "type": "application",
+      "root": "apps/agent-orchestrator",
+      "entryFile": "main",
+      "sourceRoot": "apps/agent-orchestrator/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/agent-orchestrator/tsconfig.app.json"
+      }
     }
   }
 }

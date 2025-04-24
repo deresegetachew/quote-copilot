@@ -117,6 +117,10 @@ This project implements a solution by  building a pluggable agent system that co
 
 ---
 
+🧠 Responsibilities
+	-	LangGraph: Think, classify, reason, extract
+	-	Temporal: Orchestrate, wait, retry, timeout, persist
+
 ## 📦 Project Structure
 
 ```
@@ -195,6 +199,15 @@ Each app is located under the `apps/` directory. To run a specific app, follow t
    ```bash
    nest start email-workers
    ```
+
+### 🖥️ Common Commands
+
+| Command                        | Description                                |
+|-------------------------------|--------------------------------------------|
+| `npm run api`                 | Starts the NestJS backend API              |
+| `npm run email-workers`       | Runs the email ingestion and processing app|
+| `npm run agent-orchestrator`  | Starts the Temporal agent workflow worker  |
+| `npm run start:all`           | Starts all apps in parallel (dev mode)     |
 
 ### Running All Apps
 

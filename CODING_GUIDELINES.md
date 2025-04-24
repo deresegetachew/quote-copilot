@@ -1,4 +1,4 @@
- # 🧑‍💻 Coding Guidelines
+# 🧑‍💻 Coding Guidelines
  
  This project follows a combination of **Clean Architecture** and **Hexagonal Architecture (Ports and Adapters)** to maintain a clear separation of concerns and allow long-term scalability, testability, and modularity.
  
@@ -7,19 +7,19 @@
  
  ---
  
- ## 📂 Folder Structure
- 
- Each app (e.g. `email-worker`, `telegram-worker`) is organized as follows:
- 
+ ## 📂 **Folder** Structure
+
+ Each app (e.g. `email-workers`, `telegram-workers`) is organized as follows:
+
  ```
  src/
  ├── domain/                 # Pure business logic
- │   ├── entities/           # Domain models like EmailMessage, Quote, etc.
+ │   ├── entities/           # Domain models like EmailEntity, ThreadEntity, etc.
  │   ├── factories/          # Builds complex domain objects
- │   └── valueObjects/      # Types with rules (e.g. EmailThreadId)
+ │   └── valueObjects/       # Types with rules (e.g. EmailThreadId)
  │
  ├── application/            # Orchestration logic
- │   ├── useCases/          # Each file handles one operation (e.g. ProcessEmailUseCase)
+ │   ├── useCases/           # Each file handles one operation (e.g. ProcessEmailUseCase)
  │   ├── domainEventHandlers/ # Responds to domain events raised by aggregates
  │   ├── integrationEventHandlers/ # Responds to external events (e.g. Temporal, messaging bus)
  │   └── ports/              # 
@@ -27,9 +27,9 @@
  │       └── outgoing/       # Contains contracts for repositories, agents, services (used via IoC)
  │
  ├── infrastructure/         # Tech-specific implementations
- │   ├── gmail/              # e.g. Gmail API integration
- │   ├── db/                 # e.g. MongoDB adapters
- │   └── external/           # e.g. LangGraph, Temporal, or third-party SDKs
+ │   ├── database/           # MongoDB schemas and repositories
+ │   ├── gmail/              # Gmail API integration
+ │   └── external/           # Third-party SDKs or services
  │
  ├── presenters/             # Input interfaces (driving adapters)
  │   ├── http/               # Webhook entrypoints
@@ -40,7 +40,7 @@
  
  ---
  
- ## ✅ Layer Responsibilities
+ ## ✅ Updated Layer Responsibilities
  
  ### `domain/`
  - Contains the **core rules of the system**
@@ -51,7 +51,7 @@
  - Coordinates logic across domain and external systems
  - Should use only interfaces from `domain/`
  - Contains:
-   - `use-cases/`: Application service classes
+   - `useCases/`: Application service classes
    - `domainEventHandlers/`: Responds to domain events raised by aggregates
    - `integrationEventHandlers/`: Responds to external events (e.g. Temporal, messaging bus)
    - `ports/`:
@@ -61,11 +61,25 @@
  
  ### `infrastructure/`
  - Implements interfaces from domain (e.g. `EmailRepository`)
- - Uses external services like Gmail API, Mongo, Redis, etc.
+ - Uses external services like Gmail API, MongoDB, Redis, etc.
+ - Includes subfolders like `database/` for schemas and repositories
  
  ### `presenters/`
  - Adapts incoming inputs (HTTP, polling, CLI) to application use cases
  - Responsible for translating raw messages into structured objects
+
+ ### `adapters/`
+ - Contains implementations of `ports` defined in the `application` layer.
+ - Examples include:
+   - `EmailRepositoryAdapter`: Implements the `EmailRepository` port.
+   - `GmailAdapter`: Integrates with Gmail API.
+
+ ### `ports/`
+ - Defines interfaces for dependencies used by the `application` layer.
+ - Examples include:
+   - `EmailRepository`: Interface for email persistence.
+   - `NotificationService`: Interface for sending notifications.
+ - These interfaces are implemented by adapters in the `infrastructure` layer.
  
  ---
  
