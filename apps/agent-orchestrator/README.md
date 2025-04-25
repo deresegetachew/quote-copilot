@@ -72,3 +72,28 @@ This helps keep workflow code clean and flexible.
 
 ---
 
+## 🏗 Deployment & Scaling
+
+### 🧵 Multiple Worker Instances
+
+Running multiple instances of the Agent Orchestrator app is fully supported and encouraged for scalability and reliability. Each instance connects to the same Temporal cluster and listens on the same `taskQueue`.
+
+Temporal uses a **pull-based model** — workers **poll** the server for available tasks. This enables automatic load balancing: the server doesn't push tasks to workers, it waits for them to pull.
+
+### ⚖️ Load Balancing Behavior
+
+- Tasks are distributed fairly across available worker instances.
+- Workers that are faster or less busy naturally take on more tasks.
+- If a worker crashes or disconnects, other workers continue processing.
+
+This makes it easy to horizontally scale just by spinning up more worker processes or containers.
+
+### 💥 Fault Tolerance & Recovery
+
+- Activities and workflows are retried according to policies you define.
+- If a worker crashes mid-task, Temporal will reassign the task to another worker.
+- Long-running workflows remain safe and paused — no need for sticky sessions or manual recovery.
+
+This model helps you scale out your agents confidently while minimizing operational headaches.
+
+---

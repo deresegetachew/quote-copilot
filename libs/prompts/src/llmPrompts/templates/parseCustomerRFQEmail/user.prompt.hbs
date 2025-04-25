@@ -1,0 +1,23 @@
+Based on the email thread below, extract all relevant details needed to create an RFQ (Request for Quote):
+
+Thread ID: {{threadId}}
+Emails:
+{{#each emails}}
+---
+From: {{from}}
+To: {{to}}
+Received At: {{receivedAt}}
+Subject: {{subject}}
+
+{{body}}
+{{/each}}
+
+Extract the following fields:
+- Part numbers (if any)
+- Quantity requested
+- Delivery date (if mentioned)
+- Special instructions
+- Customer name and contact (if mentioned)
+- Notes or additional requests
+
+Return a structured JSON response. If any field is missing, set its value to `null` or `"unknown"`.

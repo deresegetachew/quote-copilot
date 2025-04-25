@@ -5,12 +5,24 @@ import {
   NEW_MESSAGE_SIGNAL,
   NewMessageSignalPayload,
 } from '../../signals';
-import { executeWorkflow } from '../../util/executeWF';
 import type * as activities from '../../activities';
 import { logParsedEmailWorkflow } from './childWorkFlows/sampleChild.workflow';
+import { EMAIL_ENUMS } from '../../../../../libs/common/src';
+import { executeWorkflow } from '../../util/executeWF';
 
 const { parseEmailIntentActivity } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',
+});
+
+// TO AB: Once the activity starts running, it must finish within 5 minutes. Otherwise, it will be marked as failed (and possibly retried).
+const { sendEmailActivity } = proxyActivities<typeof activities>({
+  startToCloseTimeout: '1 minute',
+  retry: {
+    maximumAttempts: 3,
+    initialInterval: '1s',
+    backoffCoefficient: 2,
+    maximumInterval: '10s',
+  },
 });
 
 export async function processEmailThreadWorkflow(): Promise<void> {
@@ -36,16 +48,27 @@ export async function processEmailThreadWorkflow(): Promise<void> {
     while (state.queue.length > 0) {
       const { threadId, messageId } = state.queue.shift()!;
 
+      //  Step 1: We send confirmation email to the user, and start parsing the email
+
+      await sendEmailActivity({
+        email: EMAIL_ENUMS.REQUEST_RECEIVED,
+        threadId,
+        inReplyToMessageId: messageId,
+      });
+
+      // Step 2: Once
+
       const parsed = await parseEmailIntentActivity(threadId, messageId);
 
       // execute sub workflows based on the parsed intent
       switch (parsed.quantity) {
         case 1:
-          return await executeWorkflow(logParsedEmailWorkflow, {
+          await executeWorkflow(logParsedEmailWorkflow, {
             args: [parsed],
             asChild: true,
             workflowId: `rfq-intent-${threadId}`,
           });
+          break;
         default:
           throw new Error(`Unknown intent: ${parsed.quantity}`);
       }

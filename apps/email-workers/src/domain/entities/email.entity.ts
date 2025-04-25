@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 
 export class EmailEntity {
+  readonly id: string; // message ID in mongodb
   readonly messageId: string;
   readonly threadId: string;
   readonly from: string;
@@ -10,6 +11,7 @@ export class EmailEntity {
   readonly receivedAt?: DateTime;
 
   constructor({
+    id,
     messageId,
     threadId,
     from,
@@ -18,6 +20,7 @@ export class EmailEntity {
     body,
     receivedAt,
   }: {
+    id: string;
     messageId: string;
     threadId: string;
     from: string;
@@ -26,6 +29,7 @@ export class EmailEntity {
     body?: string;
     receivedAt?: DateTime;
   }) {
+    this.id = id;
     this.messageId = messageId;
     this.threadId = threadId;
     this.from = from;
@@ -33,6 +37,10 @@ export class EmailEntity {
     this.subject = subject;
     this.body = body;
     this.receivedAt = receivedAt;
+  }
+
+  getStorageId(): string {
+    return this.id;
   }
 
   getMessageId(): string {
@@ -65,6 +73,7 @@ export class EmailEntity {
 
   clone(): EmailEntity {
     return new EmailEntity({
+      id: this.id,
       messageId: this.messageId,
       threadId: this.threadId,
       from: this.from,

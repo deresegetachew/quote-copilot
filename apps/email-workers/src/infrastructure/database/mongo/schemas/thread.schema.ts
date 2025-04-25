@@ -13,7 +13,7 @@ export class Thread {
   @Prop({ type: [String] })
   messageIds: string[];
 
-  @Prop({ required: true, enum: EmailThreadStatus })
+  @Prop({ type: String, enum: EmailThreadStatus })
   status: EmailThreadStatus;
 
   @Prop()

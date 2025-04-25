@@ -3,10 +3,15 @@ import { EmailEntity } from './email.entity';
 
 export class EmailMessageAggregate {
   constructor(
+    private readonly id: string | null,
     private readonly threadId: string,
     private readonly emails: EmailEntity[] = [],
     private status: EmailThreadStatusVO = EmailThreadStatusVO.initial(),
   ) {}
+
+  getStorageId(): string | null {
+    return this.id;
+  }
 
   getThreadId(): string {
     return this.threadId;
@@ -70,11 +75,12 @@ export class EmailMessageAggregate {
   }
 
   static fromPersistence(
+    id: string,
     threadId: string,
     emails: EmailEntity[],
     status: EmailThreadStatusVO,
   ): EmailMessageAggregate {
-    return new EmailMessageAggregate(threadId, emails, status);
+    return new EmailMessageAggregate(id, threadId, emails, status);
   }
 
   static createNew(
@@ -82,6 +88,7 @@ export class EmailMessageAggregate {
     firstEmail: EmailEntity,
   ): EmailMessageAggregate {
     return new EmailMessageAggregate(
+      null,
       threadId,
       [firstEmail],
       EmailThreadStatusVO.initial(),

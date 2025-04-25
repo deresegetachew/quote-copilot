@@ -1,7 +1,11 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { PromptBody } from './types';
+import { renderTemplate } from './util/handleBars.helper';
 
-export abstract class AbstractPromptBuilder {
+export abstract class AbstractPromptBuilder<T> {
   protected prompt: PromptBody;
+  protected context: T;
 
   constructor() {
     this.prompt = {
@@ -34,26 +38,26 @@ export abstract class AbstractPromptBuilder {
     return this;
   }
 
-  protected setMetadataTags(metadataTags: string[]): this {
-    this.prompt.metadataTags = metadataTags;
+  protected setSystemPrompt(): this {
+    this.prompt.systemPrompt = this.parseTemplate('system', {});
     return this;
   }
 
-  protected setFallbackPromptKey(fallbackPromptKey: string): this {
-    this.prompt.fallbackPromptKey = fallbackPromptKey;
+  protected setUserPrompt(): this {
+    this.prompt.userPrompt = this.parseTemplate('user', {});
     return this;
   }
 
   protected abstract setAudience(audience: string): this;
   protected abstract setTone(tone: string): this;
-  protected abstract setSystemPrompt(): this;
-  protected abstract setUserPrompt(): this;
-  protected abstract setExampleInput(): this;
-  protected abstract setExampleOutput(): this;
-  protected abstract setResponseFormat(): this;
   protected abstract setTemplateVariables(
     templateVariables: Record<string, any>[],
   ): this;
+
+  setContext(context: T): this {
+    this.context = context;
+    return this;
+  }
 
   build(): PromptBody {
     // order of method calls matters
@@ -66,12 +70,25 @@ export abstract class AbstractPromptBuilder {
       .setMaxTokens(this.prompt.maxTokens)
       .setTemplateVariables(this.prompt.templateVariables)
 
-      .setMetadataTags(this.prompt.metadataTags)
-      .setFallbackPromptKey(this.prompt.fallbackPromptKey)
       .setSystemPrompt()
-      .setUserPrompt()
-      .setExampleInput()
-      .setExampleOutput()
-      .setResponseFormat().prompt;
+      .setUserPrompt().prompt;
+  }
+
+  private parseTemplate(
+    templateName: string,
+    data: Record<string, any>,
+  ): string {
+    const templatePath = path.resolve(
+      __dirname,
+      'templates',
+      'confirmation',
+      `${templateName}.prompt.hbs`,
+    );
+    if (fs.existsSync(templatePath)) {
+      return renderTemplate(templatePath, data);
+    }
+    throw new Error(
+      `Prompt Template file not found: ${templatePath}. Please check the template name and path.`,
+    );
   }
 }

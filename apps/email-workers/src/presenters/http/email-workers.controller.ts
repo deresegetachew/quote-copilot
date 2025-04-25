@@ -1,14 +1,31 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
-import { EmailMessageAggregate } from '../../domain/entities/emailMessage.aggregate';
-import { GetUnreadEmailsQuery } from '../../application/ports/incoming/query/getUnreadEmails.query';
+import {
+  GetUnreadEmailsQuery,
+  GetEmailThreadMessagesQuery,
+} from '../../application/ports/incoming/query';
+import { EmailThreadResponseDTO } from '@common';
+import { EmailThreadsResponseMapper } from './mappers';
 
 @Controller('email-workers')
 export class EmailWorkersController {
   constructor(private readonly queryBus: QueryBus) {}
 
   @Get('unread-emails')
-  async getUnreadEmails(): Promise<EmailMessageAggregate[]> {
-    return await this.queryBus.execute(new GetUnreadEmailsQuery());
+  async getUnreadEmails(): Promise<EmailThreadResponseDTO[]> {
+    const result = await this.queryBus.execute(new GetUnreadEmailsQuery());
+    return result.map((thread) =>
+      EmailThreadsResponseMapper.toResponse(thread),
+    );
+  }
+  @Get('email-threads/:threadId/messages')
+  async getEmailThreadMessages(
+    @Param('threadId') threadId: string,
+  ): Promise<EmailThreadResponseDTO> {
+    const result = await this.queryBus.execute(
+      new GetEmailThreadMessagesQuery(threadId),
+    );
+
+    return EmailThreadsResponseMapper.toResponse(result);
   }
 }

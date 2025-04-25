@@ -19,15 +19,6 @@
         ]
       }
     },
-    "agents": {
-      "type": "library",
-      "root": "libs/agents",
-      "entryFile": "index",
-      "sourceRoot": "libs/agents/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/agents/tsconfig.lib.json"
-      }
-    },
     "prompts": {
       "type": "library",
       "root": "libs/prompts",
@@ -123,6 +114,18 @@
       "compilerOptions": {
         "tsConfigPath": "apps/agent-orchestrator/tsconfig.app.json"
       }
+    },
+    "langchain": {
+      "type": "library",
+      "root": "libs/langchain",
+      "entryFile": "index",
+      "sourceRoot": "libs/langchain/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/langchain/tsconfig.lib.json"
+      }
     }
+  },
+  "compilerOptions": {
+    "webpack": true
   }
 }

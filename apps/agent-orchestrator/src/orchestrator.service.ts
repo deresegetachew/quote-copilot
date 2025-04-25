@@ -13,7 +13,7 @@ export class OrchestratorService implements OnModuleDestroy {
     this.logger.log('Starting Temporal worker...');
 
     this.worker = await Worker.create({
-      workflowsPath: path.resolve(__dirname, './workflows'),
+      workflowsPath: path.resolve(__dirname, './workflows/workflows.ts'),
       activities,
       taskQueue: TASK_QUEUES.EMAIL_TASKS_AGENT_ORCHESTRATOR,
     });

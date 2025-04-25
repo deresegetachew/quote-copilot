@@ -56,18 +56,22 @@ export const ConfigSchema = z.object({
     api: z.object({
       name: z.string(),
       port: z.number(),
+      baseUrl: z.string(),
     }),
     emailWorker: z.object({
       name: z.string(),
       port: z.number(),
+      baseUrl: z.string(),
     }),
     telegramWorker: z.object({
       name: z.string(),
       port: z.number(),
+      baseUrl: z.string(),
     }),
     whatsAppWorker: z.object({
       name: z.string(),
       port: z.number(),
+      baseUrl: z.string(),
     }),
   }),
   gmailConfig: z.object({
@@ -80,6 +84,11 @@ export const ConfigSchema = z.object({
   temporalConfig: z.object({
     namespace: z.string(),
     address: z.string(),
+  }),
+  openAIConfig: z.object({
+    apiKey: z.string(),
+    model: z.string(),
+    temperature: z.number(),
   }),
 });
 

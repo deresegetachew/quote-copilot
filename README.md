@@ -205,8 +205,8 @@ Each app is located under the `apps/` directory. To run a specific app, follow t
 | Command                        | Description                                |
 |-------------------------------|--------------------------------------------|
 | `npm run api`                 | Starts the NestJS backend API              |
-| `npm run email-workers`       | Runs the email ingestion and processing app|
-| `npm run agent-orchestrator`  | Starts the Temporal agent workflow worker  |
+| `npm run start email-workers`       | Runs the email ingestion and processing app|
+| `npm run start agent-orchestrator`  | Starts the Temporal agent workflow worker  |
 | `npm run start:all`           | Starts all apps in parallel (dev mode)     |
 
 ### Running All Apps

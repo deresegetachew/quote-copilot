@@ -12,6 +12,7 @@ export class EmailMessageMapper {
     const emailEntities: EmailEntity[] = emails.map(
       (doc) =>
         new EmailEntity({
+          id: doc.id,
           messageId: doc.messageId,
           threadId: doc.threadId,
           from: doc.from,
@@ -25,6 +26,7 @@ export class EmailMessageMapper {
     const statusVO = EmailThreadStatusVO.of(thread.status);
 
     return EmailMessageAggregate.fromPersistence(
+      thread.id,
       thread.threadId,
       emailEntities,
       statusVO,

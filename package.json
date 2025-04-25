@@ -24,6 +24,10 @@
     "test:e2e": "jest --config ./apps/api/test/jest-e2e.json"
   },
   "dependencies": {
+    "@langchain/core": "^0.3.48",
+    "@langchain/langgraph": "^0.2.67",
+    "@langchain/openai": "^0.5.7",
+    "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^10.0.0",
@@ -33,6 +37,7 @@
     "@temporalio/client": "^1.11.7",
     "@temporalio/common": "^1.11.7",
     "@temporalio/worker": "^1.11.7",
+    "bson": "^6.10.3",
     "googleapis": "^148.0.0",
     "handlebars": "^4.7.8",
     "luxon": "^3.6.1",
@@ -92,7 +97,8 @@
       "^@prompts/prompts(|/.*)$": "<rootDir>/libs/prompts/src/$1",
       "^@tenants/tenants(|/.*)$": "<rootDir>/libs/tenants/src/$1",
       "^@common/common(|/.*)$": "<rootDir>/libs/common/src/$1",
-      "^@app-config/config(|/.*)$": "<rootDir>/libs/config/src/$1"
+      "^@app-config/config(|/.*)$": "<rootDir>/libs/config/src/$1",
+      "^@tools-langchain/langchain(|/.*)$": "<rootDir>/libs/langchain/src/$1"
     }
   }
 }

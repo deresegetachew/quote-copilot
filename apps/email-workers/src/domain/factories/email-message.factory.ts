@@ -24,6 +24,7 @@ export class EmailMessageFactory {
     );
 
     const email = new EmailEntity({
+      id: null,
       messageId,
       threadId,
       from,
@@ -34,6 +35,7 @@ export class EmailMessageFactory {
     });
 
     return new EmailMessageAggregate(
+      null,
       threadId,
       [email],
       EmailThreadStatusVO.initial(),

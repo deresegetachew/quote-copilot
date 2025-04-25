@@ -17,7 +17,7 @@ export async function logParsedEmailWorkflow(parsed: {
   // simulate steps
   for (let i = 0; i < 3; i++) {
     state.counter++;
-    await sleep('1m'); // or do some activity
+    await sleep('3s'); // or do some activity
     await logInfo(`📥 Parsed Email Info:
         Thread ID: ${parsed.threadId}
         counter: ${state.counter}

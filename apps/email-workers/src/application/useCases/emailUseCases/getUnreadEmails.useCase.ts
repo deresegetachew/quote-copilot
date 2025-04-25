@@ -35,6 +35,7 @@ export class GetUnreadEmailsUseCase
 
         // Re-create the aggregate but preserve status
         const agg = new EmailMessageAggregate(
+          emailMessages.getStorageId(),
           threadId,
           emailMessages.getEmails(),
           currentStatus ?? EmailThreadStatusVO.initial(),
