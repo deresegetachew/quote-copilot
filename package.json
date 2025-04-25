@@ -26,6 +26,7 @@
   "dependencies": {
     "@langchain/core": "^0.3.48",
     "@langchain/langgraph": "^0.2.67",
+    "@langchain/ollama": "^0.2.0",
     "@langchain/openai": "^0.5.7",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^10.0.0",

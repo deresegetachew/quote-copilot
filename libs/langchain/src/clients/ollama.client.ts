@@ -1,28 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { TConfiguration } from '@app-config/config';
-import { ChatOpenAI } from '@langchain/openai';
-import { PromptBody } from '@prompts';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { ClientStrategy } from './clientStrategy.interface';
+import { ConfigService } from '@nestjs/config';
+import { Ollama } from '@langchain/ollama';
+import { TConfiguration } from '../../../config/src';
+import { PromptBody } from '../../../prompts/src';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
 
 @Injectable()
-export class OpenAIClient implements ClientStrategy {
-  private llmClient: ChatOpenAI;
+export class OllamaClient implements ClientStrategy {
+  private llmClient: any;
 
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService) {
+    this.llmClient = null;
+  }
 
   private async initialize() {
-    const openAIConfig =
-      this.configService.getOrThrow<TConfiguration['openAIConfig']>(
-        'openAIConfig',
+    const ollamaConfig =
+      this.configService.getOrThrow<TConfiguration['ollamaConfig']>(
+        'ollamaConfig',
       );
 
-    this.llmClient = new ChatOpenAI({
-      apiKey: openAIConfig.apiKey,
-      model: openAIConfig.model,
-      temperature: openAIConfig.temperature,
+    this.llmClient = new Ollama({
+      baseUrl: ollamaConfig.serverUrl,
+      model: ollamaConfig.model,
+      temperature: ollamaConfig.temperature,
     });
   }
 
@@ -34,6 +36,7 @@ export class OpenAIClient implements ClientStrategy {
   }
 
   public async invokeLLM(input: PromptBody): Promise<any> {
+    // TODO:  move repetitive logic to llmClient class
     const tone = `Use a ${input.tone} tone when responding`;
     const audience = `The audience is ${input.audience}`;
 
