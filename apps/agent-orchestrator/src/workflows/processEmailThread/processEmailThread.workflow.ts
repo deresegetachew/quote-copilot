@@ -7,7 +7,7 @@ import {
 } from '../../signals';
 import type * as activities from '../../activities';
 import { logParsedEmailWorkflow } from './childWorkFlows/sampleChild.workflow';
-import { EMAIL_ENUMS } from '../../../../../libs/common/src';
+import { EMAIL_ENUMS } from '@common';
 import { executeWorkflow } from '../../util/executeWF';
 
 const { parseEmailIntentActivity } = proxyActivities<typeof activities>({

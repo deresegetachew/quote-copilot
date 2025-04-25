@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { ProcessEmailThreadWFPort } from '../../ports/outgoing/processEmailThreadWF.port';
 import { TriggerEmailThreadProcessingWfCommand } from '../../ports/incoming/command';
-import { WORKFLOW_SIGNALS } from '../../../../../../libs/common/src';
+import { WORKFLOW_SIGNALS } from '@common';
 
 @CommandHandler(TriggerEmailThreadProcessingWfCommand)
 export class TriggerEmailProcessingUseCase

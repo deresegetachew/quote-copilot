@@ -25,7 +25,14 @@
       "entryFile": "index",
       "sourceRoot": "libs/prompts/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/prompts/tsconfig.lib.json"
+        "tsConfigPath": "libs/prompts/tsconfig.lib.json",
+        "assets": [
+          {
+            "include": "llmPrompts/**/*.hbs",
+            "outDir": "dist/libs/prompts",
+            "watchAssets": true
+          }
+        ]
       }
     },
     "tenants": {
@@ -124,8 +131,5 @@
         "tsConfigPath": "libs/langchain/tsconfig.lib.json"
       }
     }
-  },
-  "compilerOptions": {
-    "webpack": true
   }
 }

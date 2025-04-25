@@ -18,7 +18,6 @@ export class AppConfigModule {
       'dist',
       'libs',
       'config',
-      'src',
       'local.config.yml',
     );
 

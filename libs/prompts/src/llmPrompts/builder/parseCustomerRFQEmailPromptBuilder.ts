@@ -1,4 +1,4 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable, Logger, Scope } from '@nestjs/common';
 import { AbstractPromptBuilder } from '../../promptBuilder.abstract';
 
 type TContext = {
@@ -20,8 +20,20 @@ type Message = {
   receivedAt: Date; // date when the email was received
 };
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable({ scope: Scope.REQUEST })
 export class ParseCustomerRFQEmailPromptBuilder extends AbstractPromptBuilder<TContext> {
+  logger = new Logger(ParseCustomerRFQEmailPromptBuilder.name);
+
+  protected setTemplateFolderPath(): this {
+    this.templateFolder = 'parseCustomerRFQEmail';
+
+    this.logger.log('Template folder path:', {
+      templateFolder: this.templateFolder,
+    });
+
+    return this;
+  }
+
   protected setTemperature(): this {
     this.prompt.temperature = 0.1;
     return this;

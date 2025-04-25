@@ -17,9 +17,6 @@ export async function parseEmailIntentActivity(
   const app = await getAppContext();
   const configService = app.get(ConfigService);
   const httpService = app.get(HttpService);
-  const parseCustomerRFQEmailPromptBuilder = app.get(
-    ParseCustomerRFQEmailPromptBuilder,
-  );
   const parseEmailIntentGraph = app.get(ParseEmailIntentGraph);
 
   const logger = new Logger('parseEmailIntentActivity');
@@ -35,6 +32,10 @@ export async function parseEmailIntentActivity(
   logger.log('📧 🧵 Email Thread retrieved from  email worker', data);
 
   try {
+    // with transient instances we use app.resolve
+    const parseCustomerRFQEmailPromptBuilder = await app.resolve(
+      ParseCustomerRFQEmailPromptBuilder,
+    );
     const prompt = parseCustomerRFQEmailPromptBuilder
       .setContext({
         tenantName: 'DummyTenant',

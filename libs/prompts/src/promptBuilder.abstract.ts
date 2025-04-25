@@ -6,6 +6,7 @@ import { renderTemplate } from './util/handleBars.helper';
 export abstract class AbstractPromptBuilder<T> {
   protected prompt: PromptBody;
   protected context: T;
+  protected templateFolder: string;
 
   constructor() {
     this.prompt = {
@@ -48,6 +49,7 @@ export abstract class AbstractPromptBuilder<T> {
     return this;
   }
 
+  protected abstract setTemplateFolderPath(): this;
   protected abstract setAudience(audience: string): this;
   protected abstract setTone(tone: string): this;
   protected abstract setTemplateVariables(
@@ -64,26 +66,35 @@ export abstract class AbstractPromptBuilder<T> {
     // as they set the properties of the prompt object
     // and some methods depend on others
 
-    return this.setTone(this.prompt.tone)
-      .setAudience(this.prompt.audience)
-      .setTemperature(this.prompt.temperature)
-      .setMaxTokens(this.prompt.maxTokens)
-      .setTemplateVariables(this.prompt.templateVariables)
+    return (
+      this.setTemplateFolderPath(),
+      this.setTone(this.prompt.tone)
+        .setAudience(this.prompt.audience)
 
-      .setSystemPrompt()
-      .setUserPrompt().prompt;
+        .setTemperature(this.prompt.temperature)
+        .setMaxTokens(this.prompt.maxTokens)
+        .setTemplateVariables(this.prompt.templateVariables)
+
+        .setSystemPrompt()
+        .setUserPrompt().prompt
+    );
   }
 
   private parseTemplate(
     templateName: string,
     data: Record<string, any>,
   ): string {
-    const templatePath = path.resolve(
-      __dirname,
+    const templatePath = path.join(
+      process.cwd(),
+      'dist',
+      'libs',
+      'prompts',
+      'src',
+      'llmPrompts',
       'templates',
-      'confirmation',
-      `${templateName}.prompt.hbs`,
+      `${this.templateFolder}/${templateName}.prompt.hbs`,
     );
+
     if (fs.existsSync(templatePath)) {
       return renderTemplate(templatePath, data);
     }

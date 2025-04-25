@@ -1,5 +1,5 @@
 import { EmailMessageAggregate } from '../../../domain/entities/emailMessage.aggregate';
-import { EmailThreadResponseDTO } from '../../../../../../libs/common/src/dtos/emailThreads.response.dto';
+import { EmailThreadResponseDTO } from '@common';
 
 export class EmailThreadsResponseMapper {
   static toResponse(

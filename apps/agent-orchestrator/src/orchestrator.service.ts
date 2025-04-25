@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Worker } from '@temporalio/worker';
 import * as path from 'path';
 import * as activities from './activities';
-import { TASK_QUEUES } from '../../../libs/common/src';
+import { TASK_QUEUES } from '@common';
 
 @Injectable()
 export class OrchestratorService implements OnModuleDestroy {
@@ -13,7 +13,7 @@ export class OrchestratorService implements OnModuleDestroy {
     this.logger.log('Starting Temporal worker...');
 
     this.worker = await Worker.create({
-      workflowsPath: path.resolve(__dirname, './workflows/workflows.ts'),
+      workflowsPath: path.resolve(__dirname, './workflows'),
       activities,
       taskQueue: TASK_QUEUES.EMAIL_TASKS_AGENT_ORCHESTRATOR,
     });
