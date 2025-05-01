@@ -3,6 +3,7 @@ import { PromptBody } from '../../../prompts/src';
 import { ClientStrategy } from './clientStrategy.interface';
 import { OpenAIClient } from './openai.client';
 import { OllamaClient } from './ollama.client';
+import { AIMessageChunk } from '@langchain/core/messages';
 
 @Injectable({
   scope: Scope.TRANSIENT,
@@ -25,7 +26,7 @@ export class LLMClient {
     }
   }
 
-  public async invokeLLM(messages: PromptBody): Promise<any> {
+  public async invokeLLM(messages: PromptBody): Promise<AIMessageChunk> {
     if (!this.strategy) {
       throw new Error('Client strategy is not initialized');
     }

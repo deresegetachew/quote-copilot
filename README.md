@@ -68,7 +68,7 @@ This project implements a solution by  building a pluggable agent system that co
 
 1. 🏭 Check Internal Inventory
 
-- Simulate or integrate with ERP
+- Simulate or integrate with ERP (This will be mocked)
 - If found, gather:
   - Price
   - Condition (new/OH/etc.)
@@ -81,39 +81,41 @@ This project implements a solution by  building a pluggable agent system that co
 
 4. 🌐 Submit External RFQ (via Temporal)
 
-- Publish request to multiple platforms (e.g. PartsBase, ILS)
+- Publish request to multiple platforms (e.g. madeinchina.com)
 - Store RFQ state per tenant/request
 - Wait up to 72h (poll or webhook)
 - Automatically resume once responses are in
 - followup if no response or send new RFQ, and flag for human in the loop
 
-5. 🧠 Analyze RFQ Offers
+
+1. 🧠 Analyze RFQ Offers
 
 - Use LLM or logic to compare offers
 - Sort by:
   - Certifications (EASA, FAA, etc.)
   - Price
   - Delivery time
+- in the future this can be based on rules defined per tenant / product
 
 6. 🧾 Generate the Quote
 
-- Compose a client-facing quote using LLM prompt
-  - Style, tone, and content customizable per tenant
+   - Compose a client-facing quote message using LLM prompt
+     - Style, tone, and content customizable per tenant
 
 7. 📬 Send Quote & Await Response
 
-- Wait (via Temporal) for:
-  - Approval
-  - Clarification
-  - Change request
-  - If clarification → loop back to parsing with context
+   - Wait (via Temporal) for:
+     - Approval
+     - Clarification
+     - Change request
+     - If clarification → loop back to parsing with context
 
 8. ✅ Confirm & Finalize Order
 
- - Once approved:
-   - Trigger PO creation
-   - Notify supplier
-   - Update internal systems
+    - Once approved:
+      - Trigger PO creation
+      - Notify supplier
+      - Update internal systems
 
 ---
 
@@ -126,10 +128,12 @@ This project implements a solution by  building a pluggable agent system that co
 ```
 apps/
   api/                → NestJS backend for tenant and agent API
-  email-listener/     → Email ingestion app (polling or webhook)
+  email-workers/     → Email ingestion app (polling or webhook)
+  telegram-workers/  → Telegram ingestion app
+  whatsapp-workers   → Whatsapp ingestion app
 libs/
-  agents/             → LangGraph/LLM agent workflows
-  db/                 → MongoDB connection and schemas
+  langchain/           → LangGraph/LLM agent workflows
+  config/             → Project config loader and config files
   tenants/            → Tenant metadata, loader utils
   prompts/            → Prompt templates (Handlebars) and PromptBuilder classes
   common/             → Shared types, decorators, utilities

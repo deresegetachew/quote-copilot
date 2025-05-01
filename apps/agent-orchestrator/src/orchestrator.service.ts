@@ -3,6 +3,8 @@ import { Worker } from '@temporalio/worker';
 import * as path from 'path';
 import * as activities from './activities';
 import { TASK_QUEUES } from '@common';
+import { Connection, WorkflowClient } from '@temporalio/client';
+import * as workflows from './workflows';
 
 @Injectable()
 export class OrchestratorService implements OnModuleDestroy {
@@ -20,6 +22,8 @@ export class OrchestratorService implements OnModuleDestroy {
 
     this.logger.log('🚀 Temporal Worker running...');
 
+    await this.startUpWorkflows();
+
     await this.worker.run().catch((err) => {
       console.error('❌ Temporal Worker failed:', err);
       process.exit(1);
@@ -31,5 +35,12 @@ export class OrchestratorService implements OnModuleDestroy {
       this.logger.warn('🛑 Shutting down Temporal Worker...');
       await this.worker.shutdown();
     }
+  }
+
+  async startUpWorkflows() {
+    const connection = await Connection.connect();
+    const client = new WorkflowClient({ connection });
+
+    workflows.startUnreadEmailsWorkFlow(client);
   }
 }

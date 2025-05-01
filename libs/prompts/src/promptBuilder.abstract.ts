@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { PromptBody } from './types';
-import { renderTemplate } from './util/handleBars.helper';
+import { renderTemplateOrThrow } from './util/handleBars.helper';
 
 export abstract class AbstractPromptBuilder<T> {
   protected prompt: PromptBody;
@@ -39,13 +39,13 @@ export abstract class AbstractPromptBuilder<T> {
     return this;
   }
 
-  protected setSystemPrompt(): this {
-    this.prompt.systemPrompt = this.parseTemplate('system', {});
+  protected async setSystemPrompt(): Promise<this> {
+    this.prompt.systemPrompt = await this.parseTemplateOrThrow('system', {});
     return this;
   }
 
-  protected setUserPrompt(): this {
-    this.prompt.userPrompt = this.parseTemplate('user', {});
+  protected async setUserPrompt(): Promise<this> {
+    this.prompt.userPrompt = await this.parseTemplateOrThrow('user', {});
     return this;
   }
 
@@ -61,29 +61,27 @@ export abstract class AbstractPromptBuilder<T> {
     return this;
   }
 
-  build(): PromptBody {
+  async build(): Promise<PromptBody> {
     // order of method calls matters
     // as they set the properties of the prompt object
     // and some methods depend on others
+    this.setTemplateFolderPath()
+      .setTone(this.prompt.tone)
+      .setAudience(this.prompt.audience)
+      .setTemperature(this.prompt.temperature)
+      .setMaxTokens(this.prompt.maxTokens)
+      .setTemplateVariables(this.prompt.templateVariables);
 
-    return (
-      this.setTemplateFolderPath(),
-      this.setTone(this.prompt.tone)
-        .setAudience(this.prompt.audience)
+    await this.setSystemPrompt();
+    await this.setUserPrompt();
 
-        .setTemperature(this.prompt.temperature)
-        .setMaxTokens(this.prompt.maxTokens)
-        .setTemplateVariables(this.prompt.templateVariables)
-
-        .setSystemPrompt()
-        .setUserPrompt().prompt
-    );
+    return this.prompt;
   }
 
-  private parseTemplate(
+  private async parseTemplateOrThrow(
     templateName: string,
     data: Record<string, any>,
-  ): string {
+  ): Promise<string> {
     const templatePath = path.join(
       process.cwd(),
       'dist',
@@ -95,11 +93,6 @@ export abstract class AbstractPromptBuilder<T> {
       `${this.templateFolder}/${templateName}.prompt.hbs`,
     );
 
-    if (fs.existsSync(templatePath)) {
-      return renderTemplate(templatePath, data);
-    }
-    throw new Error(
-      `Prompt Template file not found: ${templatePath}. Please check the template name and path.`,
-    );
+    return await renderTemplateOrThrow(templatePath, data);
   }
 }

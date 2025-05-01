@@ -4,7 +4,11 @@ import { TConfiguration } from '@app-config/config';
 import { ChatOpenAI } from '@langchain/openai';
 import { PromptBody } from '@prompts';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import {
+  AIMessageChunk,
+  HumanMessage,
+  SystemMessage,
+} from '@langchain/core/messages';
 import { ClientStrategy } from './clientStrategy.interface';
 
 @Injectable()
@@ -33,7 +37,7 @@ export class OpenAIClient implements ClientStrategy {
     return this.llmClient;
   }
 
-  public async invokeLLM(input: PromptBody): Promise<any> {
+  public async invokeLLM(input: PromptBody): Promise<AIMessageChunk> {
     const tone = `Use a ${input.tone} tone when responding`;
     const audience = `The audience is ${input.audience}`;
 

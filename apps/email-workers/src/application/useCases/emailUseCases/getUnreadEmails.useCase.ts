@@ -52,6 +52,7 @@ export class GetUnreadEmailsUseCase
       await Promise.all(savePromises);
 
       for (const agg of aggregates) {
+        // this should be a domain event not a command
         await this.commandBus.execute(
           new TriggerEmailThreadProcessingWfCommand(
             agg.getThreadId(),

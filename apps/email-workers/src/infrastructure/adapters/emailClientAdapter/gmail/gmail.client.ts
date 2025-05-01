@@ -27,7 +27,7 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
     const res = await this.gmail.users.messages.list({
       userId: 'me',
       q: 'is:unread',
-      maxResults: 10,
+      maxResults: 1,
     });
 
     const messages = res.data.messages || [];

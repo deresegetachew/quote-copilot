@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { LLMClient } from '../clients';
 import { PromptBody } from '@prompts';
-import { OpenAI, OpenAIClient } from '@langchain/openai';
+import { AIMessageChunk } from '@langchain/core/messages';
 
 type ParseEmailIntentResponse = {
   originalInput: PromptBody;
-  parsedEmail: string;
+  parsedEmail: AIMessageChunk;
 };
 
 @Injectable()
@@ -15,7 +15,7 @@ export class ParseEmailIntentGraph {
   async parseEmailWithLLM(
     inputPrompt: PromptBody,
   ): Promise<ParseEmailIntentResponse> {
-    this.llmClient.setStrategy('ollama');
+    this.llmClient.setStrategy('openAI');
     const response = await this.llmClient.invokeLLM(inputPrompt);
     if (!response) {
       throw new Error('Failed to parse email');
