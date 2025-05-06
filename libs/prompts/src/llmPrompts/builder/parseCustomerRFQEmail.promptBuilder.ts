@@ -7,6 +7,7 @@ type TContext = {
   threadId: string; // thread ID mongodb
   status: string; // thread status
   emails: Array<Message>; // list of emails in the thread
+  responseSchema: string; // schema string for the prompt
 };
 
 type Message = {
@@ -20,7 +21,7 @@ type Message = {
   receivedAt: Date; // date when the email was received
 };
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable({ scope: Scope.TRANSIENT })
 export class ParseCustomerRFQEmailPromptBuilder extends AbstractPromptBuilder<TContext> {
   logger = new Logger(ParseCustomerRFQEmailPromptBuilder.name);
 
@@ -64,6 +65,7 @@ export class ParseCustomerRFQEmailPromptBuilder extends AbstractPromptBuilder<TC
           body: email.body,
           receivedAt: email.receivedAt,
         })),
+        responseSchema: this.context.responseSchema,
       },
     ];
 

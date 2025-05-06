@@ -1,4 +1,4 @@
-export interface PromptBody {
+export interface PromptBody<T> {
   systemPrompt: string;
   userPrompt: string;
   description?: string;
@@ -14,22 +14,5 @@ export interface PromptBody {
   toolCallsRequired?: boolean;
   fallbackPromptKey?: string;
   maxTokens?: number;
-  templateVariables?: Record<string, any>[];
+  templateVariables?: T;
 }
-
-export interface ProcurementPrompts {
-  parseEmailPrompt: PromptBody;
-  resendEmailPrompt: PromptBody;
-  generateQuotePrompt: PromptBody;
-  confirmationPrompt: PromptBody;
-  statusUpdatePrompt: PromptBody;
-}
-
-// interface ProcurementPromptsV2 {
-//   parseEmailPrompt: string;
-//   resendEmailPrompt: string;
-//   generateQuotePrompt: string;
-//   confirmationPrompt: string;
-//   statusUpdatePrompt: string;
-//   procurementProcessPrompt: string;
-// }

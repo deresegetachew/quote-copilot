@@ -3,9 +3,9 @@ import * as path from 'path';
 import { PromptBody } from './types';
 import { renderTemplateOrThrow } from './util/handleBars.helper';
 
-export abstract class AbstractPromptBuilder<T> {
-  protected prompt: PromptBody;
-  protected context: T;
+export abstract class AbstractPromptBuilder<TInput> {
+  protected prompt: PromptBody<TInput>;
+  protected context: TInput;
   protected templateFolder: string;
 
   constructor() {
@@ -18,7 +18,7 @@ export abstract class AbstractPromptBuilder<T> {
       responseFormat: '',
       responseFormatDescription: '',
       responseFormatExample: '',
-      templateVariables: [],
+      templateVariables: undefined,
       tone: '',
       audience: '',
       temperature: 0.5,
@@ -52,16 +52,14 @@ export abstract class AbstractPromptBuilder<T> {
   protected abstract setTemplateFolderPath(): this;
   protected abstract setAudience(audience: string): this;
   protected abstract setTone(tone: string): this;
-  protected abstract setTemplateVariables(
-    templateVariables: Record<string, any>[],
-  ): this;
+  protected abstract setTemplateVariables(templateVariables: TInput): this;
 
-  setContext(context: T): this {
+  setContext(context: TInput): this {
     this.context = context;
     return this;
   }
 
-  async build(): Promise<PromptBody> {
+  async build(): Promise<PromptBody<TInput>> {
     // order of method calls matters
     // as they set the properties of the prompt object
     // and some methods depend on others

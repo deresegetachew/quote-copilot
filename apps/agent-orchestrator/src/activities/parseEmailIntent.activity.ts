@@ -2,16 +2,35 @@ import { ConfigService } from '@nestjs/config';
 import { getAppContext } from '../getAppContext';
 import { HttpService } from '@nestjs/axios';
 import { EmailThreadResponseDTO, fetchObservableResult } from '@common';
-import { ParseCustomerRFQEmailPromptBuilder } from '@prompts';
+import {
+  ParseCustomerRFQEmailPromptBuilder,
+  TEmailIntentRFQResponseSchemaType,
+  emailIntentRFQResponseSchema,
+  emailIntentRFQResponseSchemaTxt,
+} from '@prompts';
 import { Logger } from '@nestjs/common';
 import { ParseEmailIntentGraph } from '@tools-langchain';
-
 // why are we doing this and not class,  temporal expects activities to be FN
 // hence to access the DI container we have to use explicit getters
+
+type TParseEmailResult =
+  | {
+      status: 'RFQ_PARSED';
+      data: TEmailIntentRFQResponseSchemaType;
+    }
+  | {
+      status: 'INCOMPLETE_RFQ';
+      data: null;
+    }
+  | {
+      status: 'NOT_RFQ';
+      data: null;
+    };
+
 export async function parseEmailIntentActivity(
   threadId: string,
   messageId: string,
-): Promise<{ threadId: string; partNumber: string; quantity: number }> {
+): Promise<TParseEmailResult> {
   console.log('Parsing email intent with threadId:', threadId, messageId);
 
   const app = await getAppContext();
@@ -32,30 +51,43 @@ export async function parseEmailIntentActivity(
   logger.log('📧 🧵 Email Thread retrieved from  email worker', data);
 
   try {
-    const parseCustomerRFQEmailPromptBuilder = await app.resolve(
-      ParseCustomerRFQEmailPromptBuilder,
-    );
-    const prompt = await parseCustomerRFQEmailPromptBuilder
-      .setContext({
-        tenantName: 'DummyTenant',
-        id: data.id,
-        threadId: data.threadId,
-        status: data.status,
-        emails: data.emails,
-      })
-      .build();
+    // const parseCustomerRFQEmailPromptBuilder = await app.resolve(
+    //   ParseCustomerRFQEmailPromptBuilder,
+    // );
+
+    // const prompt = await parseCustomerRFQEmailPromptBuilder
+    //   .setContext({
+    //     tenantName: 'DummyTenant',
+    //     id: data.id,
+    //     threadId: data.threadId,
+    //     status: data.status,
+    //     emails: data.emails,
+    //     responseSchema: emailIntentRFQResponseSchemaTxt,
+    //   })
+    //   .build();
 
     const llmResponse = await parseEmailIntentGraph.parseEmailWithLLM(prompt);
-    llmResponse.parsedEmail;
 
-    logger.log('🤖 LLM Response:', {
-      llmResponse: llmResponse.parsedEmail.toJSON(),
-    });
+    const result = emailIntentRFQResponseSchema.safeParse(
+      llmResponse.parsedEmail.content,
+    );
+
+    logger.log('🤖 parsed LLM Response:', result);
+
+    if (!result.success) {
+      logger.error('Error parsing email:', result.error);
+      // fire human in the loop activity
+
+      return { status: 'INCOMPLETE_RFQ', data: null };
+    } else {
+      const parsedData = result.data;
+
+      if (!parsedData.isRFQ) return { status: 'NOT_RFQ', data: null };
+
+      return { status: 'RFQ_PARSED', data: parsedData };
+    }
   } catch (error) {
     logger.error('Error parsing email:', error);
     throw error;
   }
-
-  // in the future we will fire langgraph to parse the email
-  return { threadId, partNumber: 'ABC123', quantity: 1 };
 }

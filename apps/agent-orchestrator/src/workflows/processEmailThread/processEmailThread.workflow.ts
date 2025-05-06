@@ -48,29 +48,37 @@ export async function processEmailThreadWorkflow(): Promise<void> {
     while (state.queue.length > 0) {
       const { threadId, messageId } = state.queue.shift()!;
 
-      //  Step 1: We send confirmation email to the user, and start parsing the email
-
-      await sendEmailActivity({
-        email: EMAIL_ENUMS.REQUEST_RECEIVED,
-        threadId,
-        inReplyToMessageId: messageId,
-      });
-
-      // Step 2: Once
-
+      // Step 1: Once
       const parsed = await parseEmailIntentActivity(threadId, messageId);
 
-      // execute sub workflows based on the parsed intent
-      switch (parsed.quantity) {
-        case 1:
+      switch (parsed.status) {
+        case 'RFQ_PARSED':
+          console.log('Parsed RFQ:', parsed.data);
+
+          await sendEmailActivity({
+            email: EMAIL_ENUMS.REQUEST_RECEIVED,
+            threadId,
+            inReplyToMessageId: messageId,
+          });
+
+          //TODO: create RFQ in the system through integration event, the usecase will handle inventory checking as well
+          // TODO: fire off inventory check sub workflow
+
           await executeWorkflow(logParsedEmailWorkflow, {
             args: [parsed],
             asChild: true,
             workflowId: `rfq-intent-${threadId}`,
           });
+
           break;
+        case 'INCOMPLETE_RFQ':
+          console.log('Incomplete RFQ:', parsed.data);
+          //TODO: Fire an integration event to notify human in the loop=
+          break;
+        case 'NOT_RFQ':
+          return; // close the email thread workflow actually
         default:
-          throw new Error(`Unknown intent: ${parsed.quantity}`);
+          throw new Error(`Unknown intent: ${parsed}`);
       }
     }
 

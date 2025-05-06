@@ -127,7 +127,7 @@ This project implements a solution by  building a pluggable agent system that co
 
 ```
 apps/
-  api/                → NestJS backend for tenant and agent API
+  core-service/      → Our core application service running core business logics as microservice
   email-workers/     → Email ingestion app (polling or webhook)
   telegram-workers/  → Telegram ingestion app
   whatsapp-workers   → Whatsapp ingestion app

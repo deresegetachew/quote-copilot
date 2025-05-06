@@ -1,3 +1,4 @@
+import { url } from 'inspector';
 import { z } from 'zod';
 
 export const ConfigSchema = z.object({
@@ -35,6 +36,9 @@ export const ConfigSchema = z.object({
         .optional(),
     })
     .optional(),
+  natsConfig: z.object({
+    url: z.string(),
+  }),
   cacheConfig: z
     .object({
       redis: z.object({

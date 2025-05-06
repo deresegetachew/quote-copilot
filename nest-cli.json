@@ -5,13 +5,13 @@
   "root": "",
   "defaultProject": "email-workers",
   "projects": {
-    "api": {
+    "core-service": {
       "type": "application",
-      "root": "apps/api",
+      "root": "apps/core-service",
       "entryFile": "main",
-      "sourceRoot": "apps/api/src",
+      "sourceRoot": "apps/core-service/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/api/tsconfig.app.json",
+        "tsConfigPath": "apps/core-service/tsconfig.app.json",
         "assets": [
           {
             "include": "**/*.yml"

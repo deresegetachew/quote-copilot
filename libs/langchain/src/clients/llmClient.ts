@@ -4,6 +4,7 @@ import { ClientStrategy } from './clientStrategy.interface';
 import { OpenAIClient } from './openai.client';
 import { OllamaClient } from './ollama.client';
 import { AIMessageChunk } from '@langchain/core/messages';
+import { AIClientTypes } from '@common';
 
 @Injectable({
   scope: Scope.TRANSIENT,
@@ -16,7 +17,7 @@ export class LLMClient {
 
   private strategy: ClientStrategy;
 
-  setStrategy(strategy: 'openAI' | 'ollama') {
+  setStrategy(strategy: AIClientTypes) {
     if (strategy === 'openAI') {
       this.strategy = this.openAIClient;
     } else if (strategy === 'ollama') {
