@@ -2,7 +2,6 @@ import { defineSignal } from '@temporalio/workflow';
 import { WORKFLOW_SIGNALS } from '@common';
 
 export interface NewMessageSignalPayload {
-  threadId: string;
   messageId: string;
 }
 

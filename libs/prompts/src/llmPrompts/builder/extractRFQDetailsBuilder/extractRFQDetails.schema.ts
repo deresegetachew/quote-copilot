@@ -1,11 +1,12 @@
 import { z } from 'zod';
+import { BaseNodeOutputSchema } from '../base.schema';
 
 export const extractRFQDetailsInputSchema = z.object({
-  messages: z.string().min(10),
+  messages: z.array(z.string()),
   responseSchema: z.string(),
 });
 
-export const extractRFQDetailsOutputSchema = z.object({
+export const extractRFQDetailsOutputSchema = BaseNodeOutputSchema.extend({
   threadId: z.string().optional(),
   rfqNumber: z.string().optional(), // our internal RFQ number
   requestSummary: z.string(),

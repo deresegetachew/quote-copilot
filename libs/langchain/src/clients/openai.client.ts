@@ -9,11 +9,11 @@ import {
   HumanMessage,
   SystemMessage,
 } from '@langchain/core/messages';
-import { ClientStrategy } from './clientStrategy.interface';
+import { ClientStrategy, LLMRunnable } from './clientStrategy.interface';
 
 @Injectable()
 export class OpenAIClient implements ClientStrategy {
-  private llmClient: ChatOpenAI;
+  private modelInstance: ChatOpenAI;
 
   constructor(private configService: ConfigService) {}
 
@@ -23,21 +23,22 @@ export class OpenAIClient implements ClientStrategy {
         'openAIConfig',
       );
 
-    this.llmClient = new ChatOpenAI({
+    this.modelInstance = new ChatOpenAI({
       apiKey: openAIConfig.apiKey,
       model: openAIConfig.model,
       temperature: openAIConfig.temperature,
+      streaming: false,
     });
   }
 
-  private async getClient() {
-    if (!this.llmClient) {
-      await this.initialize();
-    }
-    return this.llmClient;
+  public async getModel() {
+    if (!this.modelInstance)
+      throw new Error('Model instance is not initialized');
+
+    return this.modelInstance;
   }
 
-  public async invokeLLM(input: PromptBody): Promise<AIMessageChunk> {
+  public async invokeLLM(input: PromptBody<any>): Promise<AIMessageChunk> {
     const tone = `Use a ${input.tone} tone when responding`;
     const audience = `The audience is ${input.audience}`;
 
@@ -46,7 +47,7 @@ export class OpenAIClient implements ClientStrategy {
       new HumanMessage(input.userPrompt),
     ]);
 
-    const client = await this.getClient();
+    const client = await this.getModel();
 
     return client.invoke(await promptTemplate.formatMessages({}));
   }

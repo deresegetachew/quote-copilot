@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { NodesAbstract } from './nodes.abstract';
-import { LLMClient } from '../clients';
+import { NodesAbstract } from '../nodes.abstract';
+import { LLMClient } from '../../clients';
 import {
   TExtractRFQDetailsInput,
   TExtractRFQDetailsOutput,
   ExtractRFQDetailsPromptBuilder,
+  extractRFQDetailsOutputSchema,
 } from '@prompts';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class ExtractRFQDetailsNode extends NodesAbstract<
 
   protected async nodeTask(
     input: TExtractRFQDetailsInput,
-    llmClient: LLMClient,
+    llmClient: LLMClient<TExtractRFQDetailsInput>,
   ): Promise<TExtractRFQDetailsOutput> {
     this.logger = new Logger(ExtractRFQDetailsNode.name);
 
@@ -32,12 +33,9 @@ export class ExtractRFQDetailsNode extends NodesAbstract<
 
     this.logger.debug('Prompt:', { prompt });
 
-    const result = await llmClient.invokeLLM(prompt);
-
-    if (typeof result.content === 'object' && result.content !== null) {
-      return result.content as TExtractRFQDetailsOutput;
-    }
-
-    throw new Error('Unexpected response format from LLM');
+    return await llmClient.invokeLLM<typeof extractRFQDetailsOutputSchema>(
+      prompt,
+      extractRFQDetailsOutputSchema,
+    );
   }
 }

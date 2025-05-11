@@ -2,35 +2,26 @@ import { ConfigService } from '@nestjs/config';
 import { getAppContext } from '../getAppContext';
 import { HttpService } from '@nestjs/axios';
 import { EmailThreadResponseDTO, fetchObservableResult } from '@common';
-import {
-  ParseCustomerRFQEmailPromptBuilder,
-  TEmailIntentRFQResponseSchemaType,
-  emailIntentRFQResponseSchema,
-  emailIntentRFQResponseSchemaTxt,
-} from '@prompts';
+
 import { Logger } from '@nestjs/common';
 import { ParseEmailIntentGraph } from '@tools-langchain';
+import { DateTime } from 'luxon';
 // why are we doing this and not class,  temporal expects activities to be FN
 // hence to access the DI container we have to use explicit getters
 
-type TParseEmailResult =
-  | {
-      status: 'RFQ_PARSED';
-      data: TEmailIntentRFQResponseSchemaType;
-    }
-  | {
-      status: 'INCOMPLETE_RFQ';
-      data: null;
-    }
-  | {
-      status: 'NOT_RFQ';
-      data: null;
-    };
+type TState = {
+  summary?: string;
+  isRFQ?: boolean;
+  reason?: string;
+  rfqData?: any;
+  error?: { message: string; obj: any };
+  messages: string[];
+};
 
 export async function parseEmailIntentActivity(
   threadId: string,
   messageId: string,
-): Promise<TParseEmailResult> {
+): Promise<TState> {
   console.log('Parsing email intent with threadId:', threadId, messageId);
 
   const app = await getAppContext();
@@ -51,26 +42,17 @@ export async function parseEmailIntentActivity(
   logger.log('📧 🧵 Email Thread retrieved from  email worker', data);
 
   try {
-    // const parseCustomerRFQEmailPromptBuilder = await app.resolve(
-    //   ParseCustomerRFQEmailPromptBuilder,
-    // );
+    const messages = data.emails
+      .sort(
+        (a, b) =>
+          DateTime.fromISO(a.receivedAt).toMillis() -
+          DateTime.fromISO(b.receivedAt).toMillis(),
+      )
+      .map((email) => email.body);
 
-    // const prompt = await parseCustomerRFQEmailPromptBuilder
-    //   .setContext({
-    //     tenantName: 'DummyTenant',
-    //     id: data.id,
-    //     threadId: data.threadId,
-    //     status: data.status,
-    //     emails: data.emails,
-    //     responseSchema: emailIntentRFQResponseSchemaTxt,
-    //   })
-    //   .build();
+    const llmResponse = await parseEmailIntentGraph.parseEmailWithLLM(messages);
 
-    const llmResponse = await parseEmailIntentGraph.parseEmailWithLLM(prompt);
-
-    const result = emailIntentRFQResponseSchema.safeParse(
-      llmResponse.parsedEmail.content,
-    );
+    const result = emailIntentRFQResponseSchema.safeParse(llmResponse);
 
     logger.log('🤖 parsed LLM Response:', result);
 

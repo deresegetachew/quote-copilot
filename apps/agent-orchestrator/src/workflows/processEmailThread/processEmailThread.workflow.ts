@@ -25,16 +25,33 @@ const { sendEmailActivity } = proxyActivities<typeof activities>({
   },
 });
 
+type TEmailThreadWorkflowState = {
+  isDone: boolean;
+  threadId: string;
+  queue: NewMessageSignalPayload[];
+  summary: string | null;
+  latestRFQ: {
+    rfqData: any;
+    reason: string;
+    isRFQ: true;
+  } | null;
+  status: 'WAITING' | 'RFQ_PARSED' | 'NOT_RFQ' | 'INCOMPLETE_RFQ' | null;
+  requiresHumanReview?: boolean;
+};
+
 export async function processEmailThreadWorkflow(): Promise<void> {
-  const state = {
-    queue: [] as NewMessageSignalPayload[],
+  const state: TEmailThreadWorkflowState = {
     isDone: false,
-    counter: 0,
+    threadId: null,
+    queue: [],
+    summary: null,
+    latestRFQ: null,
+    status: null,
+    requiresHumanReview: false,
   };
 
   setHandler(NEW_MESSAGE_SIGNAL, (payload: NewMessageSignalPayload) => {
     state.queue.push(payload);
-    state.counter++; // increment on new signal
   });
 
   setHandler(COMPLETE_THREAD_SIGNAL, (payload: CompleteThreadSignalPayload) => {
@@ -46,10 +63,10 @@ export async function processEmailThreadWorkflow(): Promise<void> {
 
   while (!state.isDone) {
     while (state.queue.length > 0) {
-      const { threadId, messageId } = state.queue.shift()!;
+      const { messageId } = state.queue.shift()!;
 
       // Step 1: Once
-      const parsed = await parseEmailIntentActivity(threadId, messageId);
+      const parsed = await parseEmailIntentActivity(state.threadId, messageId);
 
       switch (parsed.status) {
         case 'RFQ_PARSED':
