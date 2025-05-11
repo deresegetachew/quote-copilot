@@ -68,35 +68,35 @@ export async function processEmailThreadWorkflow(): Promise<void> {
       // Step 1: Once
       const parsed = await parseEmailIntentActivity(state.threadId, messageId);
 
-      switch (parsed.status) {
-        case 'RFQ_PARSED':
-          console.log('Parsed RFQ:', parsed.data);
+      // switch (parsed.status) {
+      //   case 'RFQ_PARSED':
+      //     console.log('Parsed RFQ:', parsed.data);
 
-          await sendEmailActivity({
-            email: EMAIL_ENUMS.REQUEST_RECEIVED,
-            threadId,
-            inReplyToMessageId: messageId,
-          });
+      //     await sendEmailActivity({
+      //       email: EMAIL_ENUMS.REQUEST_RECEIVED,
+      //       threadId,
+      //       inReplyToMessageId: messageId,
+      //     });
 
-          //TODO: create RFQ in the system through integration event, the usecase will handle inventory checking as well
-          // TODO: fire off inventory check sub workflow
+      //     //TODO: create RFQ in the system through integration event, the usecase will handle inventory checking as well
+      //     // TODO: fire off inventory check sub workflow
 
-          await executeWorkflow(logParsedEmailWorkflow, {
-            args: [parsed],
-            asChild: true,
-            workflowId: `rfq-intent-${threadId}`,
-          });
+      //     await executeWorkflow(logParsedEmailWorkflow, {
+      //       args: [parsed],
+      //       asChild: true,
+      //       workflowId: `rfq-intent-${threadId}`,
+      //     });
 
-          break;
-        case 'INCOMPLETE_RFQ':
-          console.log('Incomplete RFQ:', parsed.data);
-          //TODO: Fire an integration event to notify human in the loop=
-          break;
-        case 'NOT_RFQ':
-          return; // close the email thread workflow actually
-        default:
-          throw new Error(`Unknown intent: ${parsed}`);
-      }
+      //     break;
+      //   case 'INCOMPLETE_RFQ':
+      //     console.log('Incomplete RFQ:', parsed.data);
+      //     //TODO: Fire an integration event to notify human in the loop=
+      //     break;
+      //   case 'NOT_RFQ':
+      //     return; // close the email thread workflow actually
+      //   default:
+      //     throw new Error(`Unknown intent: ${parsed}`);
+      // }
     }
 
     await sleep('5s'); // avoid busy-looping

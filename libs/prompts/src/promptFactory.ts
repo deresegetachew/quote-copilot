@@ -1,34 +1,36 @@
-// import { Injectable } from '@nestjs/common';
-// import { AbstractPromptBuilder } from './promptBuilder.abstract';
-// import { PromptKeys, SummarizeMessagePromptBuilder } from '.';
-// import { ParseCustomerRFQEmailPromptBuilder } from './llmPrompts/builder/parseCustomerRFQEmail.promptBuilder';
+import { Injectable } from '@nestjs/common';
+import { AbstractPromptBuilder } from './promptBuilder.abstract';
+import {
+  ClassifyMessageAsRFQPromptBuilder,
+  ExtractRFQDetailsPromptBuilder,
+  PromptKeys,
+  SummarizeMessagePromptBuilder,
+} from '.';
 
-// @Injectable()
-// export class PromptFactory {
-//   private readonly builders: Map<string, AbstractPromptBuilder<unknown>>;
+// TO REMOVE:
+@Injectable()
+export class PromptFactory {
+  private readonly builders: Map<string, AbstractPromptBuilder<unknown>>;
 
-//   constructor(
-//     private readonly procurementConfirmationBuilder: ParseCustomerRFQEmailPromptBuilder,
-//     private readonly summarizeMessagesBuilder: SummarizeMessagePromptBuilder,
+  constructor(
+    private readonly classifyMsgAsRFQBuilder: ClassifyMessageAsRFQPromptBuilder,
+    private readonly summarizeMessagesBuilder: SummarizeMessagePromptBuilder,
+    private readonly extractRFQDetailsBuilder: ExtractRFQDetailsPromptBuilder,
+  ) {
+    this.builders = new Map<string, AbstractPromptBuilder<unknown>>([
+      [PromptKeys.EXTRACT_RFQ_DETAILS, this.extractRFQDetailsBuilder],
+      [PromptKeys.SUMMARIZE_MESSAGE, this.summarizeMessagesBuilder],
+      [PromptKeys.CLASSIFY_MESSAGE_AS_RFQ, this.classifyMsgAsRFQBuilder],
+      // Add other mappings here
+    ]);
+  }
 
-//     // Add other builders here
-//   ) {
-//     this.builders = new Map<string, AbstractPromptBuilder<unknown>>([
-//       [
-//         PromptKeys.PARSE_CUSTOMER_RFQ_EMAIL,
-//         this.procurementConfirmationBuilder,
-//       ],
-//       [PromptKeys.SUMMARIZE_MESSAGE, this.summarizeMessagesBuilder],
-//       // Add other mappings here
-//     ]);
-//   }
-
-//   //TODO: in the future we can take in tennant Id and return the builder for that specific tenant from db
-//   getBuilder(promptKey: PromptKeys): AbstractPromptBuilder<unknown> {
-//     const builder = this.builders.get(promptKey);
-//     if (!builder) {
-//       throw new Error(`No builder found for promptKey: ${promptKey}`);
-//     }
-//     return builder;
-//   }
-// }
+  //TODO: in the future we can take in tennant Id and return the builder for that specific tenant from db
+  getBuilder(promptKey: PromptKeys): AbstractPromptBuilder<unknown> {
+    const builder = this.builders.get(promptKey);
+    if (!builder) {
+      throw new Error(`No builder found for promptKey: ${promptKey}`);
+    }
+    return builder;
+  }
+}

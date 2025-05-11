@@ -15,16 +15,16 @@ async function bootstrap() {
   const name = configService.getOrThrow<string>('apps.emailWorker.name');
   const natsURL = configService.getOrThrow<string>('natsConfig.url');
 
-  app.connectMicroservice<MicroserviceOptions>(
-    {
-      transport: Transport.NATS,
-      options: {
-        servers: process.env.NATS_URL,
-      },
-    },
-    { inheritAppConfig: true },
-  );
-  await app.startAllMicroservices();
+  // app.connectMicroservice<MicroserviceOptions>(
+  //   {
+  //     transport: Transport.NATS,
+  //     options: {
+  //       servers: process.env.NATS_URL,
+  //     },
+  //   },
+  //   { inheritAppConfig: true },
+  // );
+  // await app.startAllMicroservices();
 
   await app.listen(port, () => {
     console.log(`${name} service is running on port ${port}`);

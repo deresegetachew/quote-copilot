@@ -4,6 +4,7 @@ import { BaseNodeOutputSchema } from '../base.schema';
 
 export const classifyMessageAsRFQInputSchema = z.object({
   messages: z.array(z.string()),
+  responseSchema: z.string(),
 });
 
 export const classifyMessageAsRFQOutputSchema = BaseNodeOutputSchema.extend({

@@ -51,23 +51,23 @@ export class ParseCustomerRFQEmailPromptBuilder extends AbstractPromptBuilder<TC
   }
 
   protected setTemplateVariables(): this {
-    this.prompt.templateVariables = [
-      {
-        threadDBId: this.context.id,
-        threadId: this.context.threadId,
-        emails: this.context.emails.map((email) => ({
-          id: email.id,
-          messageId: email.messageId,
-          threadId: email.threadId,
-          subject: email.subject,
-          from: email.from,
-          to: email.to,
-          body: email.body,
-          receivedAt: email.receivedAt,
-        })),
-        responseSchema: this.context.responseSchema,
-      },
-    ];
+    this.prompt.templateVariables = {
+      tenantName: this.context.tenantName,
+      id: this.context.id,
+      threadId: this.context.threadId,
+      status: this.context.status,
+      emails: this.context.emails.map((email) => ({
+        id: email.id,
+        messageId: email.messageId,
+        threadId: email.threadId,
+        subject: email.subject,
+        from: email.from,
+        to: email.to,
+        body: email.body,
+        receivedAt: email.receivedAt,
+      })),
+      responseSchema: this.context.responseSchema,
+    };
 
     return this;
   }

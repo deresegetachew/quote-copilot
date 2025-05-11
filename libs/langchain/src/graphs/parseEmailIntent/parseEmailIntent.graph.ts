@@ -4,6 +4,7 @@ import {
   classifyMessageAsRFQOutputSchemaTxt,
   PromptBody,
   summarizeEmailOutputSchemaTxt,
+  TSummarizeMessageInput,
 } from '@prompts';
 import { AIMessageChunk } from '@langchain/core/messages';
 import { validate } from '@langchain/core/dist/utils/fast-json-patch';
@@ -43,27 +44,27 @@ const StateSchema = z.object({
     .transform((current) => current.flat()),
 });
 
-type TState = z.infer<typeof StateSchema>;
+export type TParseEmailIntentState = z.infer<typeof StateSchema>;
 
 @Injectable()
 export class ParseEmailIntentGraph {
   // private readonly graph: StateGraph<TParseEmailIntentState>;
 
   constructor(
-    private summarizeEmailNode: SummarizeMessagesNode,
+    private summarizeMessageNode: SummarizeMessagesNode,
     private classifyEmailAsRFQNode: ClassifyMessageAsRFQNode,
     private extractRFQDataNode: ExtractRFQDetailsNode,
     private handleErrorNode: HandleErrorNode,
-    private llmClient: LLMClient,
+    private llmClient: LLMClient<TSummarizeMessageInput>,
   ) {
     // this.graph = new StateGraph(MessagesAnnotation);
     this.llmClient.setStrategy('openAI');
   }
 
-  async parseEmailWithLLM(messages: string[]): Promise<TState> {
+  async parseEmailWithLLM(messages: string[]): Promise<TParseEmailIntentState> {
     const graph = this.buildGraph();
 
-    const state: TState = {
+    const state: TParseEmailIntentState = {
       messages,
       summary: null,
       isRFQ: null,
@@ -72,7 +73,8 @@ export class ParseEmailIntentGraph {
       error: null,
     };
 
-    const response: TState | undefined = await graph.invoke(state);
+    const response: TParseEmailIntentState | undefined =
+      await graph.invoke(state);
 
     if (!response) {
       throw new Error('Failed to parse email');
@@ -131,21 +133,21 @@ export class ParseEmailIntentGraph {
     return 'UNKNOWN_ERROR';
   }
 
-  private async handleErrorNodeCallback(state: TState) {
+  private async handleErrorNodeCallback(state: TParseEmailIntentState) {
     return await this.handleErrorNode.run(this.llmClient, {
       error: state.error,
     });
   }
 
-  private async summarizeMessagesNodeCallback(state: TState) {
-    const result = await this.summarizeEmailNode.run(this.llmClient, {
+  private async summarizeMessagesNodeCallback(state: TParseEmailIntentState) {
+    const result = await this.summarizeMessageNode.run(this.llmClient, {
       messages: state.messages,
       responseSchema: summarizeEmailOutputSchemaTxt,
     });
     return { summary: result.summary };
   }
 
-  private async classifyEmailAsRFQNodeCallback(state: TState) {
+  private async classifyEmailAsRFQNodeCallback(state: TParseEmailIntentState) {
     const result = await this.classifyEmailAsRFQNode.run(this.llmClient, {
       messages: state.messages,
       responseSchema: classifyMessageAsRFQOutputSchemaTxt,
@@ -153,7 +155,7 @@ export class ParseEmailIntentGraph {
     return { isRFQ: result.isRFQ, reason: result.reason };
   }
 
-  private async extractRFQDetailsNodeCallback(state: TState) {
+  private async extractRFQDetailsNodeCallback(state: TParseEmailIntentState) {
     const result = await this.extractRFQDataNode.run(this.llmClient, {
       messages: state.messages,
       responseSchema: classifyMessageAsRFQOutputSchemaTxt,

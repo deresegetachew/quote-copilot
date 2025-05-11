@@ -14,7 +14,7 @@ export class RfqReceivedHandler {
   async handleEvent(@Payload() data: any) {
     this.logger.log('RFQ Received Event Data: ', data);
 
-    await this.commandBus.execute(new ProcessRFQCommand());
+    // await this.commandBus.execute(new ProcessRFQCommand());
 
     //   lets implement the happy path for now.
 
