@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { NodesAbstract } from '../nodes.abstract';
 import { LLMClient } from '../../clients';
 import {
+  classifyMessageAsRFQInputSchema,
   classifyMessageAsRFQOutputSchema,
   ClassifyMessageAsRFQPromptBuilder,
 } from '@prompts';
@@ -20,7 +21,7 @@ export class ClassifyMessageAsRFQNode extends NodesAbstract<
   constructor(
     private classifyMessageAsRFQPromptBuilder: ClassifyMessageAsRFQPromptBuilder,
   ) {
-    super();
+    super(classifyMessageAsRFQInputSchema, classifyMessageAsRFQOutputSchema);
   }
 
   protected async nodeTask(
@@ -33,7 +34,7 @@ export class ClassifyMessageAsRFQNode extends NodesAbstract<
       .setContext(input)
       .build();
 
-    this.logger.debug('Prompt:', { prompt });
+    this.logger.debug('ClassifyMessageAsRFQNode:', { prompt });
 
     return await llmClient.invokeLLM(prompt, classifyMessageAsRFQOutputSchema);
   }

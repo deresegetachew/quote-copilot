@@ -3,12 +3,7 @@ import { ClientStrategy } from './clientStrategy.interface';
 import { ConfigService } from '@nestjs/config';
 import { ChatOllama } from '@langchain/ollama';
 import { TConfiguration } from '../../../config/src';
-import { PromptBody } from '../../../prompts/src';
-import {
-  AIMessageChunk,
-  HumanMessage,
-  SystemMessage,
-} from '@langchain/core/messages';
+
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 
 @Injectable()
@@ -37,20 +32,5 @@ export class OllamaClient implements ClientStrategy {
       await this.initialize();
     }
     return this.modelInstance;
-  }
-
-  public async invokeLLM(input: PromptBody<any>): Promise<AIMessageChunk> {
-    // TODO:  move repetitive logic to llmClient class
-    const tone = `Use a ${input.tone} tone when responding`;
-    const audience = `The audience is ${input.audience}`;
-
-    const promptTemplate = ChatPromptTemplate.fromMessages([
-      new SystemMessage(`${tone} ${audience}. ${input.systemPrompt}`),
-      new HumanMessage(input.userPrompt),
-    ]);
-
-    const client = await this.getModel();
-
-    return client.invoke(await promptTemplate.formatMessages({}));
   }
 }

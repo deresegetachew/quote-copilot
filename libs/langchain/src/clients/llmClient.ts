@@ -3,9 +3,15 @@ import { PromptBody } from '@prompts';
 import { ClientStrategy } from './clientStrategy.interface';
 import { OpenAIClient } from './openai.client';
 import { OllamaClient } from './ollama.client';
-import { AIMessageChunk } from '@langchain/core/messages';
+import {
+  AIMessageChunk,
+  HumanMessage,
+  MessageContent,
+  SystemMessage,
+} from '@langchain/core/messages';
 import { AIClientTypes } from '@common';
 import { z, ZodSchema } from 'zod';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
 
 @Injectable({
   scope: Scope.TRANSIENT,
@@ -44,10 +50,55 @@ export class LLMClient<TInput> {
       throw new Error('Client strategy is not initialized');
     }
 
+    const tone = `Use a ${messages.tone} tone when responding`;
+    const audience = `The audience is ${messages.audience}`;
+
+    const promptTemplate = ChatPromptTemplate.fromMessages([
+      new SystemMessage(`${tone} ${audience}. ${messages.systemPrompt}`),
+      new HumanMessage(messages.userPrompt),
+    ]);
+    const model = await this.strategy.getModel();
+    const rawResult = await model.invoke(
+      await promptTemplate.formatMessages({}),
+    );
+
     if (structuredOutPutSchema) {
-      const model = await this.strategy.getModel();
-      model.withStructuredOutput(structuredOutPutSchema);
+      // const structuredModel = model.withStructuredOutput(
+      //   structuredOutPutSchema,
+      // );
+      // return await structuredModel.invoke(
+      //   await promptTemplate.formatMessages({}),
+      // );
+
+      const rawContent = this.getMessageContentAsString(rawResult.content);
+      const match = rawContent.match(/```json\s*([\s\S]+?)\s*```/);
+      if (!match) throw new Error('No valid JSON block found in LLM output.');
+
+      const parsed = JSON.parse(match[1]);
+      const validated = structuredOutPutSchema.parse(parsed);
+
+      return validated;
     }
-    return await this.strategy.invokeLLM(messages);
+
+    return rawResult;
+  }
+
+  private getMessageContentAsString(content: MessageContent): string {
+    if (typeof content === 'string') {
+      return content;
+    }
+
+    if (Array.isArray(content)) {
+      return content
+        .map((chunk) => {
+          if (typeof chunk === 'string') return chunk;
+          if (chunk?.type === 'text' && typeof chunk.text === 'string')
+            return chunk.text;
+          return ''; // Ignore image_url or unknown chunks
+        })
+        .join('\n');
+    }
+
+    return '';
   }
 }

@@ -6,6 +6,7 @@ import {
   TExtractRFQDetailsOutput,
   ExtractRFQDetailsPromptBuilder,
   extractRFQDetailsOutputSchema,
+  extractRFQDetailsInputSchema,
 } from '@prompts';
 
 @Injectable()
@@ -18,7 +19,7 @@ export class ExtractRFQDetailsNode extends NodesAbstract<
   constructor(
     private extractRFQDetailsPromptBuilder: ExtractRFQDetailsPromptBuilder,
   ) {
-    super();
+    super(extractRFQDetailsInputSchema, extractRFQDetailsOutputSchema);
   }
 
   protected async nodeTask(
@@ -31,7 +32,7 @@ export class ExtractRFQDetailsNode extends NodesAbstract<
       .setContext(input)
       .build();
 
-    this.logger.debug('Prompt:', { prompt });
+    this.logger.debug('ExtractRFQDetailsNode:', { prompt });
 
     return await llmClient.invokeLLM<typeof extractRFQDetailsOutputSchema>(
       prompt,

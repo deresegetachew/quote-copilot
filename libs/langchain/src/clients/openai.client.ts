@@ -2,14 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TConfiguration } from '@app-config/config';
 import { ChatOpenAI } from '@langchain/openai';
-import { PromptBody } from '@prompts';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
-import {
-  AIMessageChunk,
-  HumanMessage,
-  SystemMessage,
-} from '@langchain/core/messages';
-import { ClientStrategy, LLMRunnable } from './clientStrategy.interface';
+
+import { ClientStrategy } from './clientStrategy.interface';
 
 @Injectable()
 export class OpenAIClient implements ClientStrategy {
@@ -32,23 +26,10 @@ export class OpenAIClient implements ClientStrategy {
   }
 
   public async getModel() {
-    if (!this.modelInstance)
-      throw new Error('Model instance is not initialized');
+    if (!this.modelInstance) {
+      await this.initialize();
+    }
 
     return this.modelInstance;
-  }
-
-  public async invokeLLM(input: PromptBody<any>): Promise<AIMessageChunk> {
-    const tone = `Use a ${input.tone} tone when responding`;
-    const audience = `The audience is ${input.audience}`;
-
-    const promptTemplate = ChatPromptTemplate.fromMessages([
-      new SystemMessage(`${tone} ${audience}. ${input.systemPrompt}`),
-      new HumanMessage(input.userPrompt),
-    ]);
-
-    const client = await this.getModel();
-
-    return client.invoke(await promptTemplate.formatMessages({}));
   }
 }

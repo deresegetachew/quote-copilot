@@ -41,12 +41,18 @@ export abstract class AbstractPromptBuilder<TInput> {
   }
 
   protected async setSystemPrompt(): Promise<this> {
-    this.prompt.systemPrompt = await this.parseTemplateOrThrow('system', {});
+    this.prompt.systemPrompt = await this.parseTemplateOrThrow(
+      'system',
+      this.context,
+    );
     return this;
   }
 
   protected async setUserPrompt(): Promise<this> {
-    this.prompt.userPrompt = await this.parseTemplateOrThrow('user', {});
+    this.prompt.userPrompt = await this.parseTemplateOrThrow(
+      'user',
+      this.context,
+    );
     return this;
   }
 

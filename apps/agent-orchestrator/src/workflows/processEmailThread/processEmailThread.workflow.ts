@@ -51,7 +51,11 @@ export async function processEmailThreadWorkflow(): Promise<void> {
   };
 
   setHandler(NEW_MESSAGE_SIGNAL, (payload: NewMessageSignalPayload) => {
-    state.queue.push(payload);
+    state.threadId = payload.threadId;
+    state.queue.push({
+      threadId: payload.threadId,
+      messageId: payload.messageId,
+    });
   });
 
   setHandler(COMPLETE_THREAD_SIGNAL, (payload: CompleteThreadSignalPayload) => {
@@ -78,7 +82,7 @@ export async function processEmailThreadWorkflow(): Promise<void> {
       //       inReplyToMessageId: messageId,
       //     });
 
-      //     //TODO: create RFQ in the system through integration event, the usecase will handle inventory checking as well
+      //     //TODO: create RFQ in the system through integration event, the useCase will handle inventory checking as well
       //     // TODO: fire off inventory check sub workflow
 
       //     await executeWorkflow(logParsedEmailWorkflow, {

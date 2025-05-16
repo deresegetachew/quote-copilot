@@ -4,11 +4,12 @@ import { Logger } from '@nestjs/common';
 import { TBaseNodeOutput } from '../../../prompts/src/llmPrompts/builder/base.schema';
 
 export abstract class NodesAbstract<Input, Output extends TBaseNodeOutput> {
-  constructor() {}
   protected logger = new Logger(NodesAbstract.name);
 
-  private inputSchema: ZodSchema<Input>;
-  private outputSchema: ZodSchema<Output>;
+  constructor(
+    private readonly inputSchema?: ZodSchema<Input>,
+    private readonly outputSchema?: ZodSchema<Output>,
+  ) {}
 
   protected abstract nodeTask(
     input: z.infer<ZodSchema<Input>>,
@@ -25,24 +26,27 @@ export abstract class NodesAbstract<Input, Output extends TBaseNodeOutput> {
         throw new Error('LLMClient is not provided');
       }
 
-      const parsedInput = this.inputSchema.parse(input);
+      const parsedInput = this.inputSchema?.parse(input);
       const result = await this.nodeTask(parsedInput, llmClient);
 
-      return this.outputSchema.parse(result);
+      this.logger.debug('Node result:', { result });
+
+      return this.outputSchema?.parse(result);
     } catch (err) {
       if (err instanceof z.ZodError) {
-        return this.outputSchema.parse({
+        this.logger.error('Zod error::', { error: err });
+        return this.outputSchema?.parse({
           message: err.message,
           error: err,
         });
       } else if (err instanceof Error) {
         this.logger.error('Node error::', { error: err });
-        return this.outputSchema.parse({
+        return this.outputSchema?.parse({
           message: err.message,
           obj: err,
         });
       }
-      return this.outputSchema.parse({
+      return this.outputSchema?.parse({
         message: 'Unknown error',
         obj: err,
       });

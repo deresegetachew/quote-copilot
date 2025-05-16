@@ -42,6 +42,7 @@ export async function parseEmailIntentActivity(
     throw error;
   }
 }
+
 async function fetchEmailThread(
   configService: ConfigService<unknown, boolean>,
   httpService: HttpService,

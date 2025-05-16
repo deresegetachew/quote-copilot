@@ -6,24 +6,24 @@ export const emailIntentResponseSchema = z
     threadId: z.string(),
     requestSummary: z.string().nonempty(),
     isRFQ: z.boolean(),
-    expectedDeliveryDate: z.string().datetime().optional(),
+    expectedDeliveryDate: z.string().nullable(),
     hasAttachments: z.boolean(),
     items: z
       .array(
         z.object({
           itemCode: z.string(),
-          itemDescription: z.string().optional(),
+          itemDescription: z.string().nullable(),
           quantity: z.number().int().positive(),
           notes: z.string().optional(),
         }),
       )
-      .optional(),
+      .nullable(),
     customerDetail: z.object({
-      customerId: z.string().optional(),
-      name: z.string().optional(),
+      customerId: z.string().nullable(),
+      name: z.string().nullable(),
       email: z.string(),
     }),
-    notes: z.string().optional(),
+    notes: z.string().nullable(),
   })
   .refine(
     (data) => {

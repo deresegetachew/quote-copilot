@@ -5,7 +5,7 @@ import { z } from 'zod';
 @Injectable()
 export class HandleErrorNode extends NodesAbstract<any, undefined> {
   constructor() {
-    super();
+    super(undefined, undefined);
   }
 
   protected async nodeTask(error: any): Promise<undefined> {

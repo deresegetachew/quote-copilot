@@ -1,26 +1,17 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { LLMClient } from '../../clients';
 import {
   classifyMessageAsRFQOutputSchemaTxt,
-  PromptBody,
   summarizeEmailOutputSchemaTxt,
   TSummarizeMessageInput,
 } from '@prompts';
-import { AIMessageChunk } from '@langchain/core/messages';
-import { validate } from '@langchain/core/dist/utils/fast-json-patch';
 import { SummarizeMessagesNode } from '../../nodes/summarizeMessages/summarizeMessages.node';
-import {
-  StateGraph,
-  START,
-  END,
-  MessagesAnnotation,
-} from '@langchain/langgraph';
+import { StateGraph, START, END } from '@langchain/langgraph';
 import { ClassifyMessageAsRFQNode } from '../../nodes/classifyMessageAsRFQ/classifyMessageAsRFQ.node';
 import { ExtractRFQDetailsNode } from '../../nodes/extractRFQDetails/extractRFQDetails.node';
 import { nextOrErrorNode } from '../../util';
 import { HandleErrorNode } from '../../nodes/handleError/handleError.node';
 import { z } from 'zod';
-import { error } from 'console';
 
 // type TError = {
 //   message: string;
@@ -33,11 +24,11 @@ const ErrorSchema = z.object({
 });
 
 const StateSchema = z.object({
-  summary: z.string().optional(),
-  isRFQ: z.boolean().optional(),
-  reason: z.string().optional(),
-  rfqData: z.any().optional(),
-  error: ErrorSchema.optional(),
+  summary: z.string().nullable(),
+  isRFQ: z.boolean().nullable(),
+  reason: z.string().nullable(),
+  rfqData: z.any().nullable(),
+  error: ErrorSchema.nullable(),
   messages: z
     .array(z.string())
     .default(() => [])
@@ -49,6 +40,7 @@ export type TParseEmailIntentState = z.infer<typeof StateSchema>;
 @Injectable()
 export class ParseEmailIntentGraph {
   // private readonly graph: StateGraph<TParseEmailIntentState>;
+  logger = new Logger(ParseEmailIntentGraph.name);
 
   constructor(
     private summarizeMessageNode: SummarizeMessagesNode,
@@ -133,33 +125,43 @@ export class ParseEmailIntentGraph {
     return 'UNKNOWN_ERROR';
   }
 
-  private async handleErrorNodeCallback(state: TParseEmailIntentState) {
+  private handleErrorNodeCallback = async (state: TParseEmailIntentState) => {
+    this.logger.debug('Handling error Node');
     return await this.handleErrorNode.run(this.llmClient, {
       error: state.error,
     });
-  }
+  };
 
-  private async summarizeMessagesNodeCallback(state: TParseEmailIntentState) {
+  private summarizeMessagesNodeCallback = async (
+    state: TParseEmailIntentState,
+  ) => {
+    this.logger.debug('Summarizing messages Node');
     const result = await this.summarizeMessageNode.run(this.llmClient, {
       messages: state.messages,
       responseSchema: summarizeEmailOutputSchemaTxt,
     });
     return { summary: result.summary };
-  }
+  };
 
-  private async classifyEmailAsRFQNodeCallback(state: TParseEmailIntentState) {
+  private classifyEmailAsRFQNodeCallback = async (
+    state: TParseEmailIntentState,
+  ) => {
+    this.logger.debug('Classifying email as RFQ Node');
     const result = await this.classifyEmailAsRFQNode.run(this.llmClient, {
       messages: state.messages,
       responseSchema: classifyMessageAsRFQOutputSchemaTxt,
     });
     return { isRFQ: result.isRFQ, reason: result.reason };
-  }
+  };
 
-  private async extractRFQDetailsNodeCallback(state: TParseEmailIntentState) {
+  private extractRFQDetailsNodeCallback = async (
+    state: TParseEmailIntentState,
+  ) => {
+    this.logger.debug('Extracting RFQ details Node');
     const result = await this.extractRFQDataNode.run(this.llmClient, {
       messages: state.messages,
       responseSchema: classifyMessageAsRFQOutputSchemaTxt,
     });
     return { rfqData: result };
-  }
+  };
 }
