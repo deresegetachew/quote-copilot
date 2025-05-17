@@ -1,4 +1,4 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable, Logger, Scope } from '@nestjs/common';
 import { PromptBody } from '@prompts';
 import { ClientStrategy } from './clientStrategy.interface';
 import { OpenAIClient } from './openai.client';
@@ -21,6 +21,8 @@ export class LLMClient<TInput> {
     private readonly openAIClient: OpenAIClient,
     private readonly ollamaClient: OllamaClient,
   ) {}
+
+  private logger = new Logger(LLMClient.name);
 
   private strategy: ClientStrategy;
 
@@ -71,6 +73,9 @@ export class LLMClient<TInput> {
       // );
 
       const rawContent = this.getMessageContentAsString(rawResult.content);
+
+      this.logger.debug('🤖🤖🤖---LLM Raw Response---🤖🤖🤖:', { rawContent });
+
       const match = rawContent.match(/```json\s*([\s\S]+?)\s*```/);
       if (!match) throw new Error('No valid JSON block found in LLM output.');
 

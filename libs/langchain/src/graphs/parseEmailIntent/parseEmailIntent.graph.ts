@@ -89,9 +89,17 @@ export class ParseEmailIntentGraph {
       .addConditionalEdges(SummarizeMessagesNode.name, (state) =>
         nextOrErrorNode(state, ClassifyMessageAsRFQNode.name),
       )
-      .addConditionalEdges(ClassifyMessageAsRFQNode.name, (state) =>
-        nextOrErrorNode(state, ExtractRFQDetailsNode.name),
-      )
+      .addConditionalEdges(ClassifyMessageAsRFQNode.name, (state) => {
+        const ifRFQExtractNode = (state: TParseEmailIntentState) => {
+          if (state.isRFQ === true) {
+            return ExtractRFQDetailsNode.name;
+          } else if (state.isRFQ === false) {
+            return END;
+          }
+        };
+
+        return nextOrErrorNode(state, ifRFQExtractNode(state));
+      })
       .addEdge(ExtractRFQDetailsNode.name, END)
       .addConditionalEdges(HandleErrorNode.name, ({ error }) => {
         const classifyError = this.classifyErrors(error);

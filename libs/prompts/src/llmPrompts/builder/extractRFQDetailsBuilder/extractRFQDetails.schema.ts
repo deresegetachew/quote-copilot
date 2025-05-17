@@ -7,21 +7,21 @@ export const extractRFQDetailsInputSchema = z.object({
 });
 
 export const extractRFQDetailsOutputSchema = BaseNodeOutputSchema.extend({
-  threadId: z.string().optional(),
-  rfqNumber: z.string().optional(), // our internal RFQ number
+  threadId: z.string(),
+  rfqNumber: z.string().optional(), // we will generate this using RFQ number generator
   requestSummary: z.string(),
 
-  expectedDeliveryDate: z.string().datetime().optional(), // ISO 8601
+  expectedDeliveryDate: z.string().datetime().nullable(), // ISO 8601
   hasAttachments: z.boolean(),
 
   items: z
     .array(
       z.object({
         itemCode: z.string(), // PN / SKU / NSN
-        itemDescription: z.string().optional(),
+        itemDescription: z.string().nullable(),
         quantity: z.number().int().positive(),
-        unit: z.string().optional(), // e.g. pcs, each, L
-        notes: z.string().optional(), // delivery condition, packaging, etc.
+        unit: z.string().nullable(), // e.g. pcs, each, L
+        notes: z.string().nullable(), // delivery condition, packaging, etc.
       }),
     )
     .min(1),
