@@ -62,3 +62,8 @@ mongodb_data/
 
 # Ignore Postgres local volume
 postgres_data/
+
+# Ignore nats data
+nats_data/
+# LangGraph API
+.langgraph_api

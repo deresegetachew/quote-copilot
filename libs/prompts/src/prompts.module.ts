@@ -1,14 +1,25 @@
 import { Module } from '@nestjs/common';
 import { PromptsService } from './services/prompts.service';
-import { PromptFactory } from './promptFactory';
-import { ParseCustomerRFQEmailPromptBuilder } from './llmPrompts/builder';
+import {
+  ClassifyMessageAsRFQPromptBuilder,
+  ExtractRFQDetailsPromptBuilder,
+  ParseCustomerRFQEmailPromptBuilder,
+  SummarizeMessagePromptBuilder,
+} from './llmPrompts/builder';
+// import { PromptFactory } from './promptFactory';
 
 @Module({
   providers: [
     PromptsService,
-    PromptFactory,
-    ParseCustomerRFQEmailPromptBuilder,
+    ClassifyMessageAsRFQPromptBuilder,
+    ExtractRFQDetailsPromptBuilder,
+    SummarizeMessagePromptBuilder,
   ],
-  exports: [PromptsService, PromptFactory],
+  exports: [
+    PromptsService,
+    ClassifyMessageAsRFQPromptBuilder,
+    ExtractRFQDetailsPromptBuilder,
+    SummarizeMessagePromptBuilder,
+  ],
 })
 export class PromptsModule {}

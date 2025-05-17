@@ -1,0 +1,14 @@
+Below is a full email thread that has been classified as an RFQ.
+
+The emails are ordered from oldest to newest. Newer messages may override or clarify information from earlier ones. For
+example, a customer might initially request 2 units, then later update that to 5 — use the most recent value.
+
+Extract all relevant procurement data from the thread.
+
+{{#each messages}}
+--- Email {{@index}} ---
+{{this}}
+{{/each}}
+
+Respond in the following JSON format:
+{{responseSchema}}

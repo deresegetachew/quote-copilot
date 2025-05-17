@@ -1,0 +1,44 @@
+import { z } from 'zod';
+import { NodesAbstract } from '../nodes.abstract';
+import { Injectable, Logger } from '@nestjs/common';
+import { LLMClient } from '../../clients';
+import {
+  summarizeEmailInputSchema,
+  summarizeEmailOutputSchema,
+  SummarizeMessagePromptBuilder,
+  TSummarizeMessageInput,
+  TSummarizeMessageOutput,
+  PromptBody,
+} from '@prompts';
+
+@Injectable()
+export class SummarizeMessagesNode extends NodesAbstract<
+  TSummarizeMessageInput,
+  TSummarizeMessageOutput
+> {
+  logger: Logger;
+
+  constructor(
+    private summarizeMessagePromptBuilder: SummarizeMessagePromptBuilder, // Replace with actual type
+  ) {
+    super(summarizeEmailInputSchema, summarizeEmailOutputSchema);
+  }
+
+  protected async nodeTask(
+    input: TSummarizeMessageInput,
+    llmClient: LLMClient<TSummarizeMessageInput>,
+  ): Promise<TSummarizeMessageOutput> {
+    this.logger = new Logger(SummarizeMessagesNode.name);
+
+    const prompt = await this.summarizeMessagePromptBuilder
+      .setContext(input)
+      .build();
+
+    this.logger.debug('SummarizeMessages node:', { prompt });
+
+    return await llmClient.invokeLLM<typeof summarizeEmailOutputSchema>(
+      prompt,
+      summarizeEmailOutputSchema,
+    );
+  }
+}

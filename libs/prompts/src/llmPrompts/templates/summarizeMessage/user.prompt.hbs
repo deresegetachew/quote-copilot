@@ -1,0 +1,20 @@
+You are given a chronological series of  messages exchanged in a thread.
+
+The emails are ordered from oldest to newest. Newer messages may override or clarify information from earlier ones. For
+example, a customer might initially request 2 units, then later update that to 5 — use the most recent value.
+
+Your task is to summarize the full conversation in a clear, concise manner.
+
+Focus on the main requests, key points, and any essential technical or commercial details.
+Avoid including irrelevant greetings, signatures, or repeated content.
+
+Here are the messages:
+
+{{#each messages}}
+--- Email {{@index}} ---
+{{this}}
+
+{{/each}}
+
+Respond in the format defined by the schema below:
+{{responseSchema}}

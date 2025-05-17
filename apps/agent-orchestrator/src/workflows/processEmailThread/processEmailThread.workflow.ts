@@ -25,16 +25,37 @@ const { sendEmailActivity } = proxyActivities<typeof activities>({
   },
 });
 
+type TEmailThreadWorkflowState = {
+  isDone: boolean;
+  threadId: string;
+  queue: NewMessageSignalPayload[];
+  summary: string | null;
+  latestRFQ: {
+    rfqData: any;
+    reason: string;
+    isRFQ: true;
+  } | null;
+  status: 'WAITING' | 'RFQ_PARSED' | 'NOT_RFQ' | 'INCOMPLETE_RFQ' | null;
+  requiresHumanReview?: boolean;
+};
+
 export async function processEmailThreadWorkflow(): Promise<void> {
-  const state = {
-    queue: [] as NewMessageSignalPayload[],
+  const state: TEmailThreadWorkflowState = {
     isDone: false,
-    counter: 0,
+    threadId: null,
+    queue: [],
+    summary: null,
+    latestRFQ: null,
+    status: null,
+    requiresHumanReview: false,
   };
 
   setHandler(NEW_MESSAGE_SIGNAL, (payload: NewMessageSignalPayload) => {
-    state.queue.push(payload);
-    state.counter++; // increment on new signal
+    state.threadId = payload.threadId;
+    state.queue.push({
+      threadId: payload.threadId,
+      messageId: payload.messageId,
+    });
   });
 
   setHandler(COMPLETE_THREAD_SIGNAL, (payload: CompleteThreadSignalPayload) => {
@@ -46,32 +67,40 @@ export async function processEmailThreadWorkflow(): Promise<void> {
 
   while (!state.isDone) {
     while (state.queue.length > 0) {
-      const { threadId, messageId } = state.queue.shift()!;
+      const { messageId } = state.queue.shift()!;
 
-      //  Step 1: We send confirmation email to the user, and start parsing the email
+      // Step 1: Once
+      const parsed = await parseEmailIntentActivity(state.threadId, messageId);
 
-      await sendEmailActivity({
-        email: EMAIL_ENUMS.REQUEST_RECEIVED,
-        threadId,
-        inReplyToMessageId: messageId,
-      });
+      // switch (parsed.status) {
+      //   case 'RFQ_PARSED':
+      //     console.log('Parsed RFQ:', parsed.data);
 
-      // Step 2: Once
+      //     await sendEmailActivity({
+      //       email: EMAIL_ENUMS.REQUEST_RECEIVED,
+      //       threadId,
+      //       inReplyToMessageId: messageId,
+      //     });
 
-      const parsed = await parseEmailIntentActivity(threadId, messageId);
+      //     //TODO: create RFQ in the system through integration event, the useCase will handle inventory checking as well
+      //     // TODO: fire off inventory check sub workflow
 
-      // execute sub workflows based on the parsed intent
-      switch (parsed.quantity) {
-        case 1:
-          await executeWorkflow(logParsedEmailWorkflow, {
-            args: [parsed],
-            asChild: true,
-            workflowId: `rfq-intent-${threadId}`,
-          });
-          break;
-        default:
-          throw new Error(`Unknown intent: ${parsed.quantity}`);
-      }
+      //     await executeWorkflow(logParsedEmailWorkflow, {
+      //       args: [parsed],
+      //       asChild: true,
+      //       workflowId: `rfq-intent-${threadId}`,
+      //     });
+
+      //     break;
+      //   case 'INCOMPLETE_RFQ':
+      //     console.log('Incomplete RFQ:', parsed.data);
+      //     //TODO: Fire an integration event to notify human in the loop=
+      //     break;
+      //   case 'NOT_RFQ':
+      //     return; // close the email thread workflow actually
+      //   default:
+      //     throw new Error(`Unknown intent: ${parsed}`);
+      // }
     }
 
     await sleep('5s'); // avoid busy-looping
