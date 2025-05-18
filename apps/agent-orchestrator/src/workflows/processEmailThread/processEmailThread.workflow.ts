@@ -30,7 +30,7 @@ type TEmailThreadWorkflowState = {
   latestRFQ: {
     rfqData: any;
     reason: string;
-    isRFQ: true;
+    isRFQ: boolean;
   } | null;
   status: 'WAITING' | 'RFQ_PARSED' | 'NOT_RFQ' | 'INCOMPLETE_RFQ' | null;
   requiresHumanReview?: boolean;
@@ -73,6 +73,31 @@ export async function processEmailThreadWorkflow(): Promise<void> {
        * after parsing we call fireIntegrationEventActivity
        * the workflow needs to be deterministic and based on the parsed data we will branch and call different activities
        */
+
+      if (parsed.isRFQ) {
+        state.status = 'RFQ_PARSED';
+        state.latestRFQ = {
+          rfqData: parsed.rfqData,
+          reason: parsed.reason,
+          isRFQ: true,
+        };
+        state.summary = parsed.summary;
+
+        // Step 2: Send email
+        // fire call fireIntegrationEventActivity to save the parsed data details and send  confirmation email to the user
+      } else {
+        state.status = 'NOT_RFQ';
+        state.summary = parsed.summary;
+        state.latestRFQ = {
+          rfqData: null,
+          reason: parsed.reason,
+          isRFQ: false,
+        };
+
+        // step 2 fire integration event to update the thread and message record
+
+        state.isDone = true; //this thread is done and should close it
+      }
     }
 
     await sleep('5s'); // avoid busy-looping
