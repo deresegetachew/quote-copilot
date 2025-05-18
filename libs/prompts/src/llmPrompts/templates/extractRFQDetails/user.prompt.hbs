@@ -10,5 +10,12 @@ Extract all relevant procurement data from the thread.
 {{this}}
 {{/each}}
 
-Respond in the following JSON format:
+
+Response in the following strict JSONformat:
+- Use `null` for any field that is missing or not clearly present in the email thread.
+- Do not omit fields.
+- Output must match the structure exactly.
+
+
 {{responseSchema}}
+

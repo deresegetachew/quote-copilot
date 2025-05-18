@@ -1,49 +1,43 @@
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
-export const emailIntentResponseSchema = z
-  .object({
-    threadId: z.string(),
-    requestSummary: z.string().nonempty(),
-    isRFQ: z.boolean(),
-    expectedDeliveryDate: z.string().nullable(),
-    hasAttachments: z.boolean(),
-    items: z
-      .array(
-        z.object({
-          itemCode: z.string(),
-          itemDescription: z.string().nullable(),
-          quantity: z.number().int().positive(),
-          notes: z.string().optional(),
-        }),
-      )
-      .nullable(),
-    customerDetail: z.object({
-      customerId: z.string().nullable(),
+export const EmailIntentSchema = z.object({
+  threadId: z.string(),
+  messages: z.array(z.string()),
+  requestSummary: z.string().nonempty().nullable(),
+  isRFQ: z.boolean().nullable(),
+  reason: z.string().nullable(),
+  expectedDeliveryDate: z.string().nullable(),
+  hasAttachments: z.boolean().nullable(),
+  items: z
+    .array(
+      z.object({
+        itemCode: z.string(),
+        itemDescription: z.string().nullable(),
+        quantity: z.number().int().positive(),
+        unit: z.string().nullable(),
+        notes: z.string().nullable(),
+      }),
+    )
+    .min(1)
+    .nullable(),
+  customerDetail: z
+    .object({
       name: z.string().nullable(),
       email: z.string(),
-    }),
-    notes: z.string().nullable(),
-  })
-  .refine(
-    (data) => {
-      if (data.isRFQ) {
-        return (
-          Array.isArray(data.items) &&
-          data.items.length > 0 &&
-          typeof data.expectedDeliveryDate === 'string'
-        );
-      }
-      return true; // valid if it's not an RFQ
-    },
-    {
-      message: 'Items and expected DeliveryDate are required if isRFQ is true',
-      path: ['items', 'expectedDeliveryDate'], // highlights this in error reporting
-    },
-  );
+    })
+    .nullable(),
+  notes: z.string().nullable(),
+  error: z
+    .object({
+      message: z.string(),
+      obj: z.any(),
+    })
+    .nullable(),
+});
 
 const jsonSchema = zodToJsonSchema(
-  emailIntentResponseSchema,
+  EmailIntentSchema,
   'emailIntentRFQResponseSchema',
 );
 
@@ -51,6 +45,4 @@ export const emailIntentRFQResponseSchemaTxt = `\`\`\`json
 ${JSON.stringify(jsonSchema.definitions?.emailIntentRFQResponseSchema || jsonSchema, null, 2)}
 \`\`\``;
 
-export type TEmailIntentRFQResponseSchemaType = z.infer<
-  typeof emailIntentResponseSchema
->;
+export type TEmailIntentSchemaType = z.infer<typeof EmailIntentSchema>;

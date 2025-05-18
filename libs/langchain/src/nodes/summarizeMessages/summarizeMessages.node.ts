@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import { NodesAbstract } from '../nodes.abstract';
 import { Injectable, Logger } from '@nestjs/common';
 import { LLMClient } from '../../clients';
@@ -8,7 +7,6 @@ import {
   SummarizeMessagePromptBuilder,
   TSummarizeMessageInput,
   TSummarizeMessageOutput,
-  PromptBody,
 } from '@prompts';
 
 @Injectable()

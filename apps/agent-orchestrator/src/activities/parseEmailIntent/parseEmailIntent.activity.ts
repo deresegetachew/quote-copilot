@@ -15,14 +15,16 @@ export async function parseEmailIntentActivity(
   threadId: string,
   messageId: string,
 ): Promise<TParseEmailActivityResponse> {
-  const logger = new Logger('parseEmailIntentActivity');
+  const logger = new Logger(
+    'Running Activity::parseEmailIntentActivity::' + threadId,
+  );
   logger.log('Parsing email intent with threadId:', threadId, messageId);
 
   const { configService, httpService, parseEmailIntentGraph } =
     await initActivity();
 
   const data = await fetchEmailThread(configService, httpService, threadId);
-  logger.log('📧 🧵 Email Thread retrieved from  email worker', data);
+  // logger.log('📧 🧵 Email Thread retrieved from  email worker', data);
 
   try {
     const messages = data.emails
@@ -33,9 +35,16 @@ export async function parseEmailIntentActivity(
       )
       .map((email) => email.body);
 
-    const llmResponse = await parseEmailIntentGraph.parseEmailWithLLM(messages);
+    const llmResponse = await parseEmailIntentGraph.parseEmailWithLLM(
+      threadId,
+      messages,
+    );
 
-    logger.log('🤖 parsed LLM Response:', llmResponse);
+    logger.log('🤖 parsed LLM Response:', {
+      threadId: llmResponse.threadId,
+      isRFQ: llmResponse.isRFQ,
+      reason: llmResponse.reason,
+    });
     return ParseEmailIntentActivityMapper.from(llmResponse);
   } catch (error) {
     logger.error('Error parsing email:', error);

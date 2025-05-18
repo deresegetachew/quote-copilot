@@ -8,8 +8,7 @@ export const extractRFQDetailsInputSchema = z.object({
 
 export const extractRFQDetailsOutputSchema = BaseNodeOutputSchema.extend({
   threadId: z.string(),
-  rfqNumber: z.string().optional(), // we will generate this using RFQ number generator
-  requestSummary: z.string(),
+  rfqNumber: z.string().nullable(), // we will generate this using RFQ number generator
 
   expectedDeliveryDate: z.string().datetime().nullable(), // ISO 8601
   hasAttachments: z.boolean(),
@@ -27,10 +26,10 @@ export const extractRFQDetailsOutputSchema = BaseNodeOutputSchema.extend({
     .min(1),
 
   customerDetail: z.object({
-    name: z.string().optional(),
+    name: z.string().nullable(),
     email: z.string(),
   }),
-  notes: z.string().optional(), // catch-all for anything unstructured
+  notes: z.string().nullable(), // catch-all for anything unstructured
 });
 
 export type TExtractRFQDetailsInput = z.infer<

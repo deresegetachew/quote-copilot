@@ -9,7 +9,7 @@ export const classifyMessageAsRFQInputSchema = z.object({
 
 export const classifyMessageAsRFQOutputSchema = BaseNodeOutputSchema.extend({
   isRFQ: z.boolean(),
-  reason: z.string().optional(),
+  reason: z.string().nullable(),
 });
 
 const ClassifyMessageAsRFQOutputJSONSchema = zodToJsonSchema(
