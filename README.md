@@ -1,6 +1,6 @@
 # AI Agents Monorepo — Multi-Tenant LLM Framework
 
-This project implements a modular AI agent platform designed for automating domain-specific workflows such as procurement, customer support, compliance, and more.
+This project implements a modular AI agent  designed for automating domain-specific workflows such as procurement, customer support, compliance, and more.
 
 📚 For coding conventions and architectural guidelines, see [CODING_GUIDELINES.md](./CODING_GUIDELINES.md)
 
@@ -56,25 +56,46 @@ This project implements a solution by  building a pluggable agent system that co
 - Temporal: to orchestrate long-running workflows and external dependencies
 - Handlebars prompt templates: for reusable and tenant-specific communication
 
+**💡 A thought on Agents  :**
+
+Agents should not access databases or call external systems directly.
+They should be pure decision-making units that **process input** and **produce actions** or **emit events.**
+
+
+why ?
+
+We want our agents to evolve independently without core business logic baked into them,
+and agents should be sandboxed and offloading business operations to scalable event driven architecture
+
+
+RFQ Manager Agent:
+- Goal:
+- Integration Events:
+  - RFQ Parsed
+  - RequestRFQClarification
+  - Cancel RFQ
+  - RequestHumanIntervention
+
+
 ### 🧠 Step-by-Step Solution Flow (Procurement Agent)
 
 1. 📥 Parse the Customer Email
 
-- Use an LLM to extract: 
+- Use an LLM to extract:
   - Part Number(s) ,
-  - Quantity , 
+  - Quantity ,
   - Desired delivery date, Handles free-form, multi-line input
-- Supports thread of emails
+- Supports thread of messages
 
-1. 🏭 Check Internal Inventory
+2. 🏭 Check Internal Inventory
 
-- Simulate or integrate with ERP (This will be mocked)
-- If found, gather:
-  - Price
-  - Condition (new/OH/etc.)
-  - Estimated time to deliver
+   - Simulate or integrate with ERP (This will be mocked)
+   - If found, gather:
+     - Price
+     - Condition (new/OH/etc.)
+     - Estimated time to deliver
 
-1. 🔀 Branch Based on Availability
+3. 🔀 Branch Based on Availability
 
 - ✅ If in stock → go to quote generation
 - ❌ Else → launch external RFQ process
@@ -87,12 +108,11 @@ This project implements a solution by  building a pluggable agent system that co
 - Automatically resume once responses are in
 - followup if no response or send new RFQ, and flag for human in the loop
 
-
-1. 🧠 Analyze RFQ Offers
+5. 🧠 Analyze RFQ Offers
 
 - Use LLM or logic to compare offers
 - Sort by:
-  - Certifications (EASA, FAA, etc.)
+  - Certifications
   - Price
   - Delivery time
 - in the future this can be based on rules defined per tenant / product
@@ -110,7 +130,7 @@ This project implements a solution by  building a pluggable agent system that co
      - Change request
      - If clarification → loop back to parsing with context
 
-8. ✅ Confirm & Finalize Order
+3. ✅ Confirm & Finalize Order
 
     - Once approved:
       - Trigger PO creation
@@ -120,15 +140,16 @@ This project implements a solution by  building a pluggable agent system that co
 ---
 
 🧠 Responsibilities
-	-	LangGraph: Think, classify, reason, extract
-	-	Temporal: Orchestrate, wait, retry, timeout, persist
+ - LangGraph: Think, classify, reason, extract
+ - Temporal: Orchestrate, wait, retry, timeout, persist
 
 ## 📦 Project Structure
 
 ```
 apps/
-  core-service/      → Our core application service running core business logics as microservice
+  core-service/      → Our core application service running core business logics as **microservice**
   email-workers/     → Email ingestion app (polling or webhook)
+  core-service       →  Application logic
   telegram-workers/  → Telegram ingestion app
   whatsapp-workers   → Whatsapp ingestion app
 libs/
@@ -157,8 +178,7 @@ Each prompt consists of the following components:
 | User Prompt       | `generate-quote.user.hbs`           | Task-specific instructions             |
 | Description       | `generate-quote.description.hbs`    | What the prompt does (doc/dev use)     |
 | Response Format   | `generate-quote.response-format.hbs`| Optional output structure guidance     |
-| Example Input     | `generate-quote.example-input.hbs`  | (optional) Sample input                |
-| Example Output    | `generate-quote.example-output.hbs` | (optional) Sample response             |
+
 
 These are compiled into structured `PromptBody` objects using builder classes like:
 
@@ -176,7 +196,7 @@ This monorepo contains multiple applications and libraries. Below are the steps 
 
 Ensure you have the following installed:
 
-- Node.js (v16 or later)
+- Node.js (v21 or later)
 - npm or yarn
 - NestJS CLI (`npm install -g @nestjs/cli`)
 
@@ -186,45 +206,53 @@ Each app is located under the `apps/` directory. To run a specific app, follow t
 
 1. Navigate to the root of the project.
 2. Install dependencies:
+
    ```bash
    npm install
    ```
+
 3. Build the project (optional, for TypeScript compilation):
+
    ```bash
    npm run build
    ```
+
 4. Run the desired app using the NestJS CLI:
+
    ```bash
    nest start <app-name>
    ```
+
    Replace `<app-name>` with the name of the app (e.g., `api`, `email-workers`, `telegram-workers`, etc.).
 
    Example:
+
    ```bash
    nest start email-workers
    ```
 
 ### 🖥️ Common Commands
 
-| Command                        | Description                                |
-|-------------------------------|--------------------------------------------|
-| `npm run api`                 | Starts the NestJS backend API              |
-| `npm run start email-workers`       | Runs the email ingestion and processing app|
-| `npm run start agent-orchestrator`  | Starts the Temporal agent workflow worker  |
-| `npm run start:all`           | Starts all apps in parallel (dev mode)     |
+| Command                              | Description                                 |
+|--------------------------------------|---------------------------------------------|
+| `npm run start email-workers`        | Runs the email ingestion and processing app  |
+| `npm run start agent-orchestrator`   | Starts the Temporal agent workflow worker    |
+| `npm run start:all`                  | Starts all apps in parallel (dev mode)       |
 
 ### Running All Apps
 
 To run all apps in the monorepo simultaneously, you can use the following command:
+
 ```bash
 npm run start:all
 ```
 
-### Watching for Changes
+### Running in Dev mode
 
 To enable hot-reloading during development, use the `--watch` flag:
+
 ```bash
-nest start <app-name> --watch
+nest start:dev <app-name> --watch
 ```
 
 ### Running Tests
@@ -232,10 +260,13 @@ nest start <app-name> --watch
 Each app has its own test suite located under the `test/` directory. To run tests for a specific app:
 
 1. Navigate to the app's directory:
+
    ```bash
    cd apps/<app-name>
    ```
+
 2. Run the tests:
+
    ```bash
    npm test
    ```
@@ -246,12 +277,15 @@ Libraries are located under the `libs/` directory. To build a specific library:
 
 1. Navigate to the root of the project.
 2. Run the build command for the library:
+
    ```bash
    nest build <library-name>
    ```
+
    Replace `<library-name>` with the name of the library (e.g., `config`, `agents`, etc.).
 
    Example:
+
    ```bash
    nest build config
    ```
@@ -262,23 +296,9 @@ The project uses a centralized configuration file located in the `libs/config` l
 
 ---
 
-## 🚧 Status
+##  Status : 🚧
 
-- ✅ Monorepo scaffolded (NestJS CLI)
-- ✅ Tenants and prompts structured
-- ✅ Prompt builders implemented
-- ✅ Handlebars templates supported
 
----
-
-## 🛠️ Next Steps
-
-- Integrate LangGraph flows for advanced agent reasoning
-- Implement Temporal-based background orchestration
-- Add Slack/email hooks for notifications
-- Build UI/CLI for configuring agents per tenant
-
----
 
 ## 👥 Authors
 

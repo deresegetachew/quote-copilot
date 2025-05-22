@@ -6,11 +6,14 @@ import { EmailMessageRepositoryPort } from '../../ports/outgoing/emailMessageRep
 import { CommandBus } from '@nestjs/cqrs';
 import { EmailThreadStatusVO } from '../../../domain/valueObjects/emailThreadStatus.vo';
 import { TriggerEmailThreadProcessingWfCommand } from '../../ports/incoming/command';
+import { Logger } from '@nestjs/common';
 
 @QueryHandler(GetUnreadEmailsQuery)
 export class GetUnreadEmailsUseCase
   implements IQueryHandler<GetUnreadEmailsQuery, EmailMessageAggregate[]>
 {
+  private logger = new Logger(GetUnreadEmailsUseCase.name);
+
   constructor(
     private readonly emailClientFactory: EmailClientFactoryPort,
     private readonly dbRepository: EmailMessageRepositoryPort,
@@ -19,15 +22,17 @@ export class GetUnreadEmailsUseCase
 
   async execute(): Promise<EmailMessageAggregate[]> {
     const client = this.emailClientFactory.getClient('GMAIL');
+    const unreadMsgs = await client.getUnreadMessages();
 
-    const msgs = await client.getUnreadMessages();
-
-    if (msgs.length > 0) {
+    if (unreadMsgs.length > 0) {
       const aggregates: EmailMessageAggregate[] = [];
       const savePromises: Promise<void>[] = [];
+      const allUnreadMessageIds = new Set(
+        unreadMsgs.flatMap((um) => um.getEmails().map((e) => e.getMessageId())),
+      );
 
-      for (const emailMessages of msgs) {
-        const threadId = emailMessages.getThreadId();
+      for (const unreadMsg of unreadMsgs) {
+        const threadId = unreadMsg.getThreadId();
 
         // Fetch existing thread status
         const existingThread = await this.dbRepository.findByThreadId(threadId);
@@ -35,28 +40,63 @@ export class GetUnreadEmailsUseCase
 
         // Re-create the aggregate but preserve status
         const agg = new EmailMessageAggregate(
-          emailMessages.getStorageId(),
+          unreadMsg.getStorageId(),
           threadId,
-          emailMessages.getEmails(),
+          [...existingThread.getEmails(), ...unreadMsg.getEmails()],
           currentStatus ?? EmailThreadStatusVO.initial(),
         );
 
-        const lastEmail = agg.getLastEmail();
-
-        if (lastEmail) {
-          aggregates.push(agg);
-          savePromises.push(this.dbRepository.save(agg));
-        }
+        aggregates.push(agg);
+        savePromises.push(this.dbRepository.save(agg));
       }
 
       await Promise.all(savePromises);
 
+      const commands: Promise<any>[] = [];
+      const threadMessageIdMap: Record<string, Set<string>> = {};
+
       for (const agg of aggregates) {
-        // this should be a domain event not a command
-        await this.commandBus.execute(
-          new TriggerEmailThreadProcessingWfCommand(
-            agg.getThreadId(),
-            agg.getLastEmail()?.getMessageId(),
+        const _unreadThreadMsgs = new Set(
+          agg
+            .getEmails()
+            .filter((email) => allUnreadMessageIds.has(email.getMessageId())),
+        );
+
+        if (_unreadThreadMsgs.size > 0) {
+          const threadId = agg.getThreadId();
+
+          for (const email of _unreadThreadMsgs) {
+            if (!threadMessageIdMap[threadId]) {
+              threadMessageIdMap[threadId] = new Set();
+            }
+            threadMessageIdMap[threadId].add(email.getMessageId());
+          }
+
+          for (const email of _unreadThreadMsgs) {
+            commands.push(
+              this.commandBus.execute(
+                new TriggerEmailThreadProcessingWfCommand(
+                  threadId,
+                  email.getMessageId(),
+                ),
+              ),
+            );
+          }
+        }
+
+        // fire all workflow triggers in parallel
+        await Promise.all(commands);
+
+        // mark all messages in parallel by thread
+        await Promise.all(
+          Object.entries(threadMessageIdMap).map(([threadId, messageIds]) =>
+            client
+              .markMessagesAsAgentRead(Array.from(messageIds))
+              .catch((err) => {
+                this.logger.warn(
+                  `Failed to mark messages as read for thread ${threadId}: ${err}`,
+                );
+              }),
           ),
         );
       }

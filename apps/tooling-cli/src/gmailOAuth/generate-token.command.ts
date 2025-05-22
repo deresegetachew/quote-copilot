@@ -22,7 +22,7 @@ export class GenerateTokenCommand extends CommandRunner {
       'gmailConfig.redirectUri',
     );
 
-    const scope = this.configService.getOrThrow<string>('gmailConfig.scopes');
+    const scope = this.configService.getOrThrow<string[]>('gmailConfig.scopes');
 
     const oAuth2Client = new google.auth.OAuth2(
       clientId,

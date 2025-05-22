@@ -1,4 +1,5 @@
 import { google, gmail_v1 } from 'googleapis';
+import { GaxiosResponse } from 'gaxios';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { GmailAuth } from './gmail.auth';
 import { EmailClientPort } from '../../../../application/ports/outgoing/emailClient.port';
@@ -9,6 +10,8 @@ import { EmailMessageFactory } from '../../../../domain/factories/email-message.
 @Injectable()
 export class GmailClient extends EmailClientPort implements OnModuleInit {
   private gmail: gmail_v1.Gmail;
+  private labels: GaxiosResponse<gmail_v1.Schema$ListLabelsResponse>;
+  private agentReadLabelName = 'agent-read';
 
   constructor(private readonly gmailAuth: GmailAuth) {
     super();
@@ -21,12 +24,13 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
   private async initialize(): Promise<void> {
     const auth = await this.gmailAuth.getOAuth2Client();
     this.gmail = google.gmail({ version: 'v1', auth });
+    await this.initializeLabels();
   }
 
   async getUnreadMessages(): Promise<EmailMessageAggregate[]> {
     const res = await this.gmail.users.messages.list({
       userId: 'me',
-      q: 'is:unread',
+      q: '-label:agent-read',
       maxResults: 1,
     });
 
@@ -88,5 +92,40 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
     }
 
     return aggregates;
+  }
+
+  async markMessagesAsAgentRead(messageIds: string[]): Promise<void> {
+    const labelObj = this.labels.data.labels?.filter(
+      (label) => label.name === this.agentReadLabelName,
+    );
+
+    await this.gmail.users.messages.batchModify({
+      userId: 'me',
+      requestBody: {
+        ids: messageIds,
+        addLabelIds: labelObj ? labelObj.map((l) => l.id) : [],
+      },
+    });
+  }
+
+  private async initializeLabels() {
+    this.labels = await this.gmail.users.labels.list({ userId: 'me' });
+    const exists = this.labels.data.labels?.some(
+      (label) => label.name === this.agentReadLabelName,
+    );
+    if (!exists) {
+      await this.createLabel(this.agentReadLabelName);
+    }
+  }
+
+  private async createLabel(labelName: string): Promise<void> {
+    await this.gmail.users.labels.create({
+      userId: 'me',
+      requestBody: {
+        name: labelName,
+        labelListVisibility: 'labelShow',
+        messageListVisibility: 'show',
+      },
+    });
   }
 }

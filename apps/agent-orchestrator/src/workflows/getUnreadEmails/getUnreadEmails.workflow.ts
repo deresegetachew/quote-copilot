@@ -22,7 +22,7 @@ export async function getUnreadEmailsWorkflow(): Promise<void> {
   while (true) {
     await getUnreadEmailsActivity();
 
-    await sleep('10m'); // avoid busy-looping
+    await sleep('1m'); // avoid busy-looping
   }
 }
 
