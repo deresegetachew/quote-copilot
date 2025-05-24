@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { getAppContext } from '../../getAppContext';
+import { AppContext } from '../../appContext';
 import { HttpService } from '@nestjs/axios';
 import { EmailThreadResponseDTO, fetchObservableResult } from '@common';
 
@@ -68,7 +68,7 @@ async function fetchEmailThread(
 }
 
 async function initActivity() {
-  const app = await getAppContext();
+  const app = await AppContext.get();
   const configService = app.get(ConfigService);
   const httpService = app.get(HttpService);
   const parseEmailIntentGraph = app.get(ParseEmailIntentGraph);
