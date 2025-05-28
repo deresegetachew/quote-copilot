@@ -10,7 +10,7 @@ export abstract class IntegrationEvent<T = any> {
     this.eventType = eventType;
     this.data = data;
     this.source = source;
-    this.timestamp = DateHelper.getNow();
+    this.timestamp = DateHelper.getNowAsString();
   }
 }
 

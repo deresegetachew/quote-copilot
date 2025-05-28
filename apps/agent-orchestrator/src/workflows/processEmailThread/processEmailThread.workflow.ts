@@ -6,9 +6,21 @@ import {
   NewMessageSignalPayload,
 } from '../../signals';
 import type * as activities from '../../activities';
+import {
+  messageParsedSubject,
+  messageParsedSubjectPayloadSchema,
+  messageParsedUnprocessableSubject,
+  messageParsedUnprocessableSubjectPayloadSchema,
+  TMessageParsedUnprocessableSubjectPayload,
+  TMessageParsedSubjectPayload,
+} from '@common/nats';
 
 const { parseEmailIntentActivity } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',
+});
+
+const { fireIntegrationEventsActivity } = proxyActivities<typeof activities>({
+  startToCloseTimeout: '1 minute',
 });
 
 // TO AB: Once the activity starts running, it must finish within 5 minutes. Otherwise, it will be marked as failed (and possibly retried).
@@ -85,14 +97,19 @@ export async function processEmailThreadWorkflow(): Promise<void> {
 
         // Step 2: Send email
         // fire call fireIntegrationEventActivity to save the parsed data details and send  confirmation email to the user
+        await fireIntegrationEventsActivity<TMessageParsedSubjectPayload>({
+          subject: messageParsedSubject,
+          schema: messageParsedSubjectPayloadSchema,
+          eventPayload: {},
+        });
       } else {
-        state.status = 'NOT_RFQ';
-        state.summary = parsed.summary;
-        state.latestRFQ = {
-          rfqData: null,
-          reason: parsed.reason,
-          isRFQ: false,
-        };
+        await fireIntegrationEventsActivity<TMessageParsedUnprocessableSubjectPayload>(
+          {
+            subject: messageParsedUnprocessableSubject,
+            schema: messageParsedUnprocessableSubjectPayloadSchema,
+            eventPayload: {},
+          },
+        );
 
         // step 2 fire integration event to update the thread and message record
 

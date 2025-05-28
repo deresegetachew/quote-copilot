@@ -98,7 +98,7 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
       .limit(pageSize)
       .exec();
 
-    const total = await this.threadModel.countDocuments(query);
+    const totalCount = await this.threadModel.countDocuments(query);
 
     const results: EmailMessageAggregate[] = [];
 
@@ -117,7 +117,7 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
 
     return {
       data: results,
-      total,
+      totalCount,
       page,
       pageSize,
     };

@@ -42,7 +42,10 @@ export class GetUnreadEmailsUseCase
         const agg = new EmailMessageAggregate(
           unreadMsg.getStorageId(),
           threadId,
-          [...existingThread.getEmails(), ...unreadMsg.getEmails()],
+          [
+            ...(existingThread?.getEmails() ?? []),
+            ...(unreadMsg?.getEmails() ?? []),
+          ],
           currentStatus ?? EmailThreadStatusVO.initial(),
         );
 
