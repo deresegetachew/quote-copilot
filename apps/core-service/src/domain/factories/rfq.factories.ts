@@ -8,7 +8,7 @@ type TCreateNewParams = {
   summary: string;
   customerDetail: { name: string | null; email: string };
   expectedDeliveryDate?: Date | null;
-  notes?: string | null;
+  notes?: string[] | null;
   reason?: string | null;
   hasAttachments?: boolean | null;
   error?: {
@@ -25,33 +25,37 @@ type TCreateNewParams = {
 };
 
 export class RfqFactory {
-  static crateFromEmailIntentResponse(response: TEmailIntentSchemaType): any {
+  static crateFromEmailIntentResponse(
+    response: TEmailIntentSchemaType,
+  ): RFQEntity {
     return RfqFactory.createNew({
-      threadId: response.threadId,
-      summary: response.requestSummary,
-      expectedDeliveryDate: response.expectedDeliveryDate
+      threadId: response?.threadId,
+      summary: response?.requestSummary,
+      expectedDeliveryDate: response?.expectedDeliveryDate
         ? DateHelper.toUTCDateTime(response.expectedDeliveryDate)
         : null,
       hasAttachments: response.hasAttachments || null,
       customerDetail: {
-        name: response.customerDetail?.name || null,
-        email: response.customerDetail.email,
+        name: response?.customerDetail?.name || null,
+        email: response?.customerDetail?.email,
       },
-      error: response.error
+      error: response?.error
         ? {
             message: response.error.message || null,
             obj: response.error.obj || null,
           }
         : null,
-      notes: response.notes || null,
-      reason: response.reason || null,
-      items: response.items.map((item) => ({
-        itemCode: item.itemCode,
-        itemDescription: item.itemDescription || null,
-        quantity: item.quantity,
-        unit: item.unit || null,
-        notes: item.notes || null,
-      })),
+      notes: response?.notes || null,
+      reason: response?.reason || null,
+      items: response?.items
+        ? response.items?.map((item) => ({
+            itemCode: item?.itemCode,
+            itemDescription: item?.itemDescription || null,
+            quantity: item?.quantity,
+            unit: item?.unit || null,
+            notes: item?.notes || null,
+          }))
+        : [],
     });
   }
 

@@ -12,10 +12,12 @@ import { Model } from 'mongoose';
 import { EmailMessageAggregate } from '../../../domain/entities/emailMessage.aggregate';
 import { EmailMessageMapper } from '../../database/mongo/mappers/emailMessage.mapper';
 import { PaginatedData } from '@common';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
+  private logger = new Logger(EmailMessageRepositoryAdapter.name);
+
   constructor(
     @InjectModel(Email.name)
     private readonly emailModel: Model<EmailDocument>,

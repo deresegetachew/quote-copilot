@@ -23,10 +23,10 @@ export class RFQ {
   @Prop({ type: Boolean, default: null })
   hasAttachments: boolean | null;
 
-  @Prop({ type: String, default: null })
-  notes: string | null;
+  @Prop({ type: [String], default: null })
+  notes: string[] | null;
 
-  @Prop({ type: RFQLineItemSchema, default: [] })
+  @Prop({ type: [RFQLineItemSchema], default: [] })
   lineItems: RFQLineItem[];
 
   @Prop({
@@ -45,7 +45,6 @@ export class RFQ {
 export type RFQDocument = RFQ & Document;
 export const RFQSchema = SchemaFactory.createForClass(RFQ);
 
-RFQSchema.index({ rfqId: 1 }, { unique: true });
 RFQSchema.index({ threadId: 1 });
 RFQSchema.index({ status: 1 });
 

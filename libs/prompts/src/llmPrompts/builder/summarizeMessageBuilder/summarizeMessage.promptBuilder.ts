@@ -9,10 +9,6 @@ export class SummarizeMessagePromptBuilder extends AbstractPromptBuilder<TSummar
   protected setTemplateFolderPath(): this {
     this.templateFolder = 'summarizeMessage';
 
-    this.logger.log('Template folder path:', {
-      templateFolder: this.templateFolder,
-    });
-
     return this;
   }
 

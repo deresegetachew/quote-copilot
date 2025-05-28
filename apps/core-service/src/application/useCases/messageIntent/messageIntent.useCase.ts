@@ -42,8 +42,11 @@ export class MessageIntentUseCase
         )
         .map((email) => email.body);
 
+      const sender = result.emails.map((email) => email.from).join(', ');
+
       const llmResponse = await this.parseEmailIntentLLMGraph.parseEmailWithLLM(
         threadId,
+        sender,
         messages,
       );
 

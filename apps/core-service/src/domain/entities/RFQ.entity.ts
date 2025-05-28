@@ -11,7 +11,7 @@ type TRFQEntityProps = {
   };
   expectedDeliveryDate: Date | null;
   hasAttachments: boolean | null;
-  notes: string | null;
+  notes: string[] | null;
   items: Array<{
     itemCode: string;
     itemDescription: string | null;
@@ -39,7 +39,7 @@ export class RFQEntity {
   private status: RFQStatusVO;
   private readonly expectedDeliveryDate: Date | null;
   private readonly hasAttachments: boolean | null;
-  private readonly notes: string | null;
+  private readonly notes: string[] | null;
   private readonly items: Array<TRFQEntityProps['items'][number]>;
   private readonly error: TRFQEntityProps['error'] | null;
   private readonly reason: string | null;
@@ -85,7 +85,7 @@ export class RFQEntity {
     return this.hasAttachments;
   }
 
-  getNotes(): string | null {
+  getNotes(): string[] | null {
     return this.notes;
   }
 

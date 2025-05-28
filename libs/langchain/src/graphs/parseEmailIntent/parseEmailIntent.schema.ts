@@ -24,10 +24,10 @@ export const EmailIntentSchema = z.object({
   customerDetail: z
     .object({
       name: z.string().nullable(),
-      email: z.string(),
+      email: z.string().nullable(),
     })
     .nullable(),
-  notes: z.string().nullable(),
+  notes: z.array(z.string()).nullable(),
   error: z
     .object({
       message: z.string(),

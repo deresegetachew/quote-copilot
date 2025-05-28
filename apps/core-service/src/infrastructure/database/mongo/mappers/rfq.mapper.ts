@@ -13,7 +13,7 @@ export class RFQMapper {
       status: RFQStatusVO.of(rfqDoc.status),
       expectedDeliveryDate: rfqDoc.expectedDeliveryDate,
 
-      notes: rfqDoc.notes,
+      notes: rfqDoc.notes ?? null,
       hasAttachments: rfqDoc.hasAttachments,
       error: {
         message: rfqDoc.reason || '',

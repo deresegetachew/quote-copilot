@@ -11,7 +11,7 @@ export class MessageIntentResponseDTO {
     } | null;
     expectedDeliveryDate: string | null;
     hasAttachments: boolean | null;
-    notes: string | null;
+    notes: string[] | null;
     items:
       | {
           itemCode: string;

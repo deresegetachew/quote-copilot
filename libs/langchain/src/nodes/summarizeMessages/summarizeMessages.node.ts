@@ -32,7 +32,7 @@ export class SummarizeMessagesNode extends NodesAbstract<
       .setContext(input)
       .build();
 
-    this.logger.debug('SummarizeMessages node:', { prompt });
+    this.logger.debug('SummarizeMessages node:');
 
     return await llmClient.invokeLLM<typeof summarizeEmailOutputSchema>(
       prompt,
