@@ -20,19 +20,37 @@ export class EnvConfigFactory extends ConfigFactory {
       name: process.env.APP_NAME,
       dbConfig: {
         mongo: {
-          uri: process.env.DB_MONGO_URI,
-          authMode:
-            process.env.DB_MONGO_AUTH_MODE === 'aws-iam'
-              ? 'aws-iam'
-              : 'password',
-          database: process.env.DB_MONGO_DATABASE,
-          enableMigration: this.getBooleanFromEnv(
-            process.env.DB_MONGO_ENABLE_MIGRATION,
-          ),
-          username: process.env.DB_MONGO_USERNAME,
-          password: process.env.DB_MONGO_PASSWORD,
-          replicaSet: '',
-          useSSL: false,
+          'email-worker-db': {
+            uri: process.env.DB_MONGO_URI,
+            authMode:
+              process.env.DB_MONGO_AUTH_MODE === 'aws-iam'
+                ? 'aws-iam'
+                : 'password',
+            database: process.env.DB_MONGO_DATABASE,
+            enableMigration: this.getBooleanFromEnv(
+              process.env.DB_MONGO_ENABLE_MIGRATION,
+            ),
+            username: process.env.DB_MONGO_USERNAME,
+            password: process.env.DB_MONGO_PASSWORD,
+            replicaSet: '',
+            useSSL: false,
+          },
+
+          'core-db': {
+            uri: process.env.DB_MONGO_URI,
+            authMode:
+              process.env.DB_MONGO_AUTH_MODE === 'aws-iam'
+                ? 'aws-iam'
+                : 'password',
+            database: process.env.DB_MONGO_DATABASE,
+            enableMigration: this.getBooleanFromEnv(
+              process.env.DB_MONGO_ENABLE_MIGRATION,
+            ),
+            username: process.env.DB_MONGO_USERNAME,
+            password: process.env.DB_MONGO_PASSWORD,
+            replicaSet: '',
+            useSSL: false,
+          },
         },
       },
       apps: {

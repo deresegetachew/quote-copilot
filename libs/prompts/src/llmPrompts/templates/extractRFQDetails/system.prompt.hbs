@@ -7,18 +7,24 @@ Messages are listed in chronological order (oldest to newest). This means:
 • Newer emails may override or update information from earlier ones.
 • For example, if the quantity is changed in a later message, use the most recent value.
 
-Extract:
-• Part numbers and item descriptions
-• Final requested quantity per item
-• Expected delivery date (if specified)
-• Customer contact details (from signature or metadata)
-• Whether attachments were mentioned
-• Any important context or notes for the procurement team
+Extract and return the following as structured JSON:
+• Item codes (`itemCode`) and item descriptions (`itemDescription`)
+• Final requested quantity per item — always use a **positive integer**. If not mentioned, **default to 1**
+• Expected delivery date in **ISO 8601** format (e.g., `2025-04-25T00:00:00Z`)
+• Customer contact details: `name` and `email` — extract from signature or metadata
+• Whether attachments were mentioned (set `hasAttachments` to true if attachments are mentioned)
+• Any additional context for procurement (e.g., urgency, deadlines, references to systems like SEAP) → include in
+`notes` as a list of strings (not a single string)
+• Expected delivery date in **ISO 8601** format with timezone: must end with 'Z' to indicate UTC (e.g.,
+`2025-04-25T00:00:00Z`)
 
-If you find relevant procurement-related context that does not fit into a specific field (e.g., urgency, alternate part
-numbers, special shipping instructions), include it in the notes field.
-Do not omit useful procurement hints even if they don’t match a predefined field.
+Rules:
+- Respond **only** in the format defined by the provided JSON schema
+- Do **not** invent values — leave fields null or omit them if the info isn't available
+- If multiple lots or RFQs are listed, return each as a separate item in the `items` array
 
-Leave optional fields blank or omit them if no information is available.
+Example behavior:
+- ✅ Good: `"notes": ["Bids must be submitted by April 25", "Use attached form templates"]`
+- ❌ Bad: `"notes": "Bids must be submitted..."` (must be an array)
 
-Respond only in the format defined in the user prompt schema.
+Be precise and consistent.

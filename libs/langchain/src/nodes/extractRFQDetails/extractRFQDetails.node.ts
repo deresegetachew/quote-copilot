@@ -32,7 +32,7 @@ export class ExtractRFQDetailsNode extends NodesAbstract<
       .setContext(input)
       .build();
 
-    this.logger.debug('ExtractRFQDetailsNode:', { prompt });
+    this.logger.debug('ExtractRFQDetailsNode:');
 
     return await llmClient.invokeLLM<typeof extractRFQDetailsOutputSchema>(
       prompt,

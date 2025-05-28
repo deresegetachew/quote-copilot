@@ -1,18 +1,17 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { RFQ_RECEIVED_EVENT_KEY } from '@common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ProcessRFQCommand } from '../../../../email-workers/src/application/ports/incoming/command';
+import { UnprocessableMessageParsed } from '@common/integrationEvents';
 
 @Controller()
-export class RfqReceivedHandler {
-  logger = new Logger(RfqReceivedHandler.name);
+export class UnprocessableMsgHandler {
+  logger = new Logger(UnprocessableMsgHandler.name);
 
   constructor(private readonly commandBus: CommandBus) {}
 
-  @MessagePattern(RFQ_RECEIVED_EVENT_KEY)
+  @MessagePattern(UnprocessableMessageParsed)
   async handleEvent(@Payload() data: any) {
-    this.logger.log('RFQ Received Event Data: ', data);
+    this.logger.log('Unprocessable message received: ', data);
 
     // await this.commandBus.execute(new ProcessRFQCommand());
 

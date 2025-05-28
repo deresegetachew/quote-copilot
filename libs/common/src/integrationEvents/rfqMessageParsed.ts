@@ -1,9 +1,9 @@
+import { messageParsedSubject } from '../nats';
 import {
   IntegrationEvent,
   TEventSources,
 } from '../types/integrationEvents.type';
 
-export const RFQ_RECEIVED_EVENT_KEY = 'rfq.received';
 export type TRFQReceivedEvent = {
   rfqId: string;
   threadId: string;
@@ -11,8 +11,8 @@ export type TRFQReceivedEvent = {
   requestSummary: string;
   itemsRequested: { itemCode: string; quantity: number; note: string }[];
 };
-export class RFQReceivedEvent extends IntegrationEvent<TRFQReceivedEvent> {
+export class RFQMessageParsed extends IntegrationEvent<TRFQReceivedEvent> {
   constructor(data, source: TEventSources) {
-    super(RFQ_RECEIVED_EVENT_KEY, data, source);
+    super(messageParsedSubject, data, source);
   }
 }

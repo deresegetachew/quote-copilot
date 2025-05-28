@@ -34,7 +34,7 @@ export class ClassifyMessageAsRFQNode extends NodesAbstract<
       .setContext(input)
       .build();
 
-    this.logger.debug('ClassifyMessageAsRFQNode:', { prompt });
+    this.logger.debug('ClassifyMessageAsRFQNode:');
 
     return await llmClient.invokeLLM(prompt, classifyMessageAsRFQOutputSchema);
   }

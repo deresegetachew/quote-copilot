@@ -6,8 +6,18 @@ services:
       - '4222:4222'
       - '6222:6222'
       - '8222:8222'
+    command: ['-c', '/etc/nats/nats-server.conf']
     volumes:
+      - ./nats-server.conf:/etc/nats/nats-server.conf
       - ./nats_data:/data
+  nats-cli:
+    image: synadia/nats-box:latest
+    container_name: nats-cli
+    platform: linux/amd64
+    stdin_open: true
+    tty: true
+    depends_on:
+      - nats
   mongodb:
     image: mongo:latest
     container_name: mongodb

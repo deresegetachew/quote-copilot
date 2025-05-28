@@ -2,16 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { LLMClient } from '../../clients';
 import {
   classifyMessageAsRFQOutputSchemaTxt,
+  extractRFQDetailsOutputSchemaTxt,
   summarizeEmailOutputSchemaTxt,
   TSummarizeMessageInput,
 } from '@prompts';
 import { SummarizeMessagesNode } from '../../nodes/summarizeMessages/summarizeMessages.node';
-import {
-  StateGraph,
-  START,
-  END,
-  CompiledStateGraph,
-} from '@langchain/langgraph';
+import { StateGraph, START, END } from '@langchain/langgraph';
 import { ClassifyMessageAsRFQNode } from '../../nodes/classifyMessageAsRFQ/classifyMessageAsRFQ.node';
 import { ExtractRFQDetailsNode } from '../../nodes/extractRFQDetails/extractRFQDetails.node';
 import { nextOrErrorNode } from '../../util';
@@ -39,9 +35,10 @@ export class ParseEmailIntentGraph {
 
   async parseEmailWithLLM(
     threadId: string,
+    sender: string,
     messages: string[],
   ): Promise<TEmailIntentSchemaType> {
-    const { graph, initialState } = this.buildGraph(threadId, messages);
+    const { graph, initialState } = this.buildGraph(threadId, sender, messages);
 
     // calling invoke internally calls validateState, so make sure initState also passes schema validation
     const response = await graph.invoke(initialState);
@@ -53,7 +50,7 @@ export class ParseEmailIntentGraph {
     return response;
   }
 
-  private buildGraph(threadId: string, messages: string[]) {
+  private buildGraph(threadId: string, sender: string, messages: string[]) {
     const graph = new StateGraph(EmailIntentSchema)
       .addNode(HandleErrorNode.name, this.handleErrorNodeCallback)
       .addNode(SummarizeMessagesNode.name, this.summarizeMessagesNodeCallback)
@@ -106,7 +103,10 @@ export class ParseEmailIntentGraph {
       expectedDeliveryDate: null,
       hasAttachments: null,
       items: null,
-      customerDetail: null,
+      customerDetail: {
+        name: null,
+        email: sender,
+      },
       notes: null,
       error: null,
     };
@@ -165,7 +165,7 @@ export class ParseEmailIntentGraph {
     this.logger.debug('Extracting RFQ details Node');
     const result = await this.extractRFQDataNode.run(this.llmClient, {
       messages: state.messages,
-      responseSchema: classifyMessageAsRFQOutputSchemaTxt,
+      responseSchema: extractRFQDetailsOutputSchemaTxt,
     });
     return { rfqData: result };
   };

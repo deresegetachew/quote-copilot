@@ -51,10 +51,10 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
     const res = await this.gmail.users.messages.get({
       userId: 'me',
       id: messageId,
+      format: 'full',
     });
 
-    const gmailMessage = res.data;
-    return EmailMessageFactory.createFromGmailMessage(gmailMessage);
+    return EmailMessageFactory.createFromGmailMessage(res.data);
   }
 
   async getMessagesByThreadId(

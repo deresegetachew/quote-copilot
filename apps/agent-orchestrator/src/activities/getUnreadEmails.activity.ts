@@ -1,16 +1,15 @@
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import { AppContext } from '../appContext';
-import { EmailThreadResponseDTO, fetchObservableResult } from '@common';
+import { EmailWorkersClient } from '@common/clients/http';
 
+// use GRPC in the future
 export async function getUnreadEmailsActivity(): Promise<void> {
-  console.log('getUnreadEmailsActivity...');
-  const app = await AppContext.get();
-  const configService = app.get(ConfigService);
-  const httpService = app.get(HttpService);
-  const baseURL = 'http://' + configService.get('apps.emailWorker.baseUrl');
+  try {
+    console.log('getUnreadEmailsActivity...');
+    const app = await AppContext.get();
+    const emailWorkerClient = app.get(EmailWorkersClient);
 
-  const request = httpService.get(`${baseURL}/email-workers/unread-emails`);
-
-  await fetchObservableResult<EmailThreadResponseDTO>(request);
+    await emailWorkerClient.getUnreadEmails();
+  } catch (error) {
+    console.error('Error in getUnreadEmailsActivity:', error);
+  }
 }
