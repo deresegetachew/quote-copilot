@@ -9,14 +9,26 @@ export const extractRFQDetailsInputSchema = z.object({
 
 export const extractRFQDetailsOutputSchema = BaseNodeOutputSchema.extend({
   rfqNumber: z.string().nullable(), // we will generate this using RFQ number generator
-  expectedDeliveryDate: z.string().nullable(),
+  expectedDeliveryDate: z.string(),
   items: z
     .array(
       z.object({
-        itemCode: z.string(), // PN / SKU / NSN
+        itemCode: z
+          .string()
+          .describe(
+            'Item code is required but was not clearly identified from the message',
+          ), // PN / SKU / NSN
         itemDescription: z.string().nullable(),
-        quantity: z.number().int().nonnegative(),
-        unit: z.string().nullable(), // e.g. pcs, each, L
+        quantity: z
+          .number()
+          .int({ message: 'Item quantity must be a number' })
+          .nonnegative({
+            message:
+              'Item quantity identified in the message must be a non-negative integer',
+          }),
+        unit: z.string({
+          message: 'Item unit could not be parsed from the message',
+        }),
         notes: z.array(z.string()).nullable(), // delivery condition, packaging, etc.
       }),
     )

@@ -17,12 +17,9 @@ type TRFQEntityProps = {
     itemDescription: string | null;
     quantity: number;
     unit: string | null;
-    notes: string | null;
+    notes: string[] | null;
   }>;
-  error: {
-    message: string | null;
-    obj: any | null;
-  } | null;
+  error: string[] | null; // Changed from object to string[] for simplicity
   reason: string | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -50,6 +47,7 @@ export class RFQEntity {
     this.id = props.id;
     this.threadId = props.threadId;
     this.summary = props.summary;
+    this.status = props.status;
     this.customerDetail = props.customerDetail;
     this.expectedDeliveryDate = props.expectedDeliveryDate;
     this.hasAttachments = props.hasAttachments;
@@ -94,7 +92,7 @@ export class RFQEntity {
     itemDescription: string | null;
     quantity: number;
     unit: string | null;
-    notes: string | null;
+    notes: string[] | null;
   }> {
     return this.items;
   }
@@ -103,8 +101,8 @@ export class RFQEntity {
     return this.error !== null;
   }
 
-  getError(): string {
-    return this.error.message;
+  getError(): string[] | null {
+    return this.error;
   }
 
   getReason(): string | null {

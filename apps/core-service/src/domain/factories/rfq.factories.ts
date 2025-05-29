@@ -1,4 +1,4 @@
-import { DateHelper } from '@common';
+import { DateHelper, RFQStatus } from '@common';
 import { RFQEntity } from '../entities/RFQ.entity';
 import { RFQStatusVO } from '../valueObjects/rfqStatus.vo';
 import { TEmailIntentSchemaType } from '@tools-langchain'; //this is a library we dont have dep on langchain just schema
@@ -11,16 +11,13 @@ type TCreateNewParams = {
   notes?: string[] | null;
   reason?: string | null;
   hasAttachments?: boolean | null;
-  error?: {
-    message: string | null;
-    obj: any | null;
-  } | null;
+  error?: string[] | null;
   items: Array<{
     itemCode: string;
     itemDescription: string | null;
     quantity: number;
     unit: string | null;
-    notes: string | null;
+    notes: string[] | null;
   }>;
 };
 
@@ -39,12 +36,7 @@ export class RfqFactory {
         name: response?.customerDetail?.name || null,
         email: response?.customerDetail?.email,
       },
-      error: response?.error
-        ? {
-            message: response.error.message || null,
-            obj: response.error.obj || null,
-          }
-        : null,
+      error: response?.error,
       notes: response?.notes || null,
       reason: response?.reason || null,
       items: response?.items
@@ -62,7 +54,7 @@ export class RfqFactory {
   static createNew(params: TCreateNewParams): RFQEntity {
     const { threadId, summary, customerDetail, error = null, items } = params;
 
-    return new RFQEntity({
+    const rfq = new RFQEntity({
       id: undefined, // ID will be set in infrastructure layer
       threadId,
       summary,
@@ -77,5 +69,11 @@ export class RfqFactory {
       createdAt: DateHelper.getNowAsDate(),
       updatedAt: DateHelper.getNowAsDate(),
     });
+
+    if (rfq.hasError()) {
+      rfq.updateStatus(RFQStatusVO.of(RFQStatus.PROCESSING_FAILED));
+    }
+
+    return rfq;
   }
 }

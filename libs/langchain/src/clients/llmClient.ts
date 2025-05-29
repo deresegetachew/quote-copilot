@@ -65,13 +65,6 @@ export class LLMClient<TInput> {
     );
 
     if (structuredOutPutSchema) {
-      // const structuredModel = model.withStructuredOutput(
-      //   structuredOutPutSchema,
-      // );
-      // return await structuredModel.invoke(
-      //   await promptTemplate.formatMessages({}),
-      // );
-
       const rawContent = this.getMessageContentAsString(rawResult.content);
 
       this.logger.debug('🤖🤖🤖---LLM Raw Response---🤖🤖🤖:', { rawContent });
@@ -80,9 +73,8 @@ export class LLMClient<TInput> {
       if (!match) throw new Error('No valid JSON block found in LLM output.');
 
       const parsed = JSON.parse(match[1]);
-      const validated = structuredOutPutSchema.parse(parsed);
 
-      return validated;
+      return parsed;
     }
 
     return rawResult;

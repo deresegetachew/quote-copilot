@@ -147,7 +147,7 @@ RFQ Manager Agent:
 
 ```
 apps/
-  core-service/      → Our core application service running core business logics as **microservice**
+****
   email-workers/     → Email ingestion app (polling or webhook)
   core-service       →  Application logic
   telegram-workers/  → Telegram ingestion app

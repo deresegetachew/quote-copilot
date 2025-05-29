@@ -1,10 +1,4 @@
-export enum RFQStatus {
-  NEW = 'NEW',
-  PROCESSING = 'PROCESSING',
-  PROCESSING_FAILED = 'PROCESSING_FAILED', // means requires human intervention
-  COMPLETED = 'COMPLETED',
-  CANCELED = 'CANCELED',
-}
+import { RFQStatus } from '@common';
 
 export class RFQStatusVO {
   private constructor(private readonly value: RFQStatus) {}
@@ -26,7 +20,7 @@ export class RFQStatusVO {
 
   canTransitionTo(target: string): boolean {
     const transitions = {
-      [RFQStatus.NEW]: [RFQStatus.PROCESSING],
+      [RFQStatus.NEW]: [RFQStatus.PROCESSING, RFQStatus.PROCESSING_FAILED],
       [RFQStatus.PROCESSING]: [
         RFQStatus.COMPLETED,
         RFQStatus.CANCELED,

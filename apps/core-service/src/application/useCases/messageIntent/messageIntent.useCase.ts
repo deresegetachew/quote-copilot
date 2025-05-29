@@ -1,14 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ParseMessageIntentCommand } from '../../ports/incoming/commands/parse-message-intent.command';
 import { EmailWorkersClient } from '@common/clients/http';
-import { MessageIntentResponseDTO } from '@common/dtos';
 import { DateTime } from 'luxon';
 import {
   ParseEmailIntentGraph,
   TEmailIntentSchemaType,
 } from '@tools-langchain';
-import { Injectable, Logger } from '@nestjs/common';
-import { MessageIntentResponseMapper } from '../../../presenters/http/mappers/messageIntentResponse.mapper';
+import { Logger } from '@nestjs/common';
 import { RfqRepositoryPort } from '../../ports/outgoing/rfqRepository.port';
 import { RfqFactory } from '../../../domain/factories/rfq.factories';
 

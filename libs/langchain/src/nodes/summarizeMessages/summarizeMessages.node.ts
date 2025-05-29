@@ -39,4 +39,19 @@ export class SummarizeMessagesNode extends NodesAbstract<
       summarizeEmailOutputSchema,
     );
   }
+
+  protected validateResponse(
+    result: TSummarizeMessageOutput,
+  ): TSummarizeMessageOutput {
+    try {
+      const validatedResult = summarizeEmailOutputSchema.parse(result);
+      return validatedResult;
+    } catch (error) {
+      this.logger.error('::SummarizeMessagesNode::', {
+        error,
+      });
+
+      throw error;
+    }
+  }
 }

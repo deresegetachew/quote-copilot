@@ -15,4 +15,9 @@ export class HandleErrorNode extends NodesAbstract<any, undefined> {
       this.logger.error('Node error::', { error });
     }
   }
+
+  protected validateResponse(result: undefined): undefined {
+    // No validation needed for error handling node
+    return result;
+  }
 }

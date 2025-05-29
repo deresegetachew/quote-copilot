@@ -16,8 +16,8 @@ export class RFQLineItem {
   @Prop({ required: false, default: null })
   unit: string | null;
 
-  @Prop({ required: false, default: null })
-  notes: string | null;
+  @Prop({ type: [String], required: false, default: null })
+  notes: string[] | null;
 }
 
 export type RFQLineItemDocument = RFQLineItem & Document;

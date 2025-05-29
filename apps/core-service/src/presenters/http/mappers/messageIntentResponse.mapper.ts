@@ -14,12 +14,7 @@ export class MessageIntentResponseMapper {
       summary: llmResponse.requestSummary ?? '',
       isRFQ: llmResponse.isRFQ,
       reason: llmResponse.reason,
-      error: llmResponse.error
-        ? {
-            message: llmResponse.error?.message ?? null,
-            obj: llmResponse.error?.obj ?? null,
-          }
-        : null,
+      error: llmResponse.error,
       rfqData: {
         customerDetail: llmResponse.customerDetail
           ? {

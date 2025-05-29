@@ -16,7 +16,7 @@ export const EmailIntentSchema = z.object({
         itemDescription: z.string().nullable(),
         quantity: z.number().int().positive(),
         unit: z.string().nullable(),
-        notes: z.string().nullable(),
+        notes: z.array(z.string()).nullable(),
       }),
     )
     .min(1)
@@ -28,12 +28,7 @@ export const EmailIntentSchema = z.object({
     })
     .nullable(),
   notes: z.array(z.string()).nullable(),
-  error: z
-    .object({
-      message: z.string(),
-      obj: z.any(),
-    })
-    .nullable(),
+  error: z.array(z.string()).nullable(),
 });
 
 const jsonSchema = zodToJsonSchema(

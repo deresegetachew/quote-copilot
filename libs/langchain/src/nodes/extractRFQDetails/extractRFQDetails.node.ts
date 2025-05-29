@@ -8,6 +8,7 @@ import {
   extractRFQDetailsOutputSchema,
   extractRFQDetailsInputSchema,
 } from '@prompts';
+import { z } from 'zod';
 
 @Injectable()
 export class ExtractRFQDetailsNode extends NodesAbstract<
@@ -34,9 +35,29 @@ export class ExtractRFQDetailsNode extends NodesAbstract<
 
     this.logger.debug('ExtractRFQDetailsNode:');
 
-    return await llmClient.invokeLLM<typeof extractRFQDetailsOutputSchema>(
-      prompt,
-      extractRFQDetailsOutputSchema,
-    );
+    const result = await llmClient.invokeLLM<
+      typeof extractRFQDetailsOutputSchema
+    >(prompt, extractRFQDetailsOutputSchema);
+
+    return result;
+  }
+
+  protected validateResponse(
+    result: TExtractRFQDetailsOutput,
+  ): TExtractRFQDetailsOutput {
+    try {
+      const validatedResult = extractRFQDetailsOutputSchema.parse(result);
+      return validatedResult;
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return {
+          ...result,
+          error: err.errors.map((e) => `${e.path} ${e.message}`),
+        };
+      }
+
+      // break the graph we dont know what happened
+      throw err;
+    }
   }
 }

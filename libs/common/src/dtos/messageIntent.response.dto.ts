@@ -3,7 +3,7 @@ export class MessageIntentResponseDTO {
   summary: string;
   isRFQ: boolean | null;
   reason: string | null;
-  error: { message: string; obj: any } | null;
+  error: string[] | null;
   rfqData: {
     customerDetail: {
       name: string | null;
@@ -18,7 +18,7 @@ export class MessageIntentResponseDTO {
           itemDescription: string | null;
           quantity: number;
           unit: string | null;
-          notes: string | null;
+          notes: string[] | null;
         }[]
       | null;
   };

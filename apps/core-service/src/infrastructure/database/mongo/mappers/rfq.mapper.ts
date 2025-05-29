@@ -15,10 +15,7 @@ export class RFQMapper {
 
       notes: rfqDoc.notes ?? null,
       hasAttachments: rfqDoc.hasAttachments,
-      error: {
-        message: rfqDoc.reason || '',
-        obj: null,
-      },
+      error: rfqDoc.error || null,
       reason: rfqDoc.reason || null,
 
       customerDetail: {
@@ -43,6 +40,7 @@ export class RFQMapper {
         ? new ObjectId(rfq.getStorageId())
         : new ObjectId(),
       threadId: rfq.getEmailThreadRef(),
+      status: rfq.getStatus().getValue(),
       summary: rfq.getSummary(),
       customerDetail: {
         name: rfq.getCustomerDetail().name ?? null,
@@ -58,7 +56,8 @@ export class RFQMapper {
         unit: item.unit,
         notes: item.notes,
       })),
-      reason: rfq.hasError() ? rfq.getReason() : null,
+      reason: rfq.getReason(),
+      error: rfq.hasError() ? rfq.getError() : null,
       createdAt: rfq.getStorageId() ? rfq.getCreatedAt() : new Date(),
       updatedAt: DateHelper.getNowAsDate(),
     };

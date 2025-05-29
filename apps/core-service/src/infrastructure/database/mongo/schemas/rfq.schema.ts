@@ -35,6 +35,9 @@ export class RFQ {
   })
   reason: string | null;
 
+  @Prop({ type: [String], default: null })
+  error: string[] | null;
+
   @Prop()
   createdAt: Date;
 

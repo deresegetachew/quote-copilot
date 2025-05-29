@@ -38,4 +38,18 @@ export class ClassifyMessageAsRFQNode extends NodesAbstract<
 
     return await llmClient.invokeLLM(prompt, classifyMessageAsRFQOutputSchema);
   }
+
+  protected validateResponse(
+    result: TClassifyMessageAsRFQOutput,
+  ): TClassifyMessageAsRFQOutput {
+    try {
+      const validatedResult = classifyMessageAsRFQOutputSchema.parse(result);
+      return validatedResult;
+    } catch (err) {
+      this.logger.error('::ClassifyMessageAsRFQNode::', {
+        error: err,
+      });
+      throw err;
+    }
+  }
 }

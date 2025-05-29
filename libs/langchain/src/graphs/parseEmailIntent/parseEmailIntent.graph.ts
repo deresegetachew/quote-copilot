@@ -118,15 +118,6 @@ export class ParseEmailIntentGraph {
   }
 
   private classifyErrors(error: TEmailIntentSchemaType['error']): string {
-    if (error.obj instanceof z.ZodError) {
-      return 'SCHEMA_VALIDATION_ERROR';
-    } else if (error.message.includes('requires clarification')) {
-      return 'REQUIRES_CLARIFICATION';
-    } else if (error.message.includes('requires human review')) {
-      return 'REQUIRES_HUMAN_REVIEW';
-    } else if (error.message.includes('retry')) {
-      return 'RETRY';
-    }
     return 'UNKNOWN_ERROR';
   }
 
@@ -162,11 +153,25 @@ export class ParseEmailIntentGraph {
   private extractRFQDetailsNodeCallback = async (
     state: TEmailIntentSchemaType,
   ) => {
-    this.logger.debug('Extracting RFQ details Node');
-    const result = await this.extractRFQDataNode.run(this.llmClient, {
-      messages: state.messages,
-      responseSchema: extractRFQDetailsOutputSchemaTxt,
-    });
-    return { rfqData: result };
+    try {
+      this.logger.debug('Extracting RFQ details Node');
+      const result = await this.extractRFQDataNode.run(this.llmClient, {
+        messages: state.messages,
+        responseSchema: extractRFQDetailsOutputSchemaTxt,
+      });
+      return {
+        expectedDeliveryDate: result.expectedDeliveryDate,
+        items: result.items,
+        customerDetail: {
+          ...state.customerDetail,
+          name: result.customerDetail.name,
+        },
+
+        notes: result.notes,
+        error: result.error,
+      };
+    } catch (error) {
+      return {};
+    }
   };
 }
