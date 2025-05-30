@@ -1,5 +1,8 @@
 # AI Agents Monorepo — Multi-Tenant LLM Framework
 
+![image](https://github.com/user-attachments/assets/eb673fca-38d3-4497-b237-2f6db5db956f)
+
+
 This project implements a modular AI agent  designed for automating domain-specific workflows such as procurement, customer support, compliance, and more.
 
 📚 For coding conventions and architectural guidelines, see [CODING_GUIDELINES.md](./CODING_GUIDELINES.md)
