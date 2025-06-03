@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { LLMClient } from '../../clients';
 import {
   classifyMessageAsRFQOutputSchemaTxt,
@@ -19,7 +19,7 @@ import {
 import { ModuleRef } from '@nestjs/core';
 
 @Injectable()
-export class ParseEmailIntentGraph {
+export class ParseEmailIntentGraph implements OnModuleInit {
   private llmClient: LLMClient<TSummarizeMessageInput>;
 
   logger = new Logger(ParseEmailIntentGraph.name);
@@ -30,8 +30,9 @@ export class ParseEmailIntentGraph {
     private extractRFQDataNode: ExtractRFQDetailsNode,
     private handleErrorNode: HandleErrorNode,
     private moduleRef: ModuleRef,
-  ) {
-    this.getLLMClient();
+  ) {}
+  async onModuleInit() {
+    await this.getLLMClient();
   }
 
   async parseEmailWithLLM(
