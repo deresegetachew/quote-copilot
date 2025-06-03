@@ -12,7 +12,6 @@ import { ClassifyMessageAsRFQNode } from '../../nodes/classifyMessageAsRFQ/class
 import { ExtractRFQDetailsNode } from '../../nodes/extractRFQDetails/extractRFQDetails.node';
 import { nextOrErrorNode } from '../../util';
 import { HandleErrorNode } from '../../nodes/handleError/handleError.node';
-import { z } from 'zod';
 import {
   EmailIntentSchema,
   TEmailIntentSchemaType,
@@ -21,7 +20,8 @@ import { ModuleRef } from '@nestjs/core';
 
 @Injectable()
 export class ParseEmailIntentGraph {
-  // private readonly graph: StateGraph<TParseEmailIntentState>;
+  private llmClient: LLMClient<TSummarizeMessageInput>;
+
   logger = new Logger(ParseEmailIntentGraph.name);
 
   constructor(
@@ -29,10 +29,9 @@ export class ParseEmailIntentGraph {
     private classifyEmailAsRFQNode: ClassifyMessageAsRFQNode,
     private extractRFQDataNode: ExtractRFQDetailsNode,
     private handleErrorNode: HandleErrorNode,
-    private llmClient: LLMClient<TSummarizeMessageInput>, // this is wrong for transient we should use resolve to inject the client
     private moduleRef: ModuleRef,
   ) {
-    this.llmClient.setStrategy('openAI');
+    this.getLLMClient();
   }
 
   async parseEmailWithLLM(
@@ -124,10 +123,8 @@ export class ParseEmailIntentGraph {
   }
 
   private handleErrorNodeCallback = async (state: TEmailIntentSchemaType) => {
-    const llmClient = await this.getLLMClient();
-
     this.logger.debug('Handling error Node');
-    return await this.handleErrorNode.run(llmClient, {
+    return await this.handleErrorNode.run(this.llmClient, {
       error: state.error,
     });
   };
@@ -136,8 +133,6 @@ export class ParseEmailIntentGraph {
     state: TEmailIntentSchemaType,
   ) => {
     this.logger.debug('Summarizing messages Node');
-
-    const llmClient = await this.getLLMClient();
     const result = await this.summarizeMessageNode.run(this.llmClient, {
       messages: state.messages,
       responseSchema: summarizeEmailOutputSchemaTxt,
@@ -149,9 +144,7 @@ export class ParseEmailIntentGraph {
     state: TEmailIntentSchemaType,
   ) => {
     this.logger.debug('Classifying email as RFQ Node');
-
-    const llmClient = await this.getLLMClient();
-    const result = await this.classifyEmailAsRFQNode.run(llmClient, {
+    const result = await this.classifyEmailAsRFQNode.run(this.llmClient, {
       messages: state.messages,
       responseSchema: classifyMessageAsRFQOutputSchemaTxt,
     });
@@ -163,9 +156,7 @@ export class ParseEmailIntentGraph {
   ) => {
     try {
       this.logger.debug('Extracting RFQ details Node');
-
-      const llmClient = await this.getLLMClient();
-      const result = await this.extractRFQDataNode.run(llmClient, {
+      const result = await this.extractRFQDataNode.run(this.llmClient, {
         messages: state.messages,
         responseSchema: extractRFQDetailsOutputSchemaTxt,
       });
@@ -186,12 +177,11 @@ export class ParseEmailIntentGraph {
   };
 
   private async getLLMClient() {
-    const llmClient = await this.moduleRef.resolve(LLMClient);
-
-    if (!llmClient) {
-      throw new Error('LLMClient is not initialized');
+    if (!this.llmClient) {
+      this.llmClient = await this.moduleRef.resolve(LLMClient);
+      this.llmClient.setStrategy('openAI');
     }
-    llmClient.setStrategy('openAI');
-    return llmClient;
+
+    return this.llmClient;
   }
 }
