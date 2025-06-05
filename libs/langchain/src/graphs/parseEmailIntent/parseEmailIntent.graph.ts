@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { LLMClient } from '../../clients';
 import {
   classifyMessageAsRFQOutputSchemaTxt,
@@ -12,15 +12,16 @@ import { ClassifyMessageAsRFQNode } from '../../nodes/classifyMessageAsRFQ/class
 import { ExtractRFQDetailsNode } from '../../nodes/extractRFQDetails/extractRFQDetails.node';
 import { nextOrErrorNode } from '../../util';
 import { HandleErrorNode } from '../../nodes/handleError/handleError.node';
-import { z } from 'zod';
 import {
   EmailIntentSchema,
   TEmailIntentSchemaType,
 } from './parseEmailIntent.schema';
+import { ModuleRef } from '@nestjs/core';
 
 @Injectable()
-export class ParseEmailIntentGraph {
-  // private readonly graph: StateGraph<TParseEmailIntentState>;
+export class ParseEmailIntentGraph implements OnModuleInit {
+  private llmClient: LLMClient<TSummarizeMessageInput>;
+
   logger = new Logger(ParseEmailIntentGraph.name);
 
   constructor(
@@ -28,9 +29,10 @@ export class ParseEmailIntentGraph {
     private classifyEmailAsRFQNode: ClassifyMessageAsRFQNode,
     private extractRFQDataNode: ExtractRFQDetailsNode,
     private handleErrorNode: HandleErrorNode,
-    private llmClient: LLMClient<TSummarizeMessageInput>,
-  ) {
-    this.llmClient.setStrategy('openAI');
+    private moduleRef: ModuleRef,
+  ) {}
+  async onModuleInit() {
+    await this.getLLMClient();
   }
 
   async parseEmailWithLLM(
@@ -174,4 +176,13 @@ export class ParseEmailIntentGraph {
       return {};
     }
   };
+
+  private async getLLMClient() {
+    if (!this.llmClient) {
+      this.llmClient = await this.moduleRef.resolve(LLMClient);
+      this.llmClient.setStrategy('openAI');
+    }
+
+    return this.llmClient;
+  }
 }
