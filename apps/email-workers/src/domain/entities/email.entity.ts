@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 
 export class EmailEntity {
-  readonly id: string; // message ID in mongodb
+  readonly id: string;
   readonly messageId: string;
   readonly threadId: string;
   readonly from: string;

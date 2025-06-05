@@ -1,4 +1,4 @@
-import { EmailMessageAggregate } from '../../../../domain/entities/emailMessage.aggregate';
+import { MessageThreadAggregate } from '../../../../domain/entities/messageThread.aggregate';
 import { EmailEntity } from '../../../../domain/entities/email.entity';
 import { EmailThreadStatusVO } from '../../../../domain/valueObjects/emailThreadStatus.vo';
 import { EmailDocument } from '../schemas/email.schema';
@@ -8,7 +8,7 @@ export class EmailMessageMapper {
   static toDomain(
     thread: ThreadDocument,
     emails: EmailDocument[],
-  ): EmailMessageAggregate {
+  ): MessageThreadAggregate {
     const emailEntities: EmailEntity[] = emails.map(
       (doc) =>
         new EmailEntity({
@@ -25,10 +25,11 @@ export class EmailMessageMapper {
 
     const statusVO = EmailThreadStatusVO.of(thread.status);
 
-    return EmailMessageAggregate.fromPersistence(
+    return MessageThreadAggregate.fromPersistence(
       thread.id,
       thread.threadId,
       emailEntities,
+      [], // temporary empty array for attachments
       statusVO,
     );
   }
@@ -46,7 +47,7 @@ export class EmailMessageMapper {
   }
 
   static toPersistenceThread(
-    aggregate: EmailMessageAggregate,
+    aggregate: MessageThreadAggregate,
   ): Partial<ThreadDocument> {
     return {
       threadId: aggregate.getThreadId(),
@@ -56,7 +57,7 @@ export class EmailMessageMapper {
   }
 
   static toPersistenceEmails(
-    aggregate: EmailMessageAggregate,
+    aggregate: MessageThreadAggregate,
   ): Partial<EmailDocument>[] {
     return aggregate.getEmails().map(this.toPersistenceEmail);
   }

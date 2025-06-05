@@ -3,9 +3,11 @@ import { GaxiosResponse } from 'gaxios';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { GmailAuth } from './gmail.auth';
 import { EmailClientPort } from '../../../../application/ports/outgoing/emailClient.port';
-import { EmailMessageAggregate } from '../../../../domain/entities/emailMessage.aggregate';
+import { MessageThreadAggregate } from '../../../../domain/entities/messageThread.aggregate';
 
-import { EmailMessageFactory } from '../../../../domain/factories/email-message.factory';
+import { EmailMessageDTO } from '../../../../application/ports/outgoing/dto/emailMessage.dto';
+import { DateTime } from 'luxon';
+import { GmailClientMapper } from './gmailClient.mapper';
 
 @Injectable()
 export class GmailClient extends EmailClientPort implements OnModuleInit {
@@ -27,7 +29,7 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
     await this.initializeLabels();
   }
 
-  async getUnreadMessages(): Promise<EmailMessageAggregate[]> {
+  async getUnreadMessages(): Promise<EmailMessageDTO[]> {
     const res = await this.gmail.users.messages.list({
       userId: 'me',
       q: '-label:agent-read',
@@ -35,7 +37,7 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
     });
 
     const messages = res.data.messages || [];
-    const emailMessages: EmailMessageAggregate[] = [];
+    const emailMessages: EmailMessageDTO[] = [];
 
     for (const message of messages) {
       if (message.id) {
@@ -47,31 +49,48 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
     return emailMessages;
   }
 
-  async getMessageById(messageId: string): Promise<EmailMessageAggregate> {
+  async getMessageById(messageId: string): Promise<EmailMessageDTO> {
     const res = await this.gmail.users.messages.get({
       userId: 'me',
       id: messageId,
       format: 'full',
     });
 
-    return EmailMessageFactory.createFromGmailMessage(res.data);
+    return GmailClientMapper.toEmailMessageDTO(res.data);
   }
 
-  async getMessagesByThreadId(
-    threadId: string,
-  ): Promise<EmailMessageAggregate[]> {
+  async getMessagesByThreadId(threadId: string): Promise<EmailMessageDTO[]> {
     const res = await this.gmail.users.threads.get({
       userId: 'me',
       id: threadId,
     });
 
+    if (res && res.status !== 200) {
+      throw new Error(`Failed to fetch thread: ${res.statusText}`);
+    }
+
     const messages = res.data.messages || [];
-    return messages.map((msg) =>
-      EmailMessageFactory.createFromGmailMessage(msg),
-    );
+    return messages.map((msg) => GmailClientMapper.toEmailMessageDTO(msg));
   }
 
-  async searchByQuery(query: string): Promise<EmailMessageAggregate[]> {
+  async getMessageAttachmentByIdOrThrow(
+    messageId: string,
+    attachmentId: string,
+  ): Promise<Buffer> {
+    const res = await this.gmail.users.messages.attachments.get({
+      userId: 'me',
+      messageId,
+      id: attachmentId,
+    });
+
+    if (res.data.data) {
+      return Buffer.from(res.data.data, 'base64');
+    } else {
+      throw new Error('Attachment data not found');
+    }
+  }
+
+  async searchByQuery(query: string): Promise<EmailMessageDTO[]> {
     const res = await this.gmail.users.messages.list({
       userId: 'me',
       q: query,
@@ -79,7 +98,7 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
     });
 
     const messages = res.data.messages || [];
-    const aggregates: EmailMessageAggregate[] = [];
+    const aggregates: EmailMessageDTO[] = [];
 
     for (const message of messages) {
       if (message.id) {
@@ -87,7 +106,7 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
           userId: 'me',
           id: message.id,
         });
-        aggregates.push(EmailMessageFactory.createFromGmailMessage(msg.data));
+        aggregates.push(GmailClientMapper.toEmailMessageDTO(msg.data));
       }
     }
 

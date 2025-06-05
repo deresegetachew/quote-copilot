@@ -9,7 +9,7 @@ import {
   EmailDocument,
 } from '../../database/mongo/schemas/email.schema';
 import { Model } from 'mongoose';
-import { EmailMessageAggregate } from '../../../domain/entities/emailMessage.aggregate';
+import { MessageThreadAggregate } from '../../../domain/entities/messageThread.aggregate';
 import { EmailMessageMapper } from '../../database/mongo/mappers/emailMessage.mapper';
 import { PaginatedData } from '@common';
 import { Injectable, Logger } from '@nestjs/common';
@@ -33,7 +33,7 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
   // but for now, we will just use the upsert option
   // to make sure that if the document does not exist, it will be created
   // and if it exists, it will be updated
-  async save(emailMessage: EmailMessageAggregate): Promise<void> {
+  async save(emailMessage: MessageThreadAggregate): Promise<void> {
     const threadData = EmailMessageMapper.toPersistenceThread(emailMessage);
     const emailsData = EmailMessageMapper.toPersistenceEmails(emailMessage);
 
@@ -54,7 +54,7 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
 
   async findByThreadId(
     threadId: string,
-  ): Promise<EmailMessageAggregate | null> {
+  ): Promise<MessageThreadAggregate | null> {
     const threadDoc = await this.threadModel.findOne({ threadId }).exec();
     if (!threadDoc) {
       return null;
@@ -76,7 +76,7 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
       receivedAt: Date;
       status: string;
     }>,
-  ): Promise<PaginatedData<EmailMessageAggregate>> {
+  ): Promise<PaginatedData<MessageThreadAggregate>> {
     const {
       subject,
       body,
@@ -102,7 +102,7 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
 
     const totalCount = await this.threadModel.countDocuments(query);
 
-    const results: EmailMessageAggregate[] = [];
+    const results: MessageThreadAggregate[] = [];
 
     for (const thread of threadDocs) {
       const emailQuery: any = { messageId: { $in: thread.messageIds } };
