@@ -1,9 +1,9 @@
-import { EmailMessageAggregate } from '../../../domain/entities/emailMessage.aggregate';
+import { MessageThreadAggregate } from '../../../domain/entities/messageThread.aggregate';
 import { EmailThreadResponseDTO } from '@common';
 
 export class EmailThreadsResponseMapper {
   static toResponse(
-    emailThreads: EmailMessageAggregate,
+    emailThreads: MessageThreadAggregate,
   ): EmailThreadResponseDTO {
     return {
       id: emailThreads.getStorageId(),

@@ -2,11 +2,11 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { EmailClientFactoryPort } from '../../ports/outgoing/emailClient.port';
 import { EmailMessageRepositoryPort } from '../../ports/outgoing/emailMessageRepository.port';
 import { GetEmailThreadMessagesQuery } from '../../ports/incoming/query';
-import { EmailMessageAggregate } from '../../../domain/entities/emailMessage.aggregate';
+import { MessageThreadAggregate } from '../../../domain/entities/messageThread.aggregate';
 
 @QueryHandler(GetEmailThreadMessagesQuery)
 export class GetEmailThreadMessagesUseCase
-  implements IQueryHandler<GetEmailThreadMessagesQuery, EmailMessageAggregate>
+  implements IQueryHandler<GetEmailThreadMessagesQuery, MessageThreadAggregate>
 {
   constructor(
     private readonly emailClientFactory: EmailClientFactoryPort,
@@ -15,7 +15,7 @@ export class GetEmailThreadMessagesUseCase
 
   async execute(
     query: GetEmailThreadMessagesQuery,
-  ): Promise<EmailMessageAggregate> {
+  ): Promise<MessageThreadAggregate> {
     const { threadId } = query;
 
     return await this.dbRepository.findByThreadId(threadId);

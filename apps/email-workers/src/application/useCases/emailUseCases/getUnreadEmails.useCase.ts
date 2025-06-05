@@ -1,5 +1,5 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { EmailMessageAggregate } from '../../../domain/entities/emailMessage.aggregate';
+import { MessageThreadAggregate } from '../../../domain/entities/messageThread.aggregate';
 import { GetUnreadEmailsQuery } from '../../ports/incoming/query/getUnreadEmails.query';
 import { EmailClientFactoryPort } from '../../ports/outgoing/emailClient.port';
 import { EmailMessageRepositoryPort } from '../../ports/outgoing/emailMessageRepository.port';
@@ -7,10 +7,11 @@ import { CommandBus } from '@nestjs/cqrs';
 import { EmailThreadStatusVO } from '../../../domain/valueObjects/emailThreadStatus.vo';
 import { TriggerEmailThreadProcessingWfCommand } from '../../ports/incoming/command';
 import { Logger } from '@nestjs/common';
+import { MessageThreadFactory } from '../../../domain/factories/messageThread.factory';
 
 @QueryHandler(GetUnreadEmailsQuery)
 export class GetUnreadEmailsUseCase
-  implements IQueryHandler<GetUnreadEmailsQuery, EmailMessageAggregate[]>
+  implements IQueryHandler<GetUnreadEmailsQuery, MessageThreadAggregate[]>
 {
   private logger = new Logger(GetUnreadEmailsUseCase.name);
 
@@ -20,12 +21,16 @@ export class GetUnreadEmailsUseCase
     private readonly commandBus: CommandBus,
   ) {}
 
-  async execute(): Promise<EmailMessageAggregate[]> {
+  async execute(): Promise<MessageThreadAggregate[]> {
     const client = this.emailClientFactory.getClient('GMAIL');
-    const unreadMsgs = await client.getUnreadMessages();
+    const unreadMsgsDTO = await client.getUnreadMessages();
+
+    const unreadMsgs = unreadMsgsDTO.map((msg) => {
+      return MessageThreadFactory.createFromEmailMessageDTO(msg);
+    });
 
     if (unreadMsgs.length > 0) {
-      const aggregates: EmailMessageAggregate[] = [];
+      const aggregates: MessageThreadAggregate[] = [];
       const savePromises: Promise<void>[] = [];
       const allUnreadMessageIds = new Set(
         unreadMsgs.flatMap((um) => um.getEmails().map((e) => e.getMessageId())),
@@ -39,13 +44,14 @@ export class GetUnreadEmailsUseCase
         const currentStatus = existingThread?.getStatus();
 
         // Re-create the aggregate but preserve status
-        const agg = new EmailMessageAggregate(
+        const agg = new MessageThreadAggregate(
           unreadMsg.getStorageId(),
           threadId,
           [
             ...(existingThread?.getEmails() ?? []),
             ...(unreadMsg?.getEmails() ?? []),
           ],
+          unreadMsg.getAttachments(),
           currentStatus ?? EmailThreadStatusVO.initial(),
         );
 

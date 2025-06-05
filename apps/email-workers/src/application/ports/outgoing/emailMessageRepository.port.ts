@@ -1,9 +1,9 @@
 import { PaginatedData } from '@common';
-import { EmailMessageAggregate } from '../../../domain/entities/emailMessage.aggregate';
+import { MessageThreadAggregate } from '../../../domain/entities/messageThread.aggregate';
 
 export abstract class EmailMessageRepositoryPort {
-  abstract findByThreadId(id: string): Promise<EmailMessageAggregate | null>;
-  abstract save(entity: EmailMessageAggregate): Promise<void>;
+  abstract findByThreadId(id: string): Promise<MessageThreadAggregate | null>;
+  abstract save(entity: MessageThreadAggregate): Promise<void>;
 
   abstract searchByFields(
     filters: Partial<{
@@ -14,5 +14,5 @@ export abstract class EmailMessageRepositoryPort {
       receivedAt: Date;
       status: string;
     }>,
-  ): Promise<PaginatedData<EmailMessageAggregate>>;
+  ): Promise<PaginatedData<MessageThreadAggregate>>;
 }
