@@ -6,10 +6,10 @@ export abstract class IntegrationEvent<T = any> {
   readonly eventType: string;
   readonly data: T;
 
-  constructor(eventType: string, data: T, source: TEventSources) {
+  constructor(source: TEventSources, eventType: string, data: T) {
+    this.source = source;
     this.eventType = eventType;
     this.data = data;
-    this.source = source;
     this.timestamp = DateHelper.getNowAsString();
   }
 }

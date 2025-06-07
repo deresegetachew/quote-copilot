@@ -6,14 +6,6 @@ import {
   NewMessageSignalPayload,
 } from '../../signals';
 import type * as activities from '../../activities';
-import {
-  messageParsedSubject,
-  messageParsedSubjectPayloadSchema,
-  messageParsedUnprocessableSubject,
-  messageParsedUnprocessableSubjectPayloadSchema,
-  TMessageParsedUnprocessableSubjectPayload,
-  TMessageParsedSubjectPayload,
-} from '@common/nats';
 
 const { parseEmailIntentActivity } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',
@@ -97,19 +89,20 @@ export async function processEmailThreadWorkflow(): Promise<void> {
 
         // Step 2: Send email
         // fire call fireIntegrationEventActivity to save the parsed data details and send  confirmation email to the user
-        await fireIntegrationEventsActivity<TMessageParsedSubjectPayload>({
-          subject: messageParsedSubject,
-          schema: messageParsedSubjectPayloadSchema,
-          eventPayload: {},
-        });
+        // await fireIntegrationEventsActivity<TMessageParsedSubjectPayload>({
+        //   subject: messageParsedSubject,
+        //   schema: messageParsedSubjectPayloadSchema,
+        //   eventPayload: {},
+        // });
       } else {
-        await fireIntegrationEventsActivity<TMessageParsedUnprocessableSubjectPayload>(
-          {
-            subject: messageParsedUnprocessableSubject,
-            schema: messageParsedUnprocessableSubjectPayloadSchema,
-            eventPayload: {},
-          },
-        );
+        console.log('Not an RFQ, checking');
+        // await fireIntegrationEventsActivity<TMessageParsedUnprocessableSubjectPayload>(
+        //   {
+        //     subject: messageParsedUnprocessableSubject,
+        //     schema: messageParsedUnprocessableSubjectPayloadSchema,
+        //     eventPayload: {},
+        //   },
+        // );
 
         // step 2 fire integration event to update the thread and message record
 

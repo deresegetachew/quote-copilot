@@ -1,5 +1,5 @@
 import { ObjectId } from 'bson';
-import { RFQEntity } from '../../../../domain/entities/RFQ.entity';
+import { RFQEntity } from '../../../../domain/entities/rfq.entity';
 import { RFQDocument } from '../schemas/rfq.schema';
 import { DateHelper } from '@common';
 import { RFQStatusVO } from '../../../../domain/valueObjects/rfqStatus.vo';

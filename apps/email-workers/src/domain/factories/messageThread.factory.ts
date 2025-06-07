@@ -33,6 +33,7 @@ export class MessageThreadFactory {
     const attachmentEntities = attachments.map(
       (att) =>
         new AttachmentEntity({
+          id: null,
           attachmentId: att.attachmentId,
           threadId,
           messageId,

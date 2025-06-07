@@ -9,6 +9,7 @@ import {
 import { Logger } from '@nestjs/common';
 import { RfqRepositoryPort } from '../../ports/outgoing/rfqRepository.port';
 import { RfqFactory } from '../../../domain/factories/rfq.factories';
+import { AttachmentParsingStatus } from '../../../../../../libs/common/src';
 
 @CommandHandler(ParseMessageIntentCommand)
 export class MessageIntentUseCase
@@ -41,6 +42,10 @@ export class MessageIntentUseCase
         .map((email) => email.body);
 
       const sender = result.emails.map((email) => email.from).join(', ');
+      const attachments = result.attachments;
+      const attPendingParse = attachments.filter(
+        (att) => att.status === AttachmentParsingStatus.PENDING_PARSING,
+      );
 
       const llmResponse = await this.parseEmailIntentLLMGraph.parseEmailWithLLM(
         threadId,

@@ -19,6 +19,17 @@ export class EmailThreadsResponseMapper {
         body: email.getBody(),
         receivedAt: email.getReceivedAt(),
       })),
+      attachments: emailThreads
+        .getAttachments(emailThreads.getThreadId())
+        .map((attachment) => ({
+          id: attachment.getStorageId(),
+          threadId: attachment.getThreadId(),
+          messageId: attachment.getMessageId(),
+          attachmentId: attachment.getAttachmentId(),
+          fileName: attachment.getFileName(),
+          mimeType: attachment.getMimeType(),
+          status: attachment.getStatus().getValue(),
+        })),
     };
   }
 }

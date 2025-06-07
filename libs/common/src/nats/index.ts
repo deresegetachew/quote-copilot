@@ -1,3 +1,2 @@
-export * from './subjects/messageParsed';
-export * from './subjects/messageParsedUnprocessable';
-export * from './subjects/messageParsedUnprocessable';
+// move to its own library nats-adapter
+export * from '../integrationEvents/topic.helper';

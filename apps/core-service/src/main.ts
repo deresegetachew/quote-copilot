@@ -1,5 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AsyncMicroserviceOptions, Transport } from '@nestjs/microservices';
+import {
+  AsyncMicroserviceOptions,
+  MicroserviceOptions,
+  Transport,
+} from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { TConfiguration } from '@app-config/config';
@@ -7,42 +11,32 @@ import { CoreServiceModule } from './coreService.module';
 
 async function bootstrap() {
   // Create the HTTP (REST) app
-  const httpApp = await NestFactory.create(CoreServiceModule);
-  httpApp.useGlobalPipes(new ValidationPipe({ transform: true }));
-  httpApp.enableShutdownHooks();
+  const app = await NestFactory.create(CoreServiceModule);
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.enableShutdownHooks();
 
-  const configService = httpApp.get(ConfigService);
+  const configService = app.get(ConfigService);
 
   const port = configService.getOrThrow<number>('apps.coreService.port');
   const name = configService.getOrThrow<string>('apps.coreService.name');
+  const natsURL = configService.getOrThrow<string>('natsConfig.url');
 
-  await httpApp.listen(port, () => {
-    console.log(`🥳 ${name} HTTP server is listening on port ${port} 🥳`);
+  app.connectMicroservice<MicroserviceOptions>(
+    {
+      transport: Transport.NATS,
+      options: {
+        servers: natsURL,
+      },
+    },
+    { inheritAppConfig: true },
+  );
+
+  app.startAllMicroservices().then(() => {
+    console.log(`🚀 ${name} microservice is running 🚀`);
   });
 
-  // Create the microservice (NATS)
-  const microservice =
-    await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
-      CoreServiceModule,
-      {
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers:
-              configService.getOrThrow<TConfiguration['natsConfig']>(
-                'natsConfig',
-              ).url,
-          },
-        }),
-        inject: [ConfigService],
-      },
-    );
-  microservice.enableShutdownHooks();
-
-  // await microservice.listen().catch((err) => {
-  //   console.error('🚨 Error starting core-service microservice 🚨: ', err);
-  //   process.exit(1);
-  // });
-  // console.log('🥳 core-service Microservice is listening with NATS 🥳');
+  await app.listen(port, () => {
+    console.log(`🥳 ${name} http server listening on port ${port} 🥳`);
+  });
 }
 bootstrap();

@@ -1,5 +1,5 @@
 import { DateHelper, RFQStatus } from '@common';
-import { RFQEntity } from '../entities/RFQ.entity';
+import { RFQEntity } from '../entities/rfq.entity';
 import { RFQStatusVO } from '../valueObjects/rfqStatus.vo';
 import { TEmailIntentSchemaType } from '@tools-langchain'; //this is a library we dont have dep on langchain just schema
 
