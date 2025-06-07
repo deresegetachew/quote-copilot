@@ -79,6 +79,10 @@ export class EnvConfigFactory extends ConfigFactory {
           port: parseInt(this.getEnvVarOrThrow('APP_PORT'), 10),
           baseUrl: this.getEnvVarOrThrow('CORE_SERVICE_BASE_URL'),
         },
+        documentWorker: {
+          name: process.env.APP_NAME,
+          port: parseInt(process.env.APP_PORT, 10),
+        },
       },
       temporalConfig: {
         namespace: this.getEnvVarOrThrow('TEMPORAL_NAMESPACE'),

@@ -93,6 +93,11 @@ export const ConfigSchema = z.object({
       port: z.number(),
       baseUrl: z.string(),
     }),
+    documentWorker: z.object({
+      name: z.string(),
+      port: z.number(),
+      baseUrl: z.string(),
+    }),
   }),
   gmailConfig: z.object({
     clientId: z.string(),
