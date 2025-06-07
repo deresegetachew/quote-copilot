@@ -17,8 +17,20 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-     "esModuleInterop": true,
+    "esModuleInterop": true,
     "paths": {
+      "@app-config/config": [
+        "libs/config/src"
+      ],
+      "@app-config/config/*": [
+        "libs/config/src/*"
+      ],
+      "@common": [
+        "libs/common/src"
+      ],
+      "@common/*": [
+        "libs/common/src/*"
+      ],
       "@db": [
         "libs/db/src"
       ],
@@ -36,18 +48,6 @@
       ],
       "@tenants/*": [
         "libs/tenants/src/*"
-      ],
-      "@common": [
-        "libs/common/src"
-      ],
-      "@common/*": [
-        "libs/common/src/*"
-      ],
-      "@app-config/config": [
-        "libs/config/src"
-      ],
-      "@app-config/config/*": [
-        "libs/config/src/*"
       ],
       "@tools-langchain": [
         "libs/langchain/src"
