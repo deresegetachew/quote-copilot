@@ -6,4 +6,5 @@ export const WORKFLOW_NAMES = {
 export const WORKFLOW_SIGNALS = {
   NEW_MESSAGE: 'newMessage',
   COMPLETE_THREAD: 'completeThread',
+  PARSE_ATTACHMENT: 'parseAttachment',
 };

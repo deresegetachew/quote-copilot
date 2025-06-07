@@ -13,6 +13,8 @@ import { MessageThreadAggregate } from '../../../domain/entities/messageThread.a
 import { EmailMessageMapper } from '../../database/mongo/mappers/emailMessage.mapper';
 import { PaginatedData } from '@common';
 import { Injectable, Logger } from '@nestjs/common';
+import { Attachment } from '../../database/mongo/schemas/attachment.schema';
+import { EmailEntity } from '../../../domain/entities/email.entity';
 
 @Injectable()
 export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
@@ -23,6 +25,8 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
     private readonly emailModel: Model<EmailDocument>,
     @InjectModel(Thread.name)
     private readonly threadModel: Model<ThreadDocument>,
+    @InjectModel(Attachment.name)
+    private readonly attachmentModel: Model<Attachment>,
   ) {
     super();
   }
@@ -64,7 +68,17 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
       .find({ messageId: { $in: threadDoc.messageIds } })
       .exec();
 
-    return EmailMessageMapper.toDomain(threadDoc, emails);
+    const attachments = await this.attachmentModel
+      .find({
+        threadId: threadDoc.threadId,
+      })
+      .exec();
+
+    return EmailMessageMapper.toDomainMessageThreadAgg(
+      threadDoc,
+      emails,
+      attachments,
+    );
   }
 
   async searchByFields(
@@ -76,7 +90,7 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
       receivedAt: Date;
       status: string;
     }>,
-  ): Promise<PaginatedData<MessageThreadAggregate>> {
+  ): Promise<PaginatedData<EmailEntity>> {
     const {
       subject,
       body,
@@ -94,27 +108,33 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
     if (status) query.status = status;
     if (receivedAt) query.createdAt = { $gte: receivedAt };
 
-    const threadDocs = await this.threadModel
-      .find(query)
+    const results: EmailEntity[] = [];
+
+    const emailQuery: any = {};
+    if (body) emailQuery.body = { $regex: body, $options: 'i' };
+    if (from) emailQuery.from = { $regex: from, $options: 'i' };
+    if (to) emailQuery.to = { $regex: to, $options: 'i' };
+
+    const totalCount = await this.emailModel.countDocuments(emailQuery).exec();
+    if (totalCount === 0) {
+      return {
+        data: [],
+        totalCount: 0,
+        page,
+        pageSize,
+      };
+    }
+
+    const emails = await this.emailModel
+      .find(emailQuery)
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .exec();
 
-    const totalCount = await this.threadModel.countDocuments(query);
-
-    const results: MessageThreadAggregate[] = [];
-
-    for (const thread of threadDocs) {
-      const emailQuery: any = { messageId: { $in: thread.messageIds } };
-      if (body) emailQuery.body = { $regex: body, $options: 'i' };
-      if (from) emailQuery.from = { $regex: from, $options: 'i' };
-      if (to) emailQuery.to = { $regex: to, $options: 'i' };
-
-      const emails = await this.emailModel.find(emailQuery).exec();
-
-      if (emails.length) {
-        results.push(EmailMessageMapper.toDomain(thread, emails));
-      }
+    if (emails.length) {
+      results.push(
+        ...emails.map((emailDoc) => EmailMessageMapper.toDomainEmail(emailDoc)),
+      );
     }
 
     return {

@@ -1,5 +1,6 @@
 import { PaginatedData } from '@common';
 import { MessageThreadAggregate } from '../../../domain/entities/messageThread.aggregate';
+import { EmailEntity } from '../../../domain/entities/email.entity';
 
 export abstract class EmailMessageRepositoryPort {
   abstract findByThreadId(id: string): Promise<MessageThreadAggregate | null>;
@@ -14,5 +15,5 @@ export abstract class EmailMessageRepositoryPort {
       receivedAt: Date;
       status: string;
     }>,
-  ): Promise<PaginatedData<MessageThreadAggregate>>;
+  ): Promise<PaginatedData<EmailEntity>>;
 }

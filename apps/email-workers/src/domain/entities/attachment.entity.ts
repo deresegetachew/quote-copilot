@@ -1,7 +1,7 @@
-import { AttachmentParsingStatusVO } from '../valueObjects/attachmentParsingStatus.vo';
+import { AttachmentParsingStatusVO } from '@common';
 
 export class AttachmentEntity {
-  private readonly id: string | null = null; // MongoDB ID, can be null if not yet saved
+  private readonly id: string | null = null;
   private readonly attachmentId: string;
   private readonly threadId: string;
   private readonly messageId: string;
@@ -11,19 +11,21 @@ export class AttachmentEntity {
     AttachmentParsingStatusVO.initial();
 
   constructor({
+    id,
     attachmentId,
     threadId,
     messageId, //emailID
     fileName,
     mimeType,
   }: {
+    id: string | null;
     attachmentId: string;
     threadId: string;
     messageId: string;
     fileName: string;
     mimeType: string;
   }) {
-    this.id = null;
+    this.id = id;
     this.attachmentId = attachmentId;
     this.threadId = threadId;
     this.messageId = messageId;

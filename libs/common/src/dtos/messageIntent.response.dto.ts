@@ -1,3 +1,5 @@
+import { AttachmentParsingStatus } from '../valueObjects';
+
 export class MessageIntentResponseDTO {
   threadId: string;
   summary: string;

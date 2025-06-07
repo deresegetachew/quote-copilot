@@ -23,7 +23,7 @@ export class GetUnreadEmailsUseCase
 
   async execute(): Promise<MessageThreadAggregate[]> {
     const client = this.emailClientFactory.getClient('GMAIL');
-    const unreadMsgsDTO = await client.getUnreadMessages();
+    const unreadMsgsDTO = await client.getUnreadMessagesOrThrow();
 
     const unreadMsgs = unreadMsgsDTO.map((msg) => {
       return MessageThreadFactory.createFromEmailMessageDTO(msg);
@@ -100,7 +100,7 @@ export class GetUnreadEmailsUseCase
         await Promise.all(
           Object.entries(threadMessageIdMap).map(([threadId, messageIds]) =>
             client
-              .markMessagesAsAgentRead(Array.from(messageIds))
+              .markMessagesAsAgentReadOrThrow(Array.from(messageIds))
               .catch((err) => {
                 this.logger.warn(
                   `Failed to mark messages as read for thread ${threadId}: ${err}`,

@@ -8,10 +8,7 @@ import { MessageThreadAggregate } from '../../../domain/entities/messageThread.a
 export class GetEmailThreadMessagesUseCase
   implements IQueryHandler<GetEmailThreadMessagesQuery, MessageThreadAggregate>
 {
-  constructor(
-    private readonly emailClientFactory: EmailClientFactoryPort,
-    private readonly dbRepository: EmailMessageRepositoryPort,
-  ) {}
+  constructor(private readonly dbRepository: EmailMessageRepositoryPort) {}
 
   async execute(
     query: GetEmailThreadMessagesQuery,

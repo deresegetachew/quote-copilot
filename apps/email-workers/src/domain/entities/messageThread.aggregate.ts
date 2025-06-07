@@ -2,7 +2,7 @@ import { file } from 'googleapis/build/src/apis/file';
 import { EmailThreadStatusVO } from '../valueObjects/emailThreadStatus.vo';
 import { AttachmentEntity } from './attachment.entity';
 import { EmailEntity } from './email.entity';
-import { AttachmentParsingStatusVO } from '../valueObjects/attachmentParsingStatus.vo';
+import { AttachmentParsingStatusVO } from '@common';
 
 export class MessageThreadAggregate {
   constructor(
@@ -49,19 +49,17 @@ export class MessageThreadAggregate {
   }
 
   getAttachments(
+    threadId?: string,
     emailId?: string,
     status?: AttachmentParsingStatusVO,
   ): AttachmentEntity[] {
-    if (emailId) {
-      return this.attachments.filter(
-        (att) =>
-          att.getMessageId() === emailId &&
-          (status ? att.getStatus().equals(status) : true),
-      );
-    }
-    return status
-      ? this.attachments.filter((att) => att.getStatus().equals(status))
-      : [...this.attachments];
+    return this.attachments.filter((att) => {
+      const matchesThread = !threadId || att.getThreadId() === threadId;
+      const matchesEmail = !emailId || att.getMessageId() === emailId;
+      const matchesStatus =
+        !status || att.getStatus().getValue() === status.getValue();
+      return matchesThread && matchesEmail && matchesStatus;
+    });
   }
 
   toJSON(): {

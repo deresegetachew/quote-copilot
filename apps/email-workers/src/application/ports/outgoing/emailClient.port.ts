@@ -2,11 +2,13 @@ import { MessageThreadAggregate } from '../../../domain/entities/messageThread.a
 import { EmailMessageDTO } from './dto/emailMessage.dto';
 
 export abstract class EmailClientPort {
-  abstract getUnreadMessages(): Promise<EmailMessageDTO[]>;
-  abstract markMessagesAsAgentRead(messageIds: string[]): Promise<void>;
-  abstract getMessageById(messageId: string): Promise<EmailMessageDTO>;
-  abstract getMessagesByThreadId(threadId: string): Promise<EmailMessageDTO[]>;
-  abstract searchByQuery(query: string): Promise<EmailMessageDTO[]>;
+  abstract getUnreadMessagesOrThrow(): Promise<EmailMessageDTO[]>;
+  abstract markMessagesAsAgentReadOrThrow(messageIds: string[]): Promise<void>;
+  abstract getMessageByIdOrThrow(messageId: string): Promise<EmailMessageDTO>;
+  abstract getMessagesByThreadIdOrThrow(
+    threadId: string,
+  ): Promise<EmailMessageDTO[]>;
+  abstract searchByQueryOrThrow(query: string): Promise<EmailMessageDTO[]>;
 }
 
 export abstract class EmailClientFactoryPort {

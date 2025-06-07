@@ -1,11 +1,6 @@
-import { ConfigService } from '@nestjs/config';
 import { AppContext } from '../../appContext';
-import { HttpService } from '@nestjs/axios';
-import { EmailThreadResponseDTO, fetchObservableResult } from '@common';
 
 import { Logger } from '@nestjs/common';
-import { ParseEmailIntentGraph } from '@tools-langchain';
-import { DateTime } from 'luxon';
 import { TParseEmailActivityResponse } from './type';
 import { ParseEmailIntentActivityMapper } from './parseEmailIntentActivity.mapper';
 import { CoreServiceClient } from '@common/clients/http';

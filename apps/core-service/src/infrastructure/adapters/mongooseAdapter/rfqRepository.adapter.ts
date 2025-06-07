@@ -7,7 +7,7 @@ import {
   RfqRepositoryPort,
   TSearchFields,
 } from '../../../application/ports/outgoing/rfqRepository.port';
-import { RFQEntity } from '../../../domain/entities/RFQ.entity';
+import { RFQEntity } from '../../../domain/entities/rfq.entity';
 import { RFQ, RFQDocument } from '../../database/mongo/schemas/rfq.schema';
 import { RFQMapper } from '../../database/mongo/mappers/rfq.mapper';
 import { ObjectId } from 'bson';

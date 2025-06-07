@@ -1,5 +1,5 @@
 import { PaginatedData, PaginatedDataFilters } from '@common';
-import { RFQEntity } from '../../../domain/entities/RFQ.entity';
+import { RFQEntity } from '../../../domain/entities/rfq.entity';
 import { RFQDocument } from '../../../infrastructure/database/mongo/schemas/rfq.schema';
 
 export type TSearchFields = {
