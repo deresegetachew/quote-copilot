@@ -62,7 +62,12 @@
       "entryFile": "main",
       "sourceRoot": "apps/document-worker/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/document-worker/tsconfig.app.json"
+        "tsConfigPath": "apps/document-worker/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "**/*.yml"
+          }
+        ]
       }
     },
     "email-workers": {

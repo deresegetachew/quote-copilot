@@ -1,8 +1,36 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentWorkerModule } from './document-worker.module';
+import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(DocumentWorkerModule);
-  await app.listen(process.env.port ?? 3000);
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.enableShutdownHooks();
+
+  const configService = app.get(ConfigService);
+  const port = configService.getOrThrow<number>('apps.documentWorker.port');
+  const name = configService.getOrThrow<string>('apps.documentWorker.name');
+  const natsURL = configService.getOrThrow<string>('natsConfig.url');
+
+  app.connectMicroservice<MicroserviceOptions>(
+    {
+      transport: Transport.NATS,
+      options: {
+        servers: natsURL,
+      },
+    },
+    { inheritAppConfig: true },
+  );
+  await app.startAllMicroservices().then(() => {
+    console.log(`🚀 ${name} microservice is running 🚀`);
+    console.log(`NATS server URL: ${natsURL}`);
+  });
+
+  await app.listen(port, () => {
+    console.log(` ${name} http server is listening on port ${port}`);
+  });
 }
 bootstrap();
