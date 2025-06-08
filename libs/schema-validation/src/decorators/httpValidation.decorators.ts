@@ -62,5 +62,10 @@ export function ValidateSchema<T>(
   schema: z.ZodSchema<T>,
   options?: ValidationOptions,
 ) {
-  return createValidationDecorator(schema, ValidationType.DATA, {}, options);
+  return createValidationDecorator(
+    schema,
+    ValidationType.HTTP_BODY,
+    {},
+    options,
+  );
 }

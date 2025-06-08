@@ -7,8 +7,8 @@ export abstract class IntegrationEvent<T = any> {
   readonly eventType: string;
   readonly data: T;
 
-  constructor(source: TEventSources, id: string, eventType: string, data: T) {
-    this.id = id;
+  constructor(source: TEventSources, eventType: string, data: T) {
+    this.id = crypto.randomUUID();
     this.source = source;
     this.eventType = eventType;
     this.data = data;

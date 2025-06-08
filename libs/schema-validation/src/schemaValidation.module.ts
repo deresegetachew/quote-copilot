@@ -1,6 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ZodValidationInterceptor } from './interceptors';
+import { SchemaValidationPipe } from './pipes';
 
 @Global()
 @Module({
@@ -9,7 +10,8 @@ import { ZodValidationInterceptor } from './interceptors';
       provide: APP_INTERCEPTOR,
       useClass: ZodValidationInterceptor,
     },
+    SchemaValidationPipe,
   ],
-  exports: [],
+  exports: [SchemaValidationPipe],
 })
 export class SchemaValidationModule {}

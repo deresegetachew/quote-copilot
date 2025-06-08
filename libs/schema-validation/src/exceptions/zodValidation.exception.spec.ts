@@ -1,4 +1,4 @@
-import { ZodValidationException } from '../exceptions/zod-validation.exception';
+import { ZodValidationException } from './zodValidation.exception';
 import { HttpStatus } from '@nestjs/common';
 import { z } from 'zod';
 

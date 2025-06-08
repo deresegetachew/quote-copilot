@@ -34,7 +34,7 @@ export function createValidationDecorator<T>(
       type: validationType,
     };
 
-    if (propertyKey) {
+    if (propertyKey && descriptor && !isCommandOrQueryHandler(target)) {
       // Method decorator
       Reflect.defineMetadata(
         VALIDATION_METADATA,
@@ -42,12 +42,18 @@ export function createValidationDecorator<T>(
         target,
         propertyKey,
       );
+
+      return descriptor;
     } else {
       // Class decorator
+      if (isCommandOrQueryHandler(target)) {
+        const proto = target.prototype || target;
+        Reflect.defineMetadata(VALIDATION_METADATA, metadata, proto, 'execute');
+      }
       Reflect.defineMetadata(VALIDATION_METADATA, metadata, target);
-    }
 
-    return descriptor;
+      return undefined;
+    }
   };
 }
 
@@ -89,4 +95,15 @@ export function getValidationType(
 ): ValidationType | undefined {
   const metadata = getValidationMetadata(target, propertyKey);
   return metadata?.type;
+}
+
+function isCommandOrQueryHandler(target: any): boolean {
+  const prototype = target.prototype;
+
+  // Check if the class has an execute method (required for both ICommandHandler and IQueryHandler)
+  if (!prototype || typeof prototype.execute !== 'function') {
+    return false;
+  }
+
+  return true;
 }

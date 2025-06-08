@@ -155,11 +155,30 @@ export class AppModule {}
 ```
 
 **Benefits of Metadata-Based Approach:**
+
 - Better separation of concerns
 - More flexible validation logic
 - Easier to extend with custom validation rules
 - Can be processed by multiple interceptors
 - Better testability
+
+### When to Use Each Approach
+
+**Use ZodValidationPipe directly when:**
+
+- You need fine-grained control over validation timing
+- You want to validate specific parameters individually
+- You're migrating from class-validator gradually
+- You need custom validation logic per endpoint
+- You want explicit, visible validation in your controller methods
+
+**Use Interceptor-based validation (decorators) when:**
+
+- You want clean, declarative code
+- You're building new applications from scratch
+- You need consistent validation patterns across your app
+- You want automatic validation for CQRS commands/queries/events
+- You prefer convention over configuration
 
 ### CQRS Commands and Queries
 
@@ -320,6 +339,45 @@ The library provides detailed error messages:
 
 ## Advanced Usage
 
+### Using ZodValidationPipe Directly
+
+The library exposes `ZodValidationPipe` that you can use directly with `@UsePipes()` decorator or inject into your controllers:
+
+```typescript
+import { Controller, Post, Body, UsePipes, Inject } from '@nestjs/common';
+import { z } from 'zod';
+import { ZodValidationPipe } from '@schema-validation';
+
+const CreateUserSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2).max(50),
+  age: z.number().int().min(18).max(120)
+});
+
+@Controller('users')
+export class UsersController {
+  // Method 1: Direct pipe usage with @UsePipes
+  @Post('direct')
+  @UsePipes(new ZodValidationPipe(CreateUserSchema, 'Create User'))
+  async createUserDirect(@Body() userData: z.infer<typeof CreateUserSchema>) {
+    return this.usersService.create(userData);
+  }
+
+  // Method 2: Inject pipe as dependency
+  constructor(
+    private readonly usersService: UsersService,
+    @Inject(ZodValidationPipe) private readonly validationPipe: ZodValidationPipe,
+  ) {}
+
+  @Post('injected')
+  async createUserWithInjectedPipe(@Body() userData: any) {
+    // Manually validate using injected pipe
+    const validatedData = this.validationPipe.transform(userData, { type: 'body' });
+    return this.usersService.create(validatedData);
+  }
+}
+```
+
 ### Custom Validation Pipe
 
 ```typescript
@@ -327,18 +385,21 @@ The library provides detailed error messages:
 @Injectable()
 export class CustomValidationPipe extends ZodValidationPipe {
   constructor() {
-    super({ 
-      context: 'Custom validation',
-      transform: true // Enable data transformation
-    });
+    super(
+      z.object({ /* your schema */ }),
+      'Custom validation',
+      { 
+        transform: true, // Enable data transformation
+        stripUnknown: true // Remove unknown fields
+      }
+    );
   }
 }
 
 @Controller('custom')
 export class CustomController {
   @Post()
-  @UsePipes(new CustomValidationPipe())
-  @ValidateBodySchema(MySchema)
+  @UsePipes(CustomValidationPipe)
   async customEndpoint(@Body() data: any) {
     return data;
   }

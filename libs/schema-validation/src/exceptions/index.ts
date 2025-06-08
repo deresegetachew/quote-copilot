@@ -1,1 +1,1 @@
-export * from './zod-validation.exception';
+export * from './zodValidation.exception';
