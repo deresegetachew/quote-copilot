@@ -130,6 +130,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/langchain/tsconfig.lib.json"
       }
+    },
+    "schema-validation": {
+      "type": "library",
+      "root": "libs/schema-validation",
+      "entryFile": "index",
+      "sourceRoot": "libs/schema-validation/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/schema-validation/tsconfig.lib.json"
+      }
     }
   }
 }

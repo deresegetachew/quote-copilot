@@ -54,6 +54,12 @@
       ],
       "@tools-langchain/*": [
         "libs/langchain/src/*"
+      ],
+      "@schema-validation": [
+        "libs/schema-validation/src"
+      ],
+      "@schema-validation/*": [
+        "libs/schema-validation/src/*"
       ]
     }
   }
