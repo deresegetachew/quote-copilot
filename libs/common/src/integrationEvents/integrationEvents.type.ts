@@ -20,4 +20,5 @@ export type TEventSources =
   | 'agent-orchestrator'
   | 'email-worker'
   | 'telegram-worker'
-  | 'whatsapp-worker';
+  | 'whatsapp-worker'
+  | 'document-worker';

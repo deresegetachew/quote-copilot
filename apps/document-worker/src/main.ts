@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { DocumentWorkerModule } from './document-worker.module';
+import { DocumentWorkerModule } from './documentWorker.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
