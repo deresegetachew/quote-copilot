@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
-import { ZodValidationException } from '../exceptions/zod-validation.exception';
+import { SchemaValidationPipe } from './schemaValidation.pipe';
+import { ZodValidationException } from '../exceptions/zodValidation.exception';
 import { z } from 'zod';
 import { BadRequestException } from '@nestjs/common';
 
-describe('ZodValidationPipe', () => {
-  let pipe: ZodValidationPipe;
+describe('SchemaValidationPipe', () => {
+  let pipe: SchemaValidationPipe;
 
   const TestSchema = z.object({
     email: z.string().email(),
@@ -14,7 +14,7 @@ describe('ZodValidationPipe', () => {
   });
 
   beforeEach(async () => {
-    pipe = new ZodValidationPipe(TestSchema, 'Test validation');
+    pipe = new SchemaValidationPipe(TestSchema, 'Test validation');
   });
 
   describe('transform', () => {
@@ -53,7 +53,7 @@ describe('ZodValidationPipe', () => {
     });
 
     it('should transform data when transform option is enabled', () => {
-      const transformPipe = new ZodValidationPipe(
+      const transformPipe = new SchemaValidationPipe(
         z.object({
           age: z.coerce.number(),
           active: z.coerce.boolean(),
@@ -83,7 +83,7 @@ describe('ZodValidationPipe', () => {
         }),
       });
 
-      const nestedPipe = new ZodValidationPipe(
+      const nestedPipe = new SchemaValidationPipe(
         NestedSchema,
         'Nested validation',
       );
@@ -111,7 +111,10 @@ describe('ZodValidationPipe', () => {
         ),
       });
 
-      const arrayPipe = new ZodValidationPipe(ArraySchema, 'Array validation');
+      const arrayPipe = new SchemaValidationPipe(
+        ArraySchema,
+        'Array validation',
+      );
 
       const validArrayData = {
         users: [

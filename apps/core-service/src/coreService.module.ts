@@ -3,6 +3,7 @@ import { AppConfigModule } from '@app-config/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CoreServiceApplicationModule } from './application/coreServiceApplication.module';
 import { CoreServicePresenterModule } from './presenters/coreServicePresenter.module';
+import { SchemaValidationModule } from '@schema-validation';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { CoreServicePresenterModule } from './presenters/coreServicePresenter.mo
     AppConfigModule.forRoot(),
     CoreServicePresenterModule,
     CoreServiceApplicationModule,
+    SchemaValidationModule,
   ],
 })
 export class CoreServiceModule {}

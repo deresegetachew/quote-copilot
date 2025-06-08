@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { ZodValidationException } from '../exceptions';
 
 @Injectable()
-export class ZodValidationPipe implements PipeTransform {
+export class SchemaValidationPipe implements PipeTransform {
   constructor(
     private readonly schema: z.ZodSchema<any>,
     private readonly validationType: string = 'input',

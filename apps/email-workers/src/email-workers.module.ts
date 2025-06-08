@@ -3,6 +3,7 @@ import { EmailWorkersPresenterModule } from './presenters/emailWorkersPresenter.
 import { EmailWorkersApplicationModule } from './application/emailWorkersApplication.module';
 import { AppConfigModule } from '@app-config/config';
 import { CqrsModule } from '@nestjs/cqrs';
+import { SchemaValidationModule } from '@schema-validation';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     AppConfigModule.forRoot(),
     EmailWorkersPresenterModule,
     EmailWorkersApplicationModule,
+    SchemaValidationModule,
   ],
 })
 export class EmailWorkersModule {}

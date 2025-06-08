@@ -16,7 +16,7 @@ export function ValidateCommandSchema<T>(
     ValidationType.USECASE_COMMAND,
     {},
     options,
-  );
+  ) as ClassDecorator;
 }
 
 /**
@@ -33,5 +33,5 @@ export function ValidateQuerySchema<T>(
     ValidationType.USECASE_QUERY,
     {},
     options,
-  );
+  ) as ClassDecorator;
 }

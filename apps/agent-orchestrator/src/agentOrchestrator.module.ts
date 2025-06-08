@@ -7,6 +7,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NATS_SERVICE } from '@common';
 import { ConfigService } from '@nestjs/config';
 import { CommonClientsModule } from '@common/clients/commonClients.module';
+import { SchemaValidationModule } from '@schema-validation';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CommonClientsModule } from '@common/clients/commonClients.module';
       },
     ]),
     CommonClientsModule,
+    SchemaValidationModule,
   ],
   providers: [OrchestratorService],
 })

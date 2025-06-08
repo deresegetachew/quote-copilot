@@ -1,5 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ParseMessageIntentCommand } from '../../ports/incoming/commands/parse-message-intent.command';
+import {
+  ParseMessageIntentCommand,
+  ParseMessageIntentCommandSchema,
+} from '../../ports/incoming/commands/parse-message-intent.command';
 import { EmailWorkersClient } from '@common/clients/http';
 import { DateTime } from 'luxon';
 import {
@@ -10,8 +13,10 @@ import { Logger } from '@nestjs/common';
 import { RfqRepositoryPort } from '../../ports/outgoing/rfqRepository.port';
 import { RfqFactory } from '../../../domain/factories/rfq.factories';
 import { AttachmentParsingStatus } from '../../../../../../libs/common/src';
+import { ValidateCommandSchema } from '@schema-validation';
 
 @CommandHandler(ParseMessageIntentCommand)
+@ValidateCommandSchema(ParseMessageIntentCommandSchema)
 export class MessageIntentUseCase
   implements ICommandHandler<ParseMessageIntentCommand, TEmailIntentSchemaType>
 {
