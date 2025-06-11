@@ -1,7 +1,7 @@
 import { proxyActivities, setHandler, sleep } from '@temporalio/workflow';
 import type * as activities from '../../activities';
 import { WorkflowClient } from '@temporalio/client';
-import { TASK_QUEUES, WORKFLOW_SIGNALS } from '../../../../../libs/common/src';
+import { TASK_QUEUES, WORKFLOW_SIGNALS } from '@common/workFlows';
 import { NEW_MESSAGE_SIGNAL } from '../../signals';
 
 const { getUnreadEmailsActivity } = proxyActivities<typeof activities>({

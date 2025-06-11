@@ -2,18 +2,26 @@ import { file } from 'googleapis/build/src/apis/file';
 import { EmailThreadStatusVO } from '../valueObjects/emailThreadStatus.vo';
 import { AttachmentEntity } from './attachment.entity';
 import { EmailEntity } from './email.entity';
-import { AttachmentParsingStatusVO } from '@common';
+import { AttachmentParsingStatusVO, ID } from '@common';
 
 export class MessageThreadAggregate {
+  private readonly id: ID;
+
   constructor(
-    private readonly id: string | null,
+    id: ID,
     private readonly threadId: string,
     private readonly emails: EmailEntity[] = [],
     private readonly attachments: AttachmentEntity[] = [],
     private status: EmailThreadStatusVO = EmailThreadStatusVO.initial(),
-  ) {}
+  ) {
+    this.id = id;
+    this.threadId = threadId;
+    this.emails = emails;
+    this.attachments = attachments;
+    this.status = status;
+  }
 
-  getStorageId(): string | null {
+  getStorageId(): ID {
     return this.id;
   }
 
@@ -129,7 +137,7 @@ export class MessageThreadAggregate {
     status: EmailThreadStatusVO,
   ): MessageThreadAggregate {
     return new MessageThreadAggregate(
-      id,
+      ID.of(id),
       threadId,
       emails,
       attachments,
@@ -143,7 +151,7 @@ export class MessageThreadAggregate {
     attachments: AttachmentEntity[] = [],
   ): MessageThreadAggregate {
     return new MessageThreadAggregate(
-      null,
+      ID.create(),
       threadId,
       [firstEmail],
       attachments,

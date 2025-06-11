@@ -14,12 +14,6 @@ export const passwordSchema = z
     'Password must contain at least one lowercase letter, one uppercase letter, and one number',
   );
 
-export const uuidSchema = z.string().uuid('Invalid UUID format');
-
-export const mongoIdSchema = z
-  .string()
-  .regex(/^[0-9a-fA-F]{24}$/, 'Invalid MongoDB ObjectId format');
-
 export const urlSchema = z
   .string()
   .min(1, 'URL is required')
@@ -91,7 +85,7 @@ export const errorResponseSchema = z.object({
 
 // Common entity schemas
 export const baseEntitySchema = z.object({
-  id: mongoIdSchema,
+  id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -115,30 +109,4 @@ export const imageUploadSchema = fileUploadSchema.extend({
   mimetype: z.string().regex(/^image\//, 'File must be an image'),
 });
 
-// Thread and message schemas for your domain
-export const threadIdSchema = z.string().min(1, 'Thread ID is required');
-
-export const messageIdSchema = z.string().min(1, 'Message ID is required');
-
 export const emailAddressSchema = z.string().email('Invalid email address');
-
-export const customerDetailSchema = z.object({
-  name: z.string().nullable(),
-  email: emailAddressSchema,
-});
-
-export const rfqItemSchema = z.object({
-  itemCode: z.string(),
-  itemDescription: z.string().nullable(),
-  quantity: z.number().positive('Quantity must be positive'),
-  unit: z.string().nullable(),
-  specifications: z.string().nullable(),
-});
-
-export const rfqDataSchema = z.object({
-  customerDetail: customerDetailSchema.nullable(),
-  expectedDeliveryDate: z.string().nullable(),
-  hasAttachments: z.boolean().nullable(),
-  notes: z.array(z.string()).nullable(),
-  items: z.array(rfqItemSchema).nullable(),
-});

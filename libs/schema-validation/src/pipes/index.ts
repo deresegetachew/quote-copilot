@@ -1,1 +1,1 @@
-export * from './schemaValidation.pipe';
+export * from './schemaValidationPipe.factory';

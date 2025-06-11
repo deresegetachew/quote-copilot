@@ -4,7 +4,9 @@ import { PromptBody } from './types';
 import { renderTemplateOrThrow } from './util/handleBars.helper';
 
 // TO REMove not sure if we need this
-export abstract class AbstractPromptBuilder<TInput> {
+export abstract class AbstractPromptBuilder<
+  TInput extends Record<string, any>,
+> {
   protected prompt: PromptBody<TInput>;
   protected context: TInput;
   protected templateFolder: string;
@@ -30,12 +32,12 @@ export abstract class AbstractPromptBuilder<TInput> {
     };
   }
 
-  protected setTemperature(temperature: number): this {
+  protected setTemperature(temperature: number | undefined): this {
     this.prompt.temperature = temperature;
     return this;
   }
 
-  protected setMaxTokens(maxTokens: number): this {
+  protected setMaxTokens(maxTokens: number | undefined): this {
     this.prompt.maxTokens = maxTokens;
     return this;
   }
@@ -59,7 +61,9 @@ export abstract class AbstractPromptBuilder<TInput> {
   protected abstract setTemplateFolderPath(): this;
   protected abstract setAudience(audience: string): this;
   protected abstract setTone(tone: string): this;
-  protected abstract setTemplateVariables(templateVariables: TInput): this;
+  protected abstract setTemplateVariables(
+    templateVariables: TInput | undefined,
+  ): this;
 
   setContext(context: TInput): this {
     this.context = context;
@@ -71,8 +75,8 @@ export abstract class AbstractPromptBuilder<TInput> {
     // as they set the properties of the prompt object
     // and some methods depend on others
     this.setTemplateFolderPath()
-      .setTone(this.prompt.tone)
-      .setAudience(this.prompt.audience)
+      .setTone(this.prompt.tone ?? '')
+      .setAudience(this.prompt.audience ?? '')
       .setTemperature(this.prompt.temperature)
       .setMaxTokens(this.prompt.maxTokens)
       .setTemplateVariables(this.prompt.templateVariables);

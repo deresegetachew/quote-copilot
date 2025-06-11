@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon';
+import { ID } from '@common/valueObjects/id.vo';
 
 export class EmailEntity {
-  readonly id: string;
+  readonly id: ID;
   readonly messageId: string;
   readonly threadId: string;
   readonly from: string;
@@ -20,7 +21,7 @@ export class EmailEntity {
     body,
     receivedAt,
   }: {
-    id: string;
+    id: ID;
     messageId: string;
     threadId: string;
     from: string;
@@ -39,7 +40,11 @@ export class EmailEntity {
     this.receivedAt = receivedAt;
   }
 
-  getStorageId(): string {
+  getId(): ID {
+    return this.id;
+  }
+
+  getStorageId(): ID {
     return this.id;
   }
 

@@ -23,7 +23,7 @@ export function buildPaginatedAggregationPipeline(
   const safePageSize = Math.min(Math.max(1, pageSize), 50);
 
   const matchStage: PipelineStage.Match = { $match: filter };
-  const sortStage: PipelineStage.Sort =
+  const sortStage: PipelineStage.Sort | undefined =
     Object.keys(sort).length > 0 ? { $sort: sort } : undefined;
   const projectStage: PipelineStage.Project | undefined =
     Object.keys(project).length > 0 ? { $project: project } : undefined;

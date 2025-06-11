@@ -1,8 +1,7 @@
-import { ZodValidationException } from './zodValidation.exception';
-import { HttpStatus } from '@nestjs/common';
+import { SchemaValidationException } from './schemaValidation.exception';
 import { z } from 'zod';
 
-describe('ZodValidationException', () => {
+describe('SchemaValidationException', () => {
   const TestSchema = z.object({
     email: z.string().email(),
     age: z.number().int().min(18),
@@ -19,56 +18,48 @@ describe('ZodValidationException', () => {
     const result = TestSchema.safeParse(invalidData);
 
     if (!result.success) {
-      const exception = new ZodValidationException(
+      const exception = new SchemaValidationException(
         result.error,
         'Test validation',
       );
 
-      expect(exception.getStatus()).toBe(HttpStatus.BAD_REQUEST);
-      expect(exception.zodError).toBe(result.error);
+      expect(exception.schemaError).toBe(result.error);
       expect(exception.validationType).toBe('Test validation');
-
-      const response = exception.getResponse() as any;
-      expect(response.message).toBe('Validation failed for Test validation');
-      expect(response.errors).toHaveLength(3);
-      expect(response.statusCode).toBe(HttpStatus.BAD_REQUEST);
+      expect(exception.message).toBe('Validation failed for Test validation');
+      expect(exception.errors).toHaveLength(3);
 
       // Check that errors are properly formatted
-      const emailError = response.errors.find((e: any) => e.path === 'email');
+      const emailError = exception.errors.find((e: any) => e.path === 'email');
       expect(emailError).toBeDefined();
-      expect(emailError.message).toBe('Invalid email');
+      expect(emailError!.message).toBe('Invalid email');
 
-      const ageError = response.errors.find((e: any) => e.path === 'age');
+      const ageError = exception.errors.find((e: any) => e.path === 'age');
       expect(ageError).toBeDefined();
-      expect(ageError.message).toBe(
+      expect(ageError!.message).toBe(
         'Number must be greater than or equal to 18',
       );
 
-      const nameError = response.errors.find((e: any) => e.path === 'name');
+      const nameError = exception.errors.find((e: any) => e.path === 'name');
       expect(nameError).toBeDefined();
-      expect(nameError.message).toBe(
+      expect(nameError!.message).toBe(
         'String must contain at least 2 character(s)',
       );
     }
   });
 
-  it('should use custom status code', () => {
+  it('should construct without status code', () => {
     const invalidData = { email: 'invalid' };
     const result = z
       .object({ email: z.string().email() })
       .safeParse(invalidData);
 
     if (!result.success) {
-      const exception = new ZodValidationException(
+      const exception = new SchemaValidationException(
         result.error,
         'Custom validation',
-        HttpStatus.UNPROCESSABLE_ENTITY,
       );
-
-      expect(exception.getStatus()).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
-
-      const response = exception.getResponse() as any;
-      expect(response.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
+      expect(exception).toBeInstanceOf(SchemaValidationException);
+      expect(exception.errors.length).toBeGreaterThan(0);
     }
   });
 
@@ -92,17 +83,16 @@ describe('ZodValidationException', () => {
     const result = NestedSchema.safeParse(invalidData);
 
     if (!result.success) {
-      const exception = new ZodValidationException(
+      const exception = new SchemaValidationException(
         result.error,
         'Nested validation',
       );
 
-      const response = exception.getResponse() as any;
-      const emailError = response.errors.find(
+      const emailError = exception.errors.find(
         (e: any) => e.path === 'user.profile.email',
       );
       expect(emailError).toBeDefined();
-      expect(emailError.message).toBe('Invalid email');
+      expect(emailError!.message).toBe('Invalid email');
     }
   });
 
@@ -125,17 +115,16 @@ describe('ZodValidationException', () => {
     const result = ArraySchema.safeParse(invalidData);
 
     if (!result.success) {
-      const exception = new ZodValidationException(
+      const exception = new SchemaValidationException(
         result.error,
         'Array validation',
       );
 
-      const response = exception.getResponse() as any;
-      const itemError = response.errors.find(
+      const itemError = exception.errors.find(
         (e: any) => e.path === 'items.0.name',
       );
       expect(itemError).toBeDefined();
-      expect(itemError.message).toBe(
+      expect(itemError!.message).toBe(
         'String must contain at least 1 character(s)',
       );
     }

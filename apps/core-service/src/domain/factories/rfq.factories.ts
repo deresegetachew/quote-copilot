@@ -1,4 +1,4 @@
-import { DateHelper, RFQStatus } from '@common';
+import { DateHelper, ID, RFQStatus } from '@common';
 import { RFQEntity } from '../entities/rfq.entity';
 import { RFQStatusVO } from '../valueObjects/rfqStatus.vo';
 import { TEmailIntentSchemaType } from '@tools-langchain'; //this is a library we dont have dep on langchain just schema
@@ -13,6 +13,7 @@ type TCreateNewParams = {
   hasAttachments?: boolean | null;
   error?: string[] | null;
   items: Array<{
+    id: ID;
     itemCode: string;
     itemDescription: string | null;
     quantity: number;
@@ -27,20 +28,21 @@ export class RfqFactory {
   ): RFQEntity {
     return RfqFactory.createNew({
       threadId: response?.threadId,
-      summary: response?.requestSummary,
+      summary: response?.requestSummary || '',
       expectedDeliveryDate: response?.expectedDeliveryDate
         ? DateHelper.toUTCDateTime(response.expectedDeliveryDate)
         : null,
       hasAttachments: response.hasAttachments || null,
       customerDetail: {
         name: response?.customerDetail?.name || null,
-        email: response?.customerDetail?.email,
+        email: response?.customerDetail?.email || '',
       },
       error: response?.error,
       notes: response?.notes || null,
       reason: response?.reason || null,
       items: response?.items
         ? response.items?.map((item) => ({
+            id: ID.create(),
             itemCode: item?.itemCode,
             itemDescription: item?.itemDescription || null,
             quantity: item?.quantity,
@@ -55,7 +57,7 @@ export class RfqFactory {
     const { threadId, summary, customerDetail, error = null, items } = params;
 
     const rfq = new RFQEntity({
-      id: undefined, // ID will be set in infrastructure layer
+      id: ID.create(),
       threadId,
       summary,
       status: RFQStatusVO.initial(),

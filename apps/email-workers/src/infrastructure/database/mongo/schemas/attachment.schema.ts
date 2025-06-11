@@ -4,6 +4,9 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class Attachment {
+  @Prop({ type: String, required: true })
+  _id: string;
+
   @Prop({ required: true })
   messageId: string;
 

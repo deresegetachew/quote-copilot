@@ -17,37 +17,37 @@ export class EnvConfigFactory extends ConfigFactory {
 
   getConfig(): TConfiguration {
     return {
-      name: process.env.APP_NAME,
+      name: this.getEnvVarOrThrow('APP_NAME'),
       dbConfig: {
         mongo: {
           'email-worker-db': {
-            uri: process.env.DB_MONGO_URI,
+            uri: this.getEnvVarOrThrow('DB_MONGO_URI'),
             authMode:
-              process.env.DB_MONGO_AUTH_MODE === 'aws-iam'
+              this.getEnvVarOrThrow('DB_MONGO_AUTH_MODE') === 'aws-iam'
                 ? 'aws-iam'
                 : 'password',
-            database: process.env.DB_MONGO_DATABASE,
+            database: this.getEnvVarOrThrow('DB_MONGO_DATABASE'),
             enableMigration: this.getBooleanFromEnv(
-              process.env.DB_MONGO_ENABLE_MIGRATION,
+              this.getEnvVarOrThrow('DB_MONGO_ENABLE_MIGRATION'),
             ),
-            username: process.env.DB_MONGO_USERNAME,
-            password: process.env.DB_MONGO_PASSWORD,
+            username: this.getEnvVarOrThrow('DB_MONGO_USERNAME'),
+            password: this.getEnvVarOrThrow('DB_MONGO_PASSWORD'),
             replicaSet: '',
             useSSL: false,
           },
 
           'core-db': {
-            uri: process.env.DB_MONGO_URI,
+            uri: this.getEnvVarOrThrow('DB_MONGO_URI'),
             authMode:
-              process.env.DB_MONGO_AUTH_MODE === 'aws-iam'
+              this.getEnvVarOrThrow('DB_MONGO_AUTH_MODE') === 'aws-iam'
                 ? 'aws-iam'
                 : 'password',
-            database: process.env.DB_MONGO_DATABASE,
+            database: this.getEnvVarOrThrow('DB_MONGO_DATABASE'),
             enableMigration: this.getBooleanFromEnv(
-              process.env.DB_MONGO_ENABLE_MIGRATION,
+              this.getEnvVarOrThrow('DB_MONGO_ENABLE_MIGRATION'),
             ),
-            username: process.env.DB_MONGO_USERNAME,
-            password: process.env.DB_MONGO_PASSWORD,
+            username: this.getEnvVarOrThrow('DB_MONGO_USERNAME'),
+            password: this.getEnvVarOrThrow('DB_MONGO_PASSWORD'),
             replicaSet: '',
             useSSL: false,
           },
@@ -55,27 +55,64 @@ export class EnvConfigFactory extends ConfigFactory {
       },
       apps: {
         api: {
-          name: process.env.APP_NAME,
-          port: parseInt(process.env.APP_PORT, 10),
+          name: this.getEnvVarOrThrow('APP_NAME'),
+          port: parseInt(this.getEnvVarOrThrow('APP_PORT'), 10),
+          baseUrl: this.getEnvVarOrThrow('API_BASE_URL'),
         },
         emailWorker: {
-          name: process.env.APP_NAME,
-          port: parseInt(process.env.APP_PORT, 10),
+          name: this.getEnvVarOrThrow('APP_NAME'),
+          port: parseInt(this.getEnvVarOrThrow('APP_PORT'), 10),
+          baseUrl: this.getEnvVarOrThrow('EMAIL_WORKER_BASE_URL'),
         },
         telegramWorker: {
-          name: process.env.APP_NAME,
-          port: parseInt(process.env.APP_PORT, 10),
+          name: this.getEnvVarOrThrow('APP_NAME'),
+          port: parseInt(this.getEnvVarOrThrow('APP_PORT'), 10),
+          baseUrl: this.getEnvVarOrThrow('TELEGRAM_WORKER_BASE_URL'),
         },
         whatsAppWorker: {
-          name: process.env.APP_NAME,
-          port: parseInt(process.env.APP_PORT, 10),
+          name: this.getEnvVarOrThrow('APP_NAME'),
+          port: parseInt(this.getEnvVarOrThrow('APP_PORT'), 10),
+          baseUrl: this.getEnvVarOrThrow('WHATSAPP_WORKER_BASE_URL'),
+        },
+        coreService: {
+          name: this.getEnvVarOrThrow('APP_NAME'),
+          port: parseInt(this.getEnvVarOrThrow('APP_PORT'), 10),
+          baseUrl: this.getEnvVarOrThrow('CORE_SERVICE_BASE_URL'),
         },
       },
       temporalConfig: {
-        namespace: process.env.TEMPORAL_NAMESPACE,
-        address: process.env.TEMPORAL_ADDRESS,
+        namespace: this.getEnvVarOrThrow('TEMPORAL_NAMESPACE'),
+        address: this.getEnvVarOrThrow('TEMPORAL_ADDRESS'),
+      },
+      natsConfig: {
+        url: this.getEnvVarOrThrow('NATS_URL'),
+      },
+      gmailConfig: {
+        clientId: this.getEnvVarOrThrow('GMAIL_CLIENT_ID'),
+        clientSecret: this.getEnvVarOrThrow('GMAIL_CLIENT_SECRET'),
+        refreshToken: this.getEnvVarOrThrow('GMAIL_REFRESH_TOKEN'),
+        redirectUri: '',
+        scopes: [],
+      },
+      openAIConfig: {
+        apiKey: this.getEnvVarOrThrow('OPENAI_API_KEY'),
+        model: '',
+        temperature: 0,
+      },
+      ollamaConfig: {
+        model: '',
+        temperature: 0,
+        serverUrl: '',
       },
     };
+  }
+
+  getEnvVarOrThrow(variableName: string): string {
+    const value = process.env[variableName];
+    if (!value) {
+      throw new Error(`Environment variable ${variableName} is not set.`);
+    }
+    return value;
   }
 }
 

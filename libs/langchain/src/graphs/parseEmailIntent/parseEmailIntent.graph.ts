@@ -136,7 +136,7 @@ export class ParseEmailIntentGraph {
       messages: state.messages,
       responseSchema: summarizeEmailOutputSchemaTxt,
     });
-    return { requestSummary: result.summary };
+    return { requestSummary: result?.summary ?? null };
   };
 
   private classifyEmailAsRFQNodeCallback = async (
@@ -147,7 +147,7 @@ export class ParseEmailIntentGraph {
       messages: state.messages,
       responseSchema: classifyMessageAsRFQOutputSchemaTxt,
     });
-    return { isRFQ: result.isRFQ, reason: result.reason };
+    return { isRFQ: result?.isRFQ ?? null, reason: result?.reason ?? null };
   };
 
   private extractRFQDetailsNodeCallback = async (
@@ -159,12 +159,15 @@ export class ParseEmailIntentGraph {
         messages: state.messages,
         responseSchema: extractRFQDetailsOutputSchemaTxt,
       });
+      if (!result) {
+        return {};
+      }
       return {
         expectedDeliveryDate: result.expectedDeliveryDate,
         items: result.items,
         customerDetail: {
           ...state.customerDetail,
-          name: result.customerDetail.name,
+          name: result.customerDetail?.name,
         },
 
         notes: result.notes,

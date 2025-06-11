@@ -1,7 +1,8 @@
 import { AttachmentParsingStatusVO } from '@common';
+import { ID } from '@common/valueObjects/id.vo';
 
 export class AttachmentEntity {
-  private readonly id: string | null = null;
+  private readonly id: ID;
   private readonly attachmentId: string;
   private readonly threadId: string;
   private readonly messageId: string;
@@ -18,7 +19,7 @@ export class AttachmentEntity {
     fileName,
     mimeType,
   }: {
-    id: string | null;
+    id: ID;
     attachmentId: string;
     threadId: string;
     messageId: string;
@@ -33,7 +34,7 @@ export class AttachmentEntity {
     this.mimeType = mimeType;
   }
 
-  getStorageId(): string | null {
+  getId(): ID {
     return this.id;
   }
 

@@ -5,6 +5,9 @@ import { RFQLineItem, RFQLineItemSchema } from './rfqLineItem.schema';
 
 @Schema()
 export class RFQ {
+  @Prop({ type: String, required: true })
+  _id: string;
+
   @Prop({ required: true })
   threadId: string;
 
@@ -26,7 +29,7 @@ export class RFQ {
   @Prop({ type: [String], default: null })
   notes: string[] | null;
 
-  @Prop({ type: [RFQLineItemSchema], default: [] })
+  @Prop({ type: [RFQLineItemSchema], _id: false, default: [] })
   lineItems: RFQLineItem[];
 
   @Prop({

@@ -58,7 +58,10 @@ export class AttachmentParsingStatusVO {
   }
 
   canTransitionTo(target: string): boolean {
-    const transitions = {
+    const transitions: Record<
+      AttachmentParsingStatus,
+      AttachmentParsingStatus[]
+    > = {
       [AttachmentParsingStatus.PENDING_PARSING]: [
         AttachmentParsingStatus.PARSING,
         AttachmentParsingStatus.PARSING_FAILED,

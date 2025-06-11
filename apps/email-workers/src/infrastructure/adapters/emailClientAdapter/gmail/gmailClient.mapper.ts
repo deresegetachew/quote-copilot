@@ -54,14 +54,15 @@ export class GmailClientMapper {
     const payload = gmailMessage.payload;
 
     return (
-      payload.headers.find((header: any) => header.name === 'From')?.value || ''
+      payload?.headers?.find((header: any) => header.name === 'From')?.value ||
+      ''
     );
   }
 
   private getTo(gmailMessage: gmail_v1.Schema$Message): string {
     const payload = gmailMessage.payload;
     return (
-      payload.headers.find((header: any) => header.name === 'To')?.value || ''
+      payload?.headers?.find((header: any) => header.name === 'To')?.value || ''
     );
   }
 
@@ -69,8 +70,8 @@ export class GmailClientMapper {
     const payload = gmailMessage.payload;
 
     return (
-      payload.headers.find((header: any) => header.name === 'Subject')?.value ||
-      ''
+      payload?.headers?.find((header: any) => header.name === 'Subject')
+        ?.value || ''
     );
   }
 
@@ -97,13 +98,13 @@ export class GmailClientMapper {
       return Buffer.from(encoded, 'base64').toString('utf-8');
     };
 
-    if (payload.mimeType?.startsWith('text/') && payload.body?.data) {
+    if (payload?.mimeType?.startsWith('text/') && payload?.body?.data) {
       if (payload.mimeType === 'text/plain') {
         result.plainText = decodeBase64(payload.body.data);
       } else if (payload.mimeType === 'text/html') {
         result.html = decodeBase64(payload.body.data);
       }
-    } else if (payload.parts) {
+    } else if (payload?.parts) {
       walkParts(payload.parts);
     }
 
@@ -136,10 +137,10 @@ export class GmailClientMapper {
       }
     };
 
-    if (payload.parts) {
+    if (payload?.parts) {
       walkParts(payload.parts);
     } else if (
-      payload.filename &&
+      payload?.filename &&
       payload.filename.length > 0 &&
       payload.body?.attachmentId
     ) {

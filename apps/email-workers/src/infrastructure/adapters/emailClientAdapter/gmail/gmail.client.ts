@@ -138,7 +138,9 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
       userId: 'me',
       requestBody: {
         ids: messageIds,
-        addLabelIds: labelObj ? labelObj.map((l) => l.id) : [],
+        addLabelIds: labelObj
+          ? labelObj.map((l) => l.id).filter((id): id is string => !!id)
+          : [],
       },
     });
   }

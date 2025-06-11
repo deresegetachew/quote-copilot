@@ -1,7 +1,8 @@
+import { ID } from '@common';
 import { RFQStatusVO } from '../valueObjects/rfqStatus.vo';
 
 type TRFQEntityProps = {
-  id: string;
+  id: ID | null;
   threadId: string;
   summary: string;
   status: RFQStatusVO;
@@ -13,9 +14,10 @@ type TRFQEntityProps = {
   hasAttachments: boolean | null;
   notes: string[] | null;
   items: Array<{
+    id: ID;
     itemCode: string;
     itemDescription: string | null;
-    quantity: number;
+    quantity: number | null;
     unit: string | null;
     notes: string[] | null;
   }>;
@@ -26,7 +28,7 @@ type TRFQEntityProps = {
 };
 
 export class RFQEntity {
-  private readonly id: string;
+  private readonly id: ID;
   private readonly threadId: string;
   private readonly summary: string;
   private readonly customerDetail: {
@@ -44,7 +46,7 @@ export class RFQEntity {
   private readonly updatedAt: Date | undefined;
 
   constructor(props: TRFQEntityProps) {
-    this.id = props.id;
+    this.id = props.id ?? ID.create();
     this.threadId = props.threadId;
     this.summary = props.summary;
     this.status = props.status;
@@ -60,7 +62,7 @@ export class RFQEntity {
   }
 
   getStorageId(): string {
-    return this.id;
+    return this.id.getValue();
   }
 
   getEmailThreadRef(): string {
@@ -88,9 +90,10 @@ export class RFQEntity {
   }
 
   getItems(): Array<{
+    id: ID;
     itemCode: string;
     itemDescription: string | null;
-    quantity: number;
+    quantity: number | null;
     unit: string | null;
     notes: string[] | null;
   }> {
