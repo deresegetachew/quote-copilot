@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SchemaValidationPipe } from './schemaValidation.pipe';
-import { ZodValidationException } from '../exceptions/zodValidation.exception';
+import { SchemaValidationException } from '../exceptions/schemaValidation.exception';
 import { z } from 'zod';
 import { BadRequestException } from '@nestjs/common';
 
@@ -30,7 +30,7 @@ describe('SchemaValidationPipe', () => {
       expect(result).toEqual(validData);
     });
 
-    it('should throw ZodValidationException for invalid data', () => {
+    it('should throw SchemaValidationException for invalid data', () => {
       const invalidData = {
         email: 'invalid-email',
         age: 15,
@@ -38,7 +38,7 @@ describe('SchemaValidationPipe', () => {
       };
 
       expect(() => pipe.transform(invalidData, { type: 'body' })).toThrow(
-        ZodValidationException,
+        SchemaValidationException,
       );
     });
 
@@ -48,7 +48,7 @@ describe('SchemaValidationPipe', () => {
       };
 
       expect(() => pipe.transform(incompleteData, { type: 'body' })).toThrow(
-        ZodValidationException,
+        SchemaValidationException,
       );
     });
 

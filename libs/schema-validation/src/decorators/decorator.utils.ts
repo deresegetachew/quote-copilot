@@ -26,8 +26,6 @@ export function createValidationDecorator<T>(
     const metadata = {
       schema,
       options: {
-        transform: true,
-        stripUnknown: true,
         ...defaultOptions,
         ...options,
       },
@@ -70,7 +68,10 @@ export function getValidationMetadata(
       type: ValidationType;
     }
   | undefined {
-  return Reflect.getMetadata(VALIDATION_METADATA, target, propertyKey);
+  if (propertyKey !== undefined) {
+    return Reflect.getMetadata(VALIDATION_METADATA, target, propertyKey);
+  }
+  return Reflect.getMetadata(VALIDATION_METADATA, target);
 }
 
 export function getValidationSchema(

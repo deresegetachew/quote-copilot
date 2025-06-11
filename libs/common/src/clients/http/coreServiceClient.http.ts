@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { fetchObservableResult } from '../../utils';
-import { MessageIntentResponseDTO } from '../../dtos';
+import { TMessageIntentResponseDTO } from '../../dtos';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -12,13 +12,15 @@ export class CoreServiceClient {
     private readonly httpClient: HttpService,
     private configService: ConfigService,
   ) {
-    this.baseURL = this.configService.get<string>('apps.coreService.baseUrl');
+    this.baseURL = this.configService.getOrThrow<string>(
+      'apps.coreService.baseUrl',
+    );
   }
 
   async parseMessageIntent(
     threadId: string,
     messageId: string,
-  ): Promise<MessageIntentResponseDTO> {
+  ): Promise<TMessageIntentResponseDTO> {
     const request = await this.httpClient.post(
       `${this.baseURL}/core-service/parse-message-intent`,
       {
@@ -26,6 +28,6 @@ export class CoreServiceClient {
         messageId,
       },
     );
-    return await fetchObservableResult<MessageIntentResponseDTO>(request);
+    return await fetchObservableResult<TMessageIntentResponseDTO>(request);
   }
 }

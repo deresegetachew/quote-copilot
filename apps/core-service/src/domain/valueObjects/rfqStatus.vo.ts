@@ -19,7 +19,7 @@ export class RFQStatusVO {
   }
 
   canTransitionTo(target: string): boolean {
-    const transitions = {
+    const transitions: Record<RFQStatus, RFQStatus[]> = {
       [RFQStatus.NEW]: [RFQStatus.PROCESSING, RFQStatus.PROCESSING_FAILED],
       [RFQStatus.PROCESSING]: [
         RFQStatus.COMPLETED,

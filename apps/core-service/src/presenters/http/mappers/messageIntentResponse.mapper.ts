@@ -1,4 +1,4 @@
-import { MessageIntentResponseDTO } from '@common';
+import { TMessageIntentResponseDTO } from '@common';
 import { TEmailIntentSchemaType } from '@tools-langchain';
 
 export type ToResponseParams = {
@@ -8,7 +8,7 @@ export type ToResponseParams = {
 export class MessageIntentResponseMapper {
   static toResponse({
     llmResponse,
-  }: ToResponseParams): MessageIntentResponseDTO {
+  }: ToResponseParams): TMessageIntentResponseDTO {
     return {
       threadId: llmResponse.threadId,
       summary: llmResponse.requestSummary ?? '',
@@ -19,7 +19,7 @@ export class MessageIntentResponseMapper {
         customerDetail: llmResponse.customerDetail
           ? {
               name: llmResponse.customerDetail?.name ?? null,
-              email: llmResponse.customerDetail?.email,
+              email: llmResponse.customerDetail?.email || '',
             }
           : null,
         expectedDeliveryDate: llmResponse.expectedDeliveryDate ?? null,

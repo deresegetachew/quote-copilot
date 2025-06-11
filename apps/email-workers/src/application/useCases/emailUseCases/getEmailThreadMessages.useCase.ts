@@ -11,13 +11,14 @@ import { ValidateQuerySchema } from '@schema-validation';
 @QueryHandler(GetEmailThreadMessagesQuery)
 @ValidateQuerySchema(GetEmailThreadMessagesQuerySchema)
 export class GetEmailThreadMessagesUseCase
-  implements IQueryHandler<GetEmailThreadMessagesQuery, MessageThreadAggregate>
+  implements
+    IQueryHandler<GetEmailThreadMessagesQuery, MessageThreadAggregate | null>
 {
   constructor(private readonly dbRepository: EmailMessageRepositoryPort) {}
 
   async execute(
     query: GetEmailThreadMessagesQuery,
-  ): Promise<MessageThreadAggregate> {
+  ): Promise<MessageThreadAggregate | null> {
     const { threadId } = query;
 
     return await this.dbRepository.findByThreadId(threadId);

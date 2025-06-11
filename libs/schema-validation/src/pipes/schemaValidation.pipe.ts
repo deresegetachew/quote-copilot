@@ -5,13 +5,13 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { z } from 'zod';
-import { ZodValidationException } from '../exceptions';
+import { SchemaValidationException } from '../exceptions';
 
 @Injectable()
-export class SchemaValidationPipe implements PipeTransform {
+export class SchemaValidationPipe<T = any> implements PipeTransform<any, T> {
   constructor(
-    private readonly schema: z.ZodSchema<any>,
-    private readonly validationType: string = 'input',
+    private readonly schema: z.ZodSchema<T>,
+    private readonly validationType?: string,
     private readonly options?: {
       errorMessage?: string;
       transform?: boolean;
@@ -19,24 +19,26 @@ export class SchemaValidationPipe implements PipeTransform {
     },
   ) {}
 
-  transform(value: any, metadata: ArgumentMetadata) {
+  transform(value: any, metadata: ArgumentMetadata): T {
     try {
-      // Use safeParse without custom options for now
       const result = this.schema.safeParse(value);
 
       if (!result.success) {
-        throw new ZodValidationException(result.error, this.validationType);
+        throw new SchemaValidationException(
+          result.error,
+          this.validationType || metadata.type || 'input',
+        );
       }
 
       return this.options?.transform ? result.data : value;
     } catch (error) {
-      if (error instanceof ZodValidationException) {
+      if (error instanceof SchemaValidationException) {
         throw error;
       }
 
       throw new BadRequestException(
         this.options?.errorMessage ||
-          `Validation failed for ${this.validationType}`,
+          `Validation failed for ${this.validationType || metadata.type || 'input'}`,
       );
     }
   }

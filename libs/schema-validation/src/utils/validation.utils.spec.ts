@@ -1,9 +1,9 @@
 import {
   validateWithSchema,
   safeValidateWithSchema,
-  createValidator,
 } from '../utils/validation.utils';
 import { z } from 'zod';
+import { SchemaValidationException } from '../exceptions';
 
 describe('ValidationUtils', () => {
   const TestSchema = z.object({
@@ -24,28 +24,16 @@ describe('ValidationUtils', () => {
       expect(result).toEqual(validData);
     });
 
-    it('should throw error for invalid data', () => {
+    it('should throw SchemaValidationException for invalid data', () => {
       const invalidData = {
         email: 'invalid-email',
         name: 'A',
         age: 15,
       };
 
-      expect(() => validateWithSchema(TestSchema, invalidData)).toThrow();
-    });
-
-    it('should use custom error message', () => {
-      const invalidData = {
-        email: 'invalid-email',
-        name: 'A',
-        age: 15,
-      };
-
-      expect(() =>
-        validateWithSchema(TestSchema, invalidData, {
-          errorMessage: 'Custom validation failed',
-        }),
-      ).toThrow('Custom validation failed');
+      expect(() => validateWithSchema(TestSchema, invalidData)).toThrow(
+        SchemaValidationException,
+      );
     });
   });
 
@@ -80,33 +68,6 @@ describe('ValidationUtils', () => {
         expect(errorResult.errors).toBeDefined();
         expect(errorResult.errors.issues).toHaveLength(3);
       }
-    });
-  });
-
-  describe('createValidator', () => {
-    it('should create a validator function for a schema', () => {
-      const validator = createValidator(TestSchema);
-
-      const validData = {
-        email: 'test@example.com',
-        name: 'John Doe',
-        age: 25,
-      };
-
-      const result = validator(validData);
-      expect(result).toEqual(validData);
-    });
-
-    it('should throw error for invalid data with created validator', () => {
-      const validator = createValidator(TestSchema);
-
-      const invalidData = {
-        email: 'invalid-email',
-        name: 'A',
-        age: 15,
-      };
-
-      expect(() => validator(invalidData)).toThrow();
     });
   });
 

@@ -4,6 +4,9 @@ import { EmailThreadStatus } from '../../../../domain/valueObjects/emailThreadSt
 
 @Schema()
 export class Thread {
+  @Prop({ type: String, required: true })
+  _id: string;
+
   @Prop({ required: true })
   threadId: string;
 
@@ -25,3 +28,6 @@ export class Thread {
 
 export type ThreadDocument = Thread & Document;
 export const ThreadSchema = SchemaFactory.createForClass(Thread);
+
+ThreadSchema.index({ threadId: 1 });
+ThreadSchema.index({ status: 1 });

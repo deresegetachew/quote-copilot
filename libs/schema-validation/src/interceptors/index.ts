@@ -1,1 +1,1 @@
-export * from './zodValidation.interceptor';
+export * from './schemaValidation.interceptor';

@@ -28,7 +28,7 @@ const { sendEmailActivity } = proxyActivities<typeof activities>({
 
 type TEmailThreadWorkflowState = {
   isDone: boolean;
-  threadId: string;
+  threadId: string | null;
   queue: NewMessageSignalPayload[];
   summary: string | null;
   latestRFQ: {
@@ -71,6 +71,9 @@ export async function processEmailThreadWorkflow(): Promise<void> {
       const { messageId } = state.queue.shift()!;
 
       // Step 1: Once
+      if (!state.threadId)
+        throw new Error('Thread ID is not set. Cannot process message.');
+
       const parsed = await parseEmailIntentActivity(state.threadId, messageId);
 
       /***

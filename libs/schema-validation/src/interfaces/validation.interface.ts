@@ -11,8 +11,6 @@ export enum ValidationType {
 
 export interface ValidationOptions {
   errorMessage?: string;
-  transform?: boolean;
-  stripUnknown?: boolean;
 }
 
 export interface ValidationMetadata {

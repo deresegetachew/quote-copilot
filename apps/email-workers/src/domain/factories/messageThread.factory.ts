@@ -3,6 +3,7 @@ import { EmailEntity } from '../entities/email.entity';
 import { EmailThreadStatusVO } from '../valueObjects/emailThreadStatus.vo';
 import { AttachmentEntity } from '../entities/attachment.entity';
 import { EmailMessageDTO } from '../../application/ports/outgoing/dto/emailMessage.dto';
+import { ID } from '@common';
 
 export class MessageThreadFactory {
   static createFromEmailMessageDTO(
@@ -20,7 +21,7 @@ export class MessageThreadFactory {
     } = messageDTO;
 
     const email = new EmailEntity({
-      id: null,
+      id: ID.create(),
       messageId,
       threadId,
       from,
@@ -33,7 +34,7 @@ export class MessageThreadFactory {
     const attachmentEntities = attachments.map(
       (att) =>
         new AttachmentEntity({
-          id: null,
+          id: ID.create(),
           attachmentId: att.attachmentId,
           threadId,
           messageId,
@@ -42,7 +43,7 @@ export class MessageThreadFactory {
         }),
     );
     return new MessageThreadAggregate(
-      null,
+      ID.create(),
       threadId,
       [email],
       attachmentEntities,

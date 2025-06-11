@@ -24,19 +24,22 @@ export abstract class NodesAbstract<Input, Output extends TBaseNodeOutput> {
   public async run(
     llmClient: LLMClient<Input>,
     input: z.infer<ZodSchema<Input>>,
-  ): Promise<Output> {
+  ): Promise<Output | undefined> {
     try {
       if (!llmClient) {
         throw new Error('LLMClient is not provided');
       }
 
-      const parsedInput = this.inputSchema?.parse(input);
+      const parsedInput = this.inputSchema
+        ? this.inputSchema.parse(input)
+        : input;
       const result = await this.nodeTask(parsedInput, llmClient);
       this.logger.debug('Node result:', { result });
 
       return this.validateResponse(result);
     } catch (err) {
       this.logger.error('Node error:', { error: err });
+      return undefined;
     }
   }
 }

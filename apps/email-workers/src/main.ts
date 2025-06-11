@@ -7,7 +7,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 async function bootstrap() {
   const app = await NestFactory.create(EmailWorkersModule);
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  // app.useGlobalPipes(new ValidationPipe({ transform: true })); // not needed as we are using schema validator
   app.enableShutdownHooks();
 
   const configService = app.get(ConfigService);

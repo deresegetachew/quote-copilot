@@ -1,18 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import {
-  AsyncMicroserviceOptions,
-  MicroserviceOptions,
-  Transport,
-} from '@nestjs/microservices';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
-import { TConfiguration } from '@app-config/config';
 import { CoreServiceModule } from './coreService.module';
 
 async function bootstrap() {
   // Create the HTTP (REST) app
   const app = await NestFactory.create(CoreServiceModule);
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableShutdownHooks();
 
   const configService = app.get(ConfigService);

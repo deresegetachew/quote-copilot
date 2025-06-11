@@ -10,9 +10,7 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 export class OllamaClient implements ClientStrategy {
   private modelInstance: ChatOllama;
 
-  constructor(private configService: ConfigService) {
-    this.modelInstance = null;
-  }
+  constructor(private configService: ConfigService) {}
 
   private async initialize() {
     const ollamaConfig =

@@ -1,17 +1,15 @@
 import { Module, Global } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { ZodValidationInterceptor } from './interceptors';
-import { SchemaValidationPipe } from './pipes';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { SchemaValidationInterceptor } from './interceptors';
 
 @Global()
 @Module({
   providers: [
     {
       provide: APP_INTERCEPTOR,
-      useClass: ZodValidationInterceptor,
+      useClass: SchemaValidationInterceptor,
     },
-    SchemaValidationPipe,
   ],
-  exports: [SchemaValidationPipe],
+  exports: [],
 })
 export class SchemaValidationModule {}

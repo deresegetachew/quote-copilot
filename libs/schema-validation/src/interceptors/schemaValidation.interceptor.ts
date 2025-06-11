@@ -12,10 +12,11 @@ import {
   getValidationOptions,
   getValidationType,
 } from '../decorators/decorator.utils';
-import { ZodValidationException } from '../exceptions';
+import { SchemaValidationException } from '../exceptions';
+import { validateWithSchema } from '../utils/validation.utils';
 
 @Injectable()
-export class ZodValidationInterceptor implements NestInterceptor {
+export class SchemaValidationInterceptor implements NestInterceptor {
   constructor() {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -75,19 +76,15 @@ export class ZodValidationInterceptor implements NestInterceptor {
     }
 
     try {
-      const result = schema.safeParse(dataToValidate);
-      if (!result.success) {
-        throw new ZodValidationException(
-          result.error,
-          validationType || 'data',
+      const parsedData = validateWithSchema(schema, dataToValidate, validationType || 'data');
+      if (!validationType) {
+        throw new BadRequestException(
+          'Validation type is required for assigning validated data.'
         );
       }
-
-      if (options?.transform) {
-        this.applyTransformation(context, validationType, result.data);
-      }
+      this.assignValidatedData(context, validationType, parsedData);
     } catch (error) {
-      if (error instanceof ZodValidationException) {
+      if (error instanceof SchemaValidationException) {
         throw error;
       }
 
@@ -100,10 +97,10 @@ export class ZodValidationInterceptor implements NestInterceptor {
     return next.handle();
   }
 
-  private applyTransformation(
+  private assignValidatedData(
     context: ExecutionContext,
     validationType: ValidationType,
-    transformedData: any,
+    validatedData: any,
   ) {
     const isHttpContext =
       validationType === ValidationType.HTTP_BODY ||
@@ -114,13 +111,13 @@ export class ZodValidationInterceptor implements NestInterceptor {
       const request = context.switchToHttp().getRequest();
       switch (validationType) {
         case ValidationType.HTTP_BODY:
-          request.body = transformedData;
+          request.body = validatedData;
           break;
         case ValidationType.HTTP_QUERY:
-          request.query = transformedData;
+          request.query = validatedData;
           break;
         case ValidationType.HTTP_PARAM:
-          request.params = transformedData;
+          request.params = validatedData;
           break;
       }
     } else {
@@ -129,18 +126,18 @@ export class ZodValidationInterceptor implements NestInterceptor {
         case ValidationType.USECASE_COMMAND:
         case ValidationType.USECASE_QUERY:
           if (args[0]) {
-            Object.assign(args[0], transformedData);
+            Object.assign(args[0], validatedData);
           }
           break;
         case ValidationType.EVENT_PAYLOAD:
           if (args[0].data) {
             // we expect data to be there
-            args[0].data = transformedData;
+            args[0].data = validatedData;
           }
           break;
         default: {
           if (args[0]) {
-            Object.assign(args[0], transformedData);
+            Object.assign(args[0], validatedData);
           }
           break;
         }

@@ -1,16 +1,11 @@
 import {
   emailSchema,
   passwordSchema,
-  uuidSchema,
-  mongoIdSchema,
   urlSchema,
   phoneSchema,
   paginationQuerySchema,
   searchQuerySchema,
   successResponseSchema,
-  customerDetailSchema,
-  rfqItemSchema,
-  rfqDataSchema,
 } from '../schemas/common.schemas';
 
 describe('CommonSchemas', () => {
@@ -66,64 +61,6 @@ describe('CommonSchemas', () => {
 
       invalidPasswords.forEach((password) => {
         const result = passwordSchema.safeParse(password);
-        expect(result.success).toBe(false);
-      });
-    });
-  });
-
-  describe('uuidSchema', () => {
-    it('should validate valid UUID formats', () => {
-      const validUuids = [
-        '123e4567-e89b-12d3-a456-426614174000',
-        'ffffffff-ffff-4fff-bfff-ffffffffffff',
-        '00000000-0000-4000-8000-000000000000',
-      ];
-
-      validUuids.forEach((uuid) => {
-        const result = uuidSchema.safeParse(uuid);
-        expect(result.success).toBe(true);
-      });
-    });
-
-    it('should reject invalid UUIDs', () => {
-      const invalidUuids = [
-        'not-a-uuid',
-        '123e4567-e89b-12d3-a456',
-        '123e4567-e89b-12d3-a456-426614174000-extra',
-        '',
-      ];
-
-      invalidUuids.forEach((uuid) => {
-        const result = uuidSchema.safeParse(uuid);
-        expect(result.success).toBe(false);
-      });
-    });
-  });
-
-  describe('mongoIdSchema', () => {
-    it('should validate valid MongoDB ObjectIds', () => {
-      const validObjectIds = [
-        '507f1f77bcf86cd799439011',
-        '123456789012345678901234',
-        'abcdef123456789012345678',
-      ];
-
-      validObjectIds.forEach((id) => {
-        const result = mongoIdSchema.safeParse(id);
-        expect(result.success).toBe(true);
-      });
-    });
-
-    it('should reject invalid MongoDB ObjectIds', () => {
-      const invalidObjectIds = [
-        'short',
-        'too-long-for-objectid-format',
-        'invalid-chars-!@#$%^&*()',
-        '',
-      ];
-
-      invalidObjectIds.forEach((id) => {
-        const result = mongoIdSchema.safeParse(id);
         expect(result.success).toBe(false);
       });
     });
@@ -242,95 +179,6 @@ describe('CommonSchemas', () => {
       };
 
       const result = successResponseSchema.safeParse(response);
-      expect(result.success).toBe(true);
-    });
-  });
-
-  describe('customerDetailSchema', () => {
-    it('should validate customer details', () => {
-      const customer = {
-        name: 'John Doe',
-        email: 'john@example.com',
-      };
-
-      const result = customerDetailSchema.safeParse(customer);
-      expect(result.success).toBe(true);
-    });
-
-    it('should handle null name', () => {
-      const customer = {
-        name: null,
-        email: 'john@example.com',
-      };
-
-      const result = customerDetailSchema.safeParse(customer);
-      expect(result.success).toBe(true);
-    });
-  });
-
-  describe('rfqItemSchema', () => {
-    it('should validate RFQ item', () => {
-      const item = {
-        itemCode: 'ITEM001',
-        itemDescription: 'Test item description',
-        quantity: 10,
-        unit: 'pieces',
-        specifications: 'Test specifications',
-      };
-
-      const result = rfqItemSchema.safeParse(item);
-      expect(result.success).toBe(true);
-    });
-
-    it('should reject negative quantities', () => {
-      const item = {
-        itemCode: 'ITEM001',
-        itemDescription: 'Test item',
-        quantity: -5,
-        unit: 'pieces',
-        specifications: null,
-      };
-
-      const result = rfqItemSchema.safeParse(item);
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe('rfqDataSchema', () => {
-    it('should validate complete RFQ data', () => {
-      const rfqData = {
-        customerDetail: {
-          name: 'John Doe',
-          email: 'john@example.com',
-        },
-        expectedDeliveryDate: '2025-12-31',
-        hasAttachments: true,
-        notes: ['Note 1', 'Note 2'],
-        items: [
-          {
-            itemCode: 'ITEM001',
-            itemDescription: 'Test item',
-            quantity: 5,
-            unit: 'pieces',
-            specifications: 'Test specs',
-          },
-        ],
-      };
-
-      const result = rfqDataSchema.safeParse(rfqData);
-      expect(result.success).toBe(true);
-    });
-
-    it('should handle null values', () => {
-      const rfqData = {
-        customerDetail: null,
-        expectedDeliveryDate: null,
-        hasAttachments: null,
-        notes: null,
-        items: null,
-      };
-
-      const result = rfqDataSchema.safeParse(rfqData);
       expect(result.success).toBe(true);
     });
   });

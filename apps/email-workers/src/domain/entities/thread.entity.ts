@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon';
+import { ID } from '@common/valueObjects/id.vo';
 
 export class ThreadEntity {
+  private readonly id: ID;
   private readonly threadId: string;
   private readonly subject: string;
   private messageIds: string[];
@@ -8,17 +10,23 @@ export class ThreadEntity {
   private readonly updatedAt?: DateTime;
 
   constructor(
+    id: ID,
     threadId: string,
     subject: string,
     messageIds: string[],
     createdAt?: DateTime,
     updatedAt?: DateTime,
   ) {
+    this.id = id;
     this.threadId = threadId;
     this.subject = subject;
     this.messageIds = messageIds;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+  }
+
+  getId(): ID {
+    return this.id;
   }
 
   getThreadId(): string {

@@ -1,13 +1,13 @@
 import { ObjectId } from 'bson';
 import { RFQEntity } from '../../../../domain/entities/rfq.entity';
 import { RFQDocument } from '../schemas/rfq.schema';
-import { DateHelper } from '@common';
+import { DateHelper, ID } from '@common';
 import { RFQStatusVO } from '../../../../domain/valueObjects/rfqStatus.vo';
 
 export class RFQMapper {
   static toDomain(rfqDoc: RFQDocument): RFQEntity {
     const rfqEntity: RFQEntity = new RFQEntity({
-      id: rfqDoc.id,
+      id: ID.of(rfqDoc.id),
       threadId: rfqDoc.threadId,
       summary: rfqDoc.summary,
       status: RFQStatusVO.of(rfqDoc.status),
@@ -23,6 +23,7 @@ export class RFQMapper {
         name: rfqDoc.customerDetail?.name || null,
       },
       items: rfqDoc.lineItems.map((item) => ({
+        id: ID.of(item._id),
         itemCode: item.itemCode,
         itemDescription: item.itemDescription,
         quantity: item.quantity,
@@ -36,20 +37,19 @@ export class RFQMapper {
 
   static toDocument(rfq: RFQEntity): Partial<RFQDocument> {
     return {
-      _id: rfq.getStorageId()
-        ? new ObjectId(rfq.getStorageId())
-        : new ObjectId(),
+      _id: rfq.getStorageId(),
       threadId: rfq.getEmailThreadRef(),
       status: rfq.getStatus().getValue(),
       summary: rfq.getSummary(),
       customerDetail: {
-        name: rfq.getCustomerDetail().name ?? null,
+        name: rfq.getCustomerDetail().name,
         email: rfq.getCustomerDetail().email,
       },
       expectedDeliveryDate: rfq.getExpectedDeliveryDate(),
       hasAttachments: rfq.getHasAttachments(),
       notes: rfq.getNotes(),
       lineItems: rfq.getItems().map((item) => ({
+        _id: item.id.getValue(),
         itemCode: item.itemCode,
         itemDescription: item.itemDescription,
         quantity: item.quantity,
