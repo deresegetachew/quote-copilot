@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import {
   GetUnreadEmailsQuery,
@@ -37,6 +37,11 @@ export class EmailWorkersController {
     const result = await this.queryBus.execute(
       new GetEmailThreadMessagesQuery(threadId),
     );
+    
+    if (!result) {
+      throw new NotFoundException(`Email thread with ID ${threadId} not found`);
+    }
+    
     return EmailThreadsResponseMapper.toResponse(result);
   }
 }

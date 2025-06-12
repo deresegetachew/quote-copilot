@@ -1,3 +1,4 @@
+import { Command } from '@nestjs/cqrs';
 import { z } from 'zod';
 
 // Schema for validating the trigger email thread processing workflow command
@@ -6,16 +7,15 @@ export const TriggerEmailThreadProcessingWfCommandSchema = z.object({
   messageId: z.string().min(1, 'Message ID is required'),
 });
 
-export class TriggerEmailThreadProcessingWfCommand {
+type TriggerEmailThreadProcessingWfCommandSchemaType = z.infer<
+  typeof TriggerEmailThreadProcessingWfCommandSchema
+>;
+
+export class TriggerEmailThreadProcessingWfCommand extends Command<void> {
   constructor(
-    public readonly threadId: z.infer<
-      typeof TriggerEmailThreadProcessingWfCommandSchema
-    >['threadId'],
-    public readonly messageId: z.infer<
-      typeof TriggerEmailThreadProcessingWfCommandSchema
-    >['messageId'],
+    public readonly threadId: string,
+    public readonly messageId: string,
   ) {
-    this.threadId = threadId;
-    this.messageId = messageId;
+    super();
   }
 }

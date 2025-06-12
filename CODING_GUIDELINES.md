@@ -119,3 +119,13 @@
  👉 [https://github.com/deresegetachew/play-ddd](https://github.com/deresegetachew/play-ddd)
  
  ---
+
+
+
+
+ ### DDD recommendations
+
+✅ UseCase owns transactions.
+✅ Aggregate owns invariants and domain state. and fire domain events
+✅ Domain Event signals that something happened.
+✅ Event Handler triggers workflows, notifications, etc.

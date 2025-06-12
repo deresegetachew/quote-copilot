@@ -35,7 +35,7 @@ export class EmailMessageMapper {
     const statusVO = EmailThreadStatusVO.of(thread.status);
 
     return MessageThreadAggregate.fromPersistence(
-      thread.id,
+      thread._id,
       thread.threadId,
       emailEntities,
       attachmentEntities,
@@ -45,7 +45,7 @@ export class EmailMessageMapper {
 
   static toDomainEmail(doc: EmailDocument): EmailEntity {
     return new EmailEntity({
-      id: ID.of(doc.id),
+      id: ID.of(doc._id),
       messageId: doc.messageId,
       threadId: doc.threadId,
       from: doc.from,

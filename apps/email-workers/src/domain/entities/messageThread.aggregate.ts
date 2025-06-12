@@ -2,11 +2,10 @@ import { file } from 'googleapis/build/src/apis/file';
 import { EmailThreadStatusVO } from '../valueObjects/emailThreadStatus.vo';
 import { AttachmentEntity } from './attachment.entity';
 import { EmailEntity } from './email.entity';
-import { AttachmentParsingStatusVO, ID } from '@common';
+import { AttachmentParsingStatusVO, ID, TAggregateRoot } from '@common';
+import { UnreadEmailMessageAppendedEvent } from '../events/unreadEmailMessageAppended.event';
 
-export class MessageThreadAggregate {
-  private readonly id: ID;
-
+export class MessageThreadAggregate extends TAggregateRoot {
   constructor(
     id: ID,
     private readonly threadId: string,
@@ -14,15 +13,12 @@ export class MessageThreadAggregate {
     private readonly attachments: AttachmentEntity[] = [],
     private status: EmailThreadStatusVO = EmailThreadStatusVO.initial(),
   ) {
-    this.id = id;
+    super(id);
+
     this.threadId = threadId;
     this.emails = emails;
     this.attachments = attachments;
     this.status = status;
-  }
-
-  getStorageId(): ID {
-    return this.id;
   }
 
   getThreadId(): string {
@@ -107,6 +103,12 @@ export class MessageThreadAggregate {
     );
     if (!exists) {
       this.emails.push(email);
+      this.addDomainEvent(
+        new UnreadEmailMessageAppendedEvent(
+          this.getStorageId().getValue(),
+          email,
+        ),
+      );
     }
   }
 
@@ -157,24 +159,5 @@ export class MessageThreadAggregate {
       attachments,
       EmailThreadStatusVO.initial(),
     );
-  }
-
-  static addMessage(
-    thread: MessageThreadAggregate,
-    email: EmailEntity,
-    attachments: AttachmentEntity[] = [],
-  ): MessageThreadAggregate {
-    const existingThread = thread.getStorageId()
-      ? thread
-      : MessageThreadAggregate.createNew(
-          thread.getThreadId(),
-          email,
-          attachments,
-        );
-
-    existingThread.addEmail(email);
-    attachments.forEach((att) => existingThread.addAttachment(att));
-
-    return existingThread;
   }
 }

@@ -7,7 +7,6 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 async function bootstrap() {
   const app = await NestFactory.create(DocumentWorkerModule);
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableShutdownHooks();
 
   const configService = app.get(ConfigService);

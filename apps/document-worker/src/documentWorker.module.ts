@@ -3,6 +3,7 @@ import { DocumentWorkerPresenterModule } from './presenters/documentWorkersPrese
 import { DocumentWorkerApplicationModule } from './application/documentWorkerApplication.module';
 import { AppConfigModule } from '@app-config/config';
 import { CqrsModule } from '@nestjs/cqrs';
+import { SchemaValidationModule } from '../../../libs/schema-validation/src';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     AppConfigModule.forRoot(),
     DocumentWorkerPresenterModule,
     DocumentWorkerApplicationModule,
+    SchemaValidationModule,
   ],
 })
 export class DocumentWorkerModule {}

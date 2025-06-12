@@ -1,4 +1,6 @@
+import { Command } from '@nestjs/cqrs';
 import { z } from 'zod';
+import { TEmailIntentSchemaType } from '@tools-langchain';
 
 // Schema for validating the parse message intent command payload
 export const ParseMessageIntentCommandSchema = z.object({
@@ -6,8 +8,14 @@ export const ParseMessageIntentCommandSchema = z.object({
   messageId: z.string().min(1, 'Message ID is required'),
 });
 
-export class ParseMessageIntentCommand {
+type ParseMessageIntentCommandSchemaType = z.infer<
+  typeof ParseMessageIntentCommandSchema
+>;
+
+export class ParseMessageIntentCommand extends Command<TEmailIntentSchemaType> {
   constructor(
     public readonly payload: z.infer<typeof ParseMessageIntentCommandSchema>,
-  ) {}
+  ) {
+    super();
+  }
 }
