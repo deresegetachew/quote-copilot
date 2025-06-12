@@ -4,7 +4,6 @@ import {
   MongooseModuleOptions,
   MongooseOptionsFactory,
 } from '@nestjs/mongoose';
-import { TConfiguration } from '@app-config/config';
 
 @Injectable()
 export class MongooseConnectionFactory implements MongooseOptionsFactory {

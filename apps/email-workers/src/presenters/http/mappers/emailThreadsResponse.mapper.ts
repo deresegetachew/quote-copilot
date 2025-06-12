@@ -3,8 +3,12 @@ import { MessageThreadAggregate } from '../../../domain/entities/messageThread.a
 
 export class EmailThreadsResponseMapper {
   static toResponse(
-    emailThreads: MessageThreadAggregate,
+    emailThreads: MessageThreadAggregate | null,
   ): TGetEmailThreadMessagesResponse {
+    if (!emailThreads) {
+      throw new Error('Email thread aggregate cannot be null');
+    }
+    
     return {
       id: emailThreads.getStorageId().getValue(),
       threadId: emailThreads.getThreadId(),
