@@ -21,6 +21,6 @@ export class GetEmailThreadMessagesUseCase
   ): Promise<MessageThreadAggregate | null> {
     const { threadId } = query;
 
-    return await this.dbRepository.findByThreadId(threadId);
+    return await this.dbRepository.findByStorageThreadId(threadId);
   }
 }

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
 export const EmailIntentSchema = z.object({
-  threadId: z.string(),
+  storageThreadID: z.string(),
   messages: z.array(z.string()),
   requestSummary: z.string().nonempty().nullable(),
   isRFQ: z.boolean().nullable(),

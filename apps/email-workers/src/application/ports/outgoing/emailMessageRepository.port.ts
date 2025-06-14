@@ -3,7 +3,9 @@ import { MessageThreadAggregate } from '../../../domain/entities/messageThread.a
 import { EmailEntity } from '../../../domain/entities/email.entity';
 
 export abstract class EmailMessageRepositoryPort {
-  abstract findByThreadId(id: string): Promise<MessageThreadAggregate | null>;
+  abstract findByStorageThreadId(
+    id: string,
+  ): Promise<MessageThreadAggregate | null>;
   abstract findByThreadIds(
     ids: string[],
   ): Promise<Map<string, MessageThreadAggregate>>;

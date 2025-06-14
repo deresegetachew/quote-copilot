@@ -10,7 +10,7 @@ export class MessageIntentResponseMapper {
     llmResponse,
   }: ToResponseParams): TMessageIntentResponseDTO {
     return {
-      threadId: llmResponse.threadId,
+      threadId: llmResponse.storageThreadID,
       summary: llmResponse.requestSummary ?? '',
       isRFQ: llmResponse.isRFQ,
       reason: llmResponse.reason,

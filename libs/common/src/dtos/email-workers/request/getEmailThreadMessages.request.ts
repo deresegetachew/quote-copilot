@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Param schema for threadId in getEmailThreadMessages endpoint
 export const GetEmailThreadMessagesParamSchema = z
   .object({
-    threadId: z.string().min(1, 'Thread ID is required'),
+    storageThreadID: z.string().min(1, 'storageThreadID ID is required'),
   })
   .strict();
 
