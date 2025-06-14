@@ -19,7 +19,6 @@ export class TriggerWorkflowOnUnreadEmails
       );
     } catch (error) {
       console.error('Error triggering workflow on unread emails:', error);
-      throw error; // Re-throw the error to ensure it is handled by the caller
     }
   }
 }
