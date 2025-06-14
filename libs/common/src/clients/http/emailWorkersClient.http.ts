@@ -20,10 +20,10 @@ export class EmailWorkersClient {
   }
 
   async getEmailThreadMessages(
-    threadId: string,
+    storageThreadID: string,
   ): Promise<TGetEmailThreadMessagesResponse> {
     const request = await this.httpClient.get<TGetEmailThreadMessagesResponse>(
-      `${this.baseURL}/email-workers/email-threads/${threadId}/messages`,
+      `${this.baseURL}/email-workers/email-threads/${storageThreadID}/messages`,
     );
     return await fetchObservableResult<TGetEmailThreadMessagesResponse>(
       request,

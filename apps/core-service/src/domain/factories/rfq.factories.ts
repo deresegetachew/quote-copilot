@@ -27,7 +27,7 @@ export class RfqFactory {
     response: TEmailIntentSchemaType,
   ): RFQEntity {
     return RfqFactory.createNew({
-      threadId: response?.threadId,
+      threadId: response?.storageThreadID,
       summary: response?.requestSummary || '',
       expectedDeliveryDate: response?.expectedDeliveryDate
         ? DateHelper.toUTCDateTime(response.expectedDeliveryDate)

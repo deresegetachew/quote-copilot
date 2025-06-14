@@ -54,10 +54,10 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
     }
   }
 
-  async findByThreadId(
+  async findByStorageThreadId(
     threadId: string,
   ): Promise<MessageThreadAggregate | null> {
-    const threadDoc = await this.threadModel.findOne({ threadId }).exec();
+    const threadDoc = await this.threadModel.findOne({ _id: threadId }).exec();
     if (!threadDoc) {
       return null;
     }
