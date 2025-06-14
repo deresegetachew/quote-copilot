@@ -1,0 +1,1 @@
+export * from './core-service/parse-message-intent/response/messageIntent.response.dto'; 

@@ -70,12 +70,12 @@ export class MessageIntentUseCase
           `From: ${msg.from}\nTo: ${msg.to}\nSubject: ${msg.subject}\nDate: ${msg.receivedAt}\nBody: ${msg.body}`
         );
 
-      const sender = result.emails.map((email) => email.from).join(', ');
-      const attachments = result.attachments;
+      // Get sender info from threadMessages
+      const sender = threadMessages.emails.map((email) => email.from).join(', ');
+      const attachments = threadMessages.attachments;
       const attPendingParse = attachments.filter(
         (att) => att.status === AttachmentParsingStatus.PENDING_PARSING,
       );
-      // Get sender info
 
       // Parse the email intent using LLM
       const llmResponse = await this.parseEmailIntentLLMGraph.parseEmailWithLLM(

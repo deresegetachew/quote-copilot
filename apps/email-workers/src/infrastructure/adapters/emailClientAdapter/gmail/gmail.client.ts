@@ -25,7 +25,7 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
   private async initialize(): Promise<void> {
     const auth = await this.gmailAuth.getOAuth2Client();
     this.gmail = google.gmail({ version: 'v1', auth });
-    await this.initializeLabelsOrThrow();
+    await this.initializeLabels();
   }
 
   async getUnreadMessagesOrThrow(): Promise<EmailMessageDTO[]> {

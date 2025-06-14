@@ -34,7 +34,13 @@ export class GetRFQByIdQueryHandler implements IQueryHandler<GetRFQByIdQuery> {
       expectedDeliveryDate: rfq.getExpectedDeliveryDate(),
       hasAttachments: rfq.getHasAttachments(),
       notes: rfq.getNotes(),
-      items: rfq.getItems(),
+      items: rfq.getItems().map(item => ({
+        itemCode: item.itemCode,
+        itemDescription: item.itemDescription,
+        quantity: item.quantity ?? 0, // Convert null to 0
+        unit: item.unit,
+        notes: item.notes,
+      })),
       error: rfq.getError(),
       reason: rfq.getReason(),
       createdAt: rfq.getCreatedAt(),

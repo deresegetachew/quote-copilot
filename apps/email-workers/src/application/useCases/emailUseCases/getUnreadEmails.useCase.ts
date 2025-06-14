@@ -1,13 +1,13 @@
-import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { MessageThreadAggregate } from '../../../domain/entities/messageThread.aggregate';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { CommandBus } from '@nestjs/cqrs';
 import { GetUnreadEmailsQuery } from '../../ports/incoming/query/getUnreadEmails.query';
 import { EmailClientFactoryPort } from '../../ports/outgoing/emailClient.port';
 import { EmailMessageRepositoryPort } from '../../ports/outgoing/emailMessageRepository.port';
-import { CommandBus } from '@nestjs/cqrs';
-import { EmailThreadStatusVO } from '../../../domain/valueObjects/emailThreadStatus.vo';
-import { TriggerEmailThreadProcessingWfCommand } from '../../ports/incoming/command';
-import { Logger } from '@nestjs/common';
+import { MessageThreadAggregate } from '../../../domain/entities/messageThread.aggregate';
 import { MessageThreadFactory } from '../../../domain/factories/messageThread.factory';
+import { EmailThreadStatusVO } from '../../../domain/valueObjects/emailThreadStatus.vo';
+import { TriggerEmailThreadProcessingWfCommand } from '../../ports/incoming/command/triggerEmailThreadProcessingWf.command';
+import { Logger } from '@nestjs/common';
 
 @QueryHandler(GetUnreadEmailsQuery)
 export class GetUnreadEmailsUseCase
@@ -48,32 +48,25 @@ export class GetUnreadEmailsUseCase
           existingThread?.getEmails().map(email => email.getMessageId()) ?? []
         );
 
-        // Re-create the aggregate but preserve status
-        const agg = new MessageThreadAggregate(
-          unreadMsg.getStorageId(),
-          threadId,
-          [
-            ...(existingThread?.getEmails() ?? []),
-            ...(unreadMsg?.getEmails() ?? []),
-          ],
-          unreadMsg.getAttachments(),
-          currentStatus ?? EmailThreadStatusVO.initial(),
+        // Filter new emails that don't already exist
+        const newEmails = unreadMsg.getEmails().filter(email => 
+          !existingMessageIds.has(email.getMessageId())
         );
 
-        // Only process if there are truly new emails
         if (newEmails.length > 0) {
           this.logger.log(
             `Found ${newEmails.length} new emails in thread ${threadId}, existing: ${existingMessageIds.size}`
           );
 
-          // Create aggregate with ALL emails (existing + new) for completeness
-          const agg = new EmailMessageAggregate(
-            existingThread?.getStorageId() || unreadMsg.getStorageId(),
+          // Re-create the aggregate with existing + new emails
+          const agg = new MessageThreadAggregate(
+            unreadMsg.getStorageId(),
             threadId,
             [
               ...(existingThread?.getEmails() ?? []),
               ...newEmails, // Only add truly new emails
             ],
+            unreadMsg.getAttachments(),
             currentStatus ?? EmailThreadStatusVO.initial(),
           );
 
@@ -149,7 +142,7 @@ export class GetUnreadEmailsUseCase
       await Promise.all(
         Object.entries(threadMessageIdMap).map(([threadId, messageIds]) =>
           client
-            .markMessagesAsAgentRead(Array.from(messageIds))
+            .markMessagesAsAgentReadOrThrow(Array.from(messageIds))
             .catch((err) => {
               this.logger.warn(
                 `Failed to mark messages as read for thread ${threadId}: ${err}`,

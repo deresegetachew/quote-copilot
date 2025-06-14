@@ -6,6 +6,14 @@ import {
   NewMessageSignalPayload,
 } from '../../signals';
 import type * as activities from '../../activities';
+import { 
+  TMessageParsedSubjectPayload,
+  TMessageParsedUnprocessableSubjectPayload,
+  messageParsedSubject,
+  messageParsedSubjectPayloadSchema,
+  messageParsedUnprocessableSubject,
+  messageParsedUnprocessableSubjectPayloadSchema,
+} from '@common/nats';
 
 const { parseEmailIntentActivity } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',

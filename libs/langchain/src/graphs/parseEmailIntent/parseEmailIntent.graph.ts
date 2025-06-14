@@ -316,7 +316,7 @@ export class ParseEmailIntentGraph {
       let processedDeliveryDate = result.expectedDeliveryDate;
       if (result.expectedDeliveryDate) {
         const originalDate = result.expectedDeliveryDate;
-        processedDeliveryDate = this.processRelativeDate(originalDate);
+        processedDeliveryDate = this.processRelativeDate(originalDate) || '';
         
         if (processedDeliveryDate !== originalDate) {
           this.logger.log(`Converted relative date "${originalDate}" to "${processedDeliveryDate}" for thread ${state.threadId}`);
