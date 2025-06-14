@@ -26,7 +26,9 @@
     "test:e2e": "jest --config ./apps/api/test/jest-e2e.json"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@langchain/core": "^0.3.50",
+    "@langchain/google-genai": "^0.2.10",
     "@langchain/langgraph": "^0.2.67",
     "@langchain/ollama": "^0.2.0",
     "@langchain/openai": "^0.5.8",

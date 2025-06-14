@@ -26,8 +26,26 @@ export class RFQRepositoryAdapter extends RfqRepositoryPort {
   }
 
   async findById(id: string): Promise<RFQEntity | null> {
-    const _id = new ObjectId(id);
-    const rfq = await this.rfqModel.findById(_id).exec();
+    let rfq: RFQDocument | null = null;
+    try {
+      // Try treating id as MongoDB ObjectId
+      const _id = new ObjectId(id);
+      rfq = await this.rfqModel.findById(_id).exec();
+    } catch (error) {
+      // Invalid ObjectId (e.g., threadId)
+      rfq = null;
+    }
+
+    // Fallback: try locating by threadId when not found or invalid ObjectId
+    if (!rfq) {
+      rfq = await this.rfqModel.findOne({ threadId: id }).exec();
+    }
+
+    return rfq ? RFQMapper.toDomain(rfq) : null;
+  }
+
+  async findByThreadId(threadId: string): Promise<RFQEntity | null> {
+    const rfq = await this.rfqModel.findOne({ threadId }).exec();
 
     return rfq ? RFQMapper.toDomain(rfq) : null;
   }

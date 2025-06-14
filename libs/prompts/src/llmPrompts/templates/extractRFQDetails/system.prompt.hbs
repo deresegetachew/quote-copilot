@@ -18,13 +18,30 @@ Extract and return the following as structured JSON:
 • Expected delivery date in **ISO 8601** format with timezone: must end with 'Z' to indicate UTC (e.g.,
 `2025-04-25T00:00:00Z`)
 
+**IMPORTANT DATE PARSING RULES:**
+- Convert relative dates to absolute dates from today's perspective
+- "within 30 days" → calculate 30 days from today and format as ISO 8601
+- "within 2 weeks" → calculate 14 days from today
+- "ASAP" or "urgent" → calculate 2-3 days from today
+- "by end of month" → calculate to last day of current month
+- "Q1 2024" → calculate to March 31, 2024
+- Always use **ISO 8601** format with UTC timezone: `YYYY-MM-DDTHH:mm:ssZ`
+
+**Date Conversion Examples:**
+- "Timeline: Required within 30 days" → `2025-02-03T00:00:00Z` (if today is January 4, 2025)
+- "Urgent delivery needed" → `2025-01-07T00:00:00Z` (if today is January 4, 2025)
+- "By end of this month" → `2025-01-31T00:00:00Z` (if today is January 4, 2025)
+
 Rules:
 - Respond **only** in the format defined by the provided JSON schema
 - Do **not** invent values — leave fields null or omit them if the info isn't available
 - If multiple lots or RFQs are listed, return each as a separate item in the `items` array
+- **ALWAYS** convert relative dates to absolute ISO 8601 dates
 
 Example behavior:
 - ✅ Good: `"notes": ["Bids must be submitted by April 25", "Use attached form templates"]`
 - ❌ Bad: `"notes": "Bids must be submitted..."` (must be an array)
+- ✅ Good: `"expectedDeliveryDate": "2025-02-03T00:00:00Z"`
+- ❌ Bad: `"expectedDeliveryDate": "within 30 days"` (must be converted to actual date)
 
 Be precise and consistent.

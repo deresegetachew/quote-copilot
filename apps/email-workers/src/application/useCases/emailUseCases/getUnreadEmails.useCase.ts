@@ -39,9 +39,14 @@ export class GetUnreadEmailsUseCase
       for (const unreadMsg of unreadMsgs) {
         const threadId = unreadMsg.getThreadId();
 
-        // Fetch existing thread status
+        // Fetch existing thread to preserve status and check for existing emails
         const existingThread = await this.dbRepository.findByThreadId(threadId);
         const currentStatus = existingThread?.getStatus();
+        
+        // Get existing message IDs to avoid duplicates
+        const existingMessageIds = new Set(
+          existingThread?.getEmails().map(email => email.getMessageId()) ?? []
+        );
 
         // Re-create the aggregate but preserve status
         const agg = new MessageThreadAggregate(
@@ -55,8 +60,35 @@ export class GetUnreadEmailsUseCase
           currentStatus ?? EmailThreadStatusVO.initial(),
         );
 
-        aggregates.push(agg);
-        savePromises.push(this.dbRepository.save(agg));
+        // Only process if there are truly new emails
+        if (newEmails.length > 0) {
+          this.logger.log(
+            `Found ${newEmails.length} new emails in thread ${threadId}, existing: ${existingMessageIds.size}`
+          );
+
+          // Create aggregate with ALL emails (existing + new) for completeness
+          const agg = new EmailMessageAggregate(
+            existingThread?.getStorageId() || unreadMsg.getStorageId(),
+            threadId,
+            [
+              ...(existingThread?.getEmails() ?? []),
+              ...newEmails, // Only add truly new emails
+            ],
+            currentStatus ?? EmailThreadStatusVO.initial(),
+          );
+
+          aggregates.push(agg);
+          savePromises.push(this.dbRepository.save(agg));
+        } else {
+          this.logger.log(
+            `No new emails found in thread ${threadId}, skipping save`
+          );
+          
+          // Still add to aggregates for potential workflow triggers
+          if (existingThread) {
+            aggregates.push(existingThread);
+          }
+        }
       }
 
       await Promise.all(savePromises);
@@ -109,6 +141,22 @@ export class GetUnreadEmailsUseCase
           ),
         );
       }
+
+      // fire all workflow triggers in parallel
+      await Promise.all(commands);
+
+      // mark all messages in parallel by thread
+      await Promise.all(
+        Object.entries(threadMessageIdMap).map(([threadId, messageIds]) =>
+          client
+            .markMessagesAsAgentRead(Array.from(messageIds))
+            .catch((err) => {
+              this.logger.warn(
+                `Failed to mark messages as read for thread ${threadId}: ${err}`,
+              );
+            }),
+        ),
+      );
 
       return aggregates;
     }

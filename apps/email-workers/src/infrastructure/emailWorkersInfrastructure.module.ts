@@ -3,6 +3,7 @@ import { EmailClientAdapterModule } from './adapters/emailClientAdapter/emailCli
 import { MongooseAdapterModule } from './adapters/mongooseAdapter/mongooseAdapter.module';
 import { DatabaseModule } from './database/mongo/database.module';
 import { TemporalWorkFlowAdapterModule } from './adapters/temporalWorkFlowAdapter/temporalWorkFlowAdapter.module';
+import { EmailTemplateRendererService } from './services';
 
 const adapterModules = [
   EmailClientAdapterModule,
@@ -13,7 +14,13 @@ const adapterModules = [
 @Module({
   imports: [...adapterModules, DatabaseModule],
   controllers: [],
-  providers: [],
-  exports: [...adapterModules, DatabaseModule],
+  providers: [
+    EmailTemplateRendererService,
+  ],
+  exports: [
+    ...adapterModules, 
+    DatabaseModule,
+    EmailTemplateRendererService,
+  ],
 })
 export class EmailWorkersInfrastructureModule {}

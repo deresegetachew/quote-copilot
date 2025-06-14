@@ -7,7 +7,7 @@ export class Thread {
   @Prop({ type: String, required: true })
   _id: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   threadId: string;
 
   @Prop({ required: true })
@@ -29,5 +29,6 @@ export class Thread {
 export type ThreadDocument = Thread & Document;
 export const ThreadSchema = SchemaFactory.createForClass(Thread);
 
-ThreadSchema.index({ threadId: 1 });
 ThreadSchema.index({ status: 1 });
+// Add unique index on threadId to prevent duplicates
+ThreadSchema.index({ threadId: 1 }, { unique: true });

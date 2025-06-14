@@ -77,8 +77,10 @@ export async function processEmailThreadWorkflow(): Promise<void> {
       const parsed = await parseEmailIntentActivity(state.threadId, messageId);
 
       /***
-       * after parsing we call fireIntegrationEventActivity
-       * the workflow needs to be deterministic and based on the parsed data we will branch and call different activities
+       * Note: The parseEmailIntentActivity now handles:
+       * - RFQ creation/updating via core service
+       * - Firing NATS events for confirmation emails automatically
+       * The workflow just needs to fire integration events for other services
        */
 
       if (parsed.isRFQ) {
@@ -90,26 +92,48 @@ export async function processEmailThreadWorkflow(): Promise<void> {
         };
         state.summary = parsed.summary;
 
-        // Step 2: Send email
-        // fire call fireIntegrationEventActivity to save the parsed data details and send  confirmation email to the user
-        // await fireIntegrationEventsActivity<TMessageParsedSubjectPayload>({
-        //   subject: messageParsedSubject,
-        //   schema: messageParsedSubjectPayloadSchema,
-        //   eventPayload: {},
-        // });
+        // Fire integration event with proper payload for other services
+        const eventPayload: TMessageParsedSubjectPayload = {
+          threadId: state.threadId,
+          messageId: messageId,
+          summary: parsed.summary || 'RFQ processed',
+          expectedDeliveryDate: parsed.rfqData?.expectedDeliveryDate || null,
+          hasAttachments: parsed.rfqData?.hasAttachments || null,
+          requiresHumanReview: false, // TODO: Add logic to determine this
+          items: parsed.rfqData?.items?.map(item => ({
+            itemCode: item.itemCode,
+            itemDescription: item.itemDescription,
+            quantity: item.quantity,
+            unit: item.unit,
+            notes: item.notes?.join(', ') || null,
+          })) || null,
+          customerDetail: parsed.rfqData?.customerDetail || null,
+          notes: null, // Notes at message level (not available in current type)
+        };
+
+        await fireIntegrationEventsActivity<TMessageParsedSubjectPayload>({
+          subject: messageParsedSubject,
+          schema: messageParsedSubjectPayloadSchema,
+          eventPayload,
+        });
       } else {
-        console.log('Not an RFQ, checking');
-        // await fireIntegrationEventsActivity<TMessageParsedUnprocessableSubjectPayload>(
-        //   {
-        //     subject: messageParsedUnprocessableSubject,
-        //     schema: messageParsedUnprocessableSubjectPayloadSchema,
-        //     eventPayload: {},
-        //   },
-        // );
+        // Fire unprocessable message event
+        const eventPayload: TMessageParsedUnprocessableSubjectPayload = {
+          threadId: state.threadId,
+          messageId: messageId,
+          summary: parsed.summary || 'Message not processable as RFQ',
+        };
 
-        // step 2 fire integration event to update the thread and message record
+        await fireIntegrationEventsActivity<TMessageParsedUnprocessableSubjectPayload>(
+          {
+            subject: messageParsedUnprocessableSubject,
+            schema: messageParsedUnprocessableSubjectPayloadSchema,
+            eventPayload,
+          },
+        );
 
-        state.isDone = true; //this thread is done and should close it
+        // Mark thread as done for non-RFQ messages
+        state.isDone = true;
       }
     }
 

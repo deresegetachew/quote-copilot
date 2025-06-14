@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 export const ConfigSchema = z.object({
   name: z.string(),
+  aiStrategy: z.enum(['openAI', 'ollama', 'gemini']).default('gemini'),
   authConfig: z.any().optional(),
   awsConfig: z.any().optional(),
   azureConfig: z.any().optional(),
@@ -114,6 +115,45 @@ export const ConfigSchema = z.object({
     serverUrl: z.string(),
     model: z.string(),
     temperature: z.number(),
+  }),
+  geminiConfig: z.object({
+    apiKey: z.string(),
+    model: z.string(),
+    temperature: z.number(),
+  }),
+  attachmentConfig: z.object({
+    enabled: z.boolean().default(false),
+    maxFileSize: z.number().default(10485760), // 10MB
+    allowedMimeTypes: z.array(z.string()).default([
+      'text/csv',
+      'application/pdf',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ]),
+    enableVirusScanning: z.boolean().default(true),
+    enableContentScanning: z.boolean().default(true),
+    tempDirectory: z.string().default('/tmp/attachments'),
+    retentionPeriodDays: z.number().default(7),
+    processingTimeoutMs: z.number().default(30000), // 30 seconds
+  }),
+  corsConfig: z.object({
+    origins: z.array(z.string()).default([
+      'http://localhost:3000',
+      'http://localhost:3001', 
+      'http://localhost:3003',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001',
+      'http://127.0.0.1:3003',
+    ]),
+    methods: z.array(z.string()).default(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']),
+    allowedHeaders: z.array(z.string()).default(['Content-Type', 'Authorization', 'Accept']),
+    credentials: z.boolean().default(true),
+  }),
+  minioConfig: z.object({
+    endpoint: z.string(),
+    accessKey: z.string(),
+    secretKey: z.string(),
+    bucketName: z.string().default('attachments')
   }),
 });
 

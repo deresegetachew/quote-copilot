@@ -19,6 +19,7 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
 
   async onModuleInit() {
     await this.initialize();
+    console.log('Gmail client successfully initialized with valid credentials');
   }
 
   private async initialize(): Promise<void> {
@@ -145,7 +146,103 @@ export class GmailClient extends EmailClientPort implements OnModuleInit {
     });
   }
 
-  private async initializeLabelsOrThrow() {
+  /**
+   * Send a new email
+   */
+  async sendEmail(params: {
+    to: string;
+    subject: string;
+    body: string;
+    from?: string;
+  }): Promise<void> {
+    const { to, subject, body, from } = params;
+    
+    const raw = this.createRawEmail({
+      to,
+      subject,
+      body,
+      from,
+    });
+
+    await this.gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw,
+      },
+    });
+  }
+
+  /**
+   * Send a reply to an existing email thread
+   */
+  async sendReply(params: {
+    to: string;
+    subject: string;
+    body: string;
+    threadId: string;
+    inReplyTo?: string;
+    references?: string;
+    from?: string;
+  }): Promise<void> {
+    const { to, subject, body, threadId, inReplyTo, references, from } = params;
+    
+    const raw = this.createRawEmail({
+      to,
+      subject: subject.startsWith('Re:') ? subject : `Re: ${subject}`,
+      body,
+      inReplyTo,
+      references,
+      from,
+    });
+
+    await this.gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw,
+        threadId,
+      },
+    });
+  }
+
+  /**
+   * Create raw email format for Gmail API
+   */
+  private createRawEmail(params: {
+    to: string;
+    subject: string;
+    body: string;
+    inReplyTo?: string;
+    references?: string;
+    from?: string;
+  }): string {
+    const { to, subject, body, inReplyTo, references, from } = params;
+    
+    const lines = [
+      `To: ${to}`,
+      `Subject: ${subject}`,
+      `Content-Type: text/plain; charset=utf-8`,
+      `Content-Transfer-Encoding: 7bit`,
+    ];
+
+    if (from) {
+      lines.unshift(`From: ${from}`);
+    }
+
+    if (inReplyTo) {
+      lines.push(`In-Reply-To: ${inReplyTo}`);
+    }
+
+    if (references) {
+      lines.push(`References: ${references}`);
+    }
+
+    lines.push('', body);
+
+    const email = lines.join('\r\n');
+    return Buffer.from(email).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  private async initializeLabels() {
     this.labels = await this.gmail.users.labels.list({ userId: 'me' });
     const exists = this.labels.data.labels?.some(
       (label) => label.name === this.agentReadLabelName,

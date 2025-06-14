@@ -1,1 +1,1 @@
-export type AIClientTypes = 'openAI' | 'ollama';
+export type AIClientTypes = 'openAI' | 'ollama' | 'gemini';

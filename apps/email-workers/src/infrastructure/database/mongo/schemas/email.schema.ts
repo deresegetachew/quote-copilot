@@ -6,7 +6,7 @@ export class Email {
   @Prop({ type: String, required: true })
   _id: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   messageId: string;
 
   @Prop({ required: true })
@@ -30,3 +30,6 @@ export class Email {
 
 export type EmailDocument = Email & Document;
 export const EmailSchema = SchemaFactory.createForClass(Email);
+
+// Add unique index on messageId to prevent duplicates
+EmailSchema.index({ messageId: 1 }, { unique: true });

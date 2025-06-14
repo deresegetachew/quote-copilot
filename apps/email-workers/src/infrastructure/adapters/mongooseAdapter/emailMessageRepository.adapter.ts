@@ -61,11 +61,15 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
   ): Promise<MessageThreadAggregate | null> {
     const threadDoc = await this.threadModel.findOne({ threadId }).exec();
     if (!threadDoc) {
+      this.logger.warn(`No thread found for threadId: ${threadId}`);
       return null;
     }
 
+    // Query emails directly by threadId instead of relying on thread.messageIds
+    // This ensures we get ALL emails in the thread, including recent follow-ups
     const emails = await this.emailModel
-      .find({ messageId: { $in: threadDoc.messageIds } })
+      .find({ threadId })
+      .sort({ receivedAt: 1 }) // Sort chronologically
       .exec();
 
     const attachments = await this.attachmentModel

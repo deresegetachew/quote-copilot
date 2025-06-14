@@ -3,6 +3,7 @@ import { PromptBody } from '@prompts';
 import { ClientStrategy } from './clientStrategy.interface';
 import { OpenAIClient } from './openai.client';
 import { OllamaClient } from './ollama.client';
+import { GeminiClient } from './gemini.client';
 import {
   AIMessageChunk,
   HumanMessage,
@@ -20,6 +21,7 @@ export class LLMClient<TInput> {
   constructor(
     private readonly openAIClient: OpenAIClient,
     private readonly ollamaClient: OllamaClient,
+    private readonly geminiClient: GeminiClient,
   ) {}
 
   private logger = new Logger(LLMClient.name);
@@ -31,6 +33,8 @@ export class LLMClient<TInput> {
       this.strategy = this.openAIClient;
     } else if (strategy === 'ollama') {
       this.strategy = this.ollamaClient;
+    } else if (strategy === 'gemini') {
+      this.strategy = this.geminiClient;
     } else {
       throw new Error(`Unknown strategy: ${strategy}`);
     }

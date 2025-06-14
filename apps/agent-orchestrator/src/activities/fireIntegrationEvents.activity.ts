@@ -29,9 +29,11 @@ export async function fireIntegrationEventsActivity<T>(
       eventPayload,
     );
 
-    // validateWithSchema(schema, eventPayload);
+    validateWithSchema(schema, eventPayload);
 
-    // await natsService.emit(subject, eventPayload);
+    await natsService.emit(subject, eventPayload);
+    
+    logger.log(`Successfully fired integration event: ${subject}`);
   } catch (error) {
     logger.error('Error firing integration events:', error);
     throw error;

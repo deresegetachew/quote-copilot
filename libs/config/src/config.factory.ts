@@ -18,6 +18,7 @@ export class EnvConfigFactory extends ConfigFactory {
   getConfig(): TConfiguration {
     return {
       name: this.getEnvVarOrThrow('APP_NAME'),
+      aiStrategy: (process.env.AI_STRATEGY as "openAI" | "ollama" | "gemini") || 'gemini',
       dbConfig: {
         mongo: {
           'email-worker-db': {
@@ -91,18 +92,57 @@ export class EnvConfigFactory extends ConfigFactory {
         clientId: this.getEnvVarOrThrow('GMAIL_CLIENT_ID'),
         clientSecret: this.getEnvVarOrThrow('GMAIL_CLIENT_SECRET'),
         refreshToken: this.getEnvVarOrThrow('GMAIL_REFRESH_TOKEN'),
-        redirectUri: '',
-        scopes: [],
+        redirectUri: process.env.GMAIL_REDIRECT_URI || '',
+        scopes: process.env.GMAIL_SCOPES?.split(',') || [],
       },
       openAIConfig: {
         apiKey: this.getEnvVarOrThrow('OPENAI_API_KEY'),
-        model: '',
-        temperature: 0,
+        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+        temperature: parseFloat(process.env.OPENAI_TEMPERATURE || '0.1'),
       },
       ollamaConfig: {
-        model: '',
-        temperature: 0,
-        serverUrl: '',
+        model: process.env.OLLAMA_MODEL || 'llama3.2',
+        temperature: parseFloat(process.env.OLLAMA_TEMPERATURE || '0.1'),
+        serverUrl: process.env.OLLAMA_SERVER_URL || 'http://localhost:11434',
+      },
+      geminiConfig: {
+        apiKey: this.getEnvVarOrThrow('GEMINI_API_KEY'),
+        model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+        temperature: parseFloat(process.env.GEMINI_TEMPERATURE || '0.1'),
+      },
+      attachmentConfig: {
+        enabled: this.getBooleanFromEnv(process.env.ATTACHMENT_ENABLED) || false,
+        maxFileSize: parseInt(process.env.ATTACHMENT_MAX_FILE_SIZE || '10485760', 10),
+        allowedMimeTypes: process.env.ATTACHMENT_ALLOWED_MIME_TYPES?.split(',') || [
+          'text/csv',
+          'application/pdf',
+          'application/vnd.ms-excel',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ],
+        enableVirusScanning: this.getBooleanFromEnv(process.env.ATTACHMENT_ENABLE_VIRUS_SCANNING) || true,
+        enableContentScanning: this.getBooleanFromEnv(process.env.ATTACHMENT_ENABLE_CONTENT_SCANNING) || true,
+        tempDirectory: process.env.ATTACHMENT_TEMP_DIRECTORY || '/tmp/attachments',
+        retentionPeriodDays: parseInt(process.env.ATTACHMENT_RETENTION_PERIOD_DAYS || '7', 10),
+        processingTimeoutMs: parseInt(process.env.ATTACHMENT_PROCESSING_TIMEOUT_MS || '30000', 10),
+      },
+      corsConfig: {
+        origins: process.env.CORS_ORIGINS?.split(',') || [
+          'http://localhost:3000',
+          'http://localhost:3001', 
+          'http://localhost:3003',
+          'http://127.0.0.1:3000',
+          'http://127.0.0.1:3001',
+          'http://127.0.0.1:3003',
+        ],
+        methods: process.env.CORS_METHODS?.split(',') || ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: process.env.CORS_ALLOWED_HEADERS?.split(',') || ['Content-Type', 'Authorization', 'Accept'],
+        credentials: this.getBooleanFromEnv(process.env.CORS_CREDENTIALS) || true,
+      },
+      minioConfig: {
+        endpoint: this.getEnvVarOrThrow('MINIO_ENDPOINT'),
+        accessKey: this.getEnvVarOrThrow('MINIO_ACCESS_KEY'),
+        secretKey: this.getEnvVarOrThrow('MINIO_SECRET_KEY'),
+        bucketName: process.env.MINIO_BUCKET_NAME || 'attachments'
       },
     };
   }

@@ -13,6 +13,7 @@ export type TSearchFields = {
 
 export abstract class RfqRepositoryPort {
   abstract findById(id: string): Promise<RFQEntity | null>;
+  abstract findByThreadId(threadId: string): Promise<RFQEntity | null>;
   abstract save(entity: RFQEntity): Promise<void>;
 
   abstract searchByFields(
