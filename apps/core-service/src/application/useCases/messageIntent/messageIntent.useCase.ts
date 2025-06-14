@@ -59,14 +59,14 @@ export class MessageIntentUseCase
       );
 
       this.logger.log('🤖 parsed LLM Response:', {
-        threadId: llmResponse.threadId,
+        threadId: llmResponse.storageThreadID,
         isRFQ: llmResponse.isRFQ,
         reason: llmResponse.reason,
       });
 
       if (llmResponse.isRFQ) {
         this.logger.log(
-          `📩 RFQ detected in thread ${llmResponse.threadId}. Reason: ${llmResponse.reason}`,
+          `📩 RFQ detected in thread ${llmResponse.storageThreadID}. Reason: ${llmResponse.reason}`,
         );
 
         const newRFQ = RfqFactory.crateFromEmailIntentResponse(llmResponse);

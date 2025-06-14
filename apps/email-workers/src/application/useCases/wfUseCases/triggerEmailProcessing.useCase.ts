@@ -11,7 +11,7 @@ import { ValidateCommandSchema } from '@schema-validation';
 @CommandHandler(TriggerEmailThreadProcessingWfCommand)
 @ValidateCommandSchema(TriggerEmailThreadProcessingWfCommandSchema)
 export class TriggerEmailProcessingUseCase
-  implements ICommandHandler<TriggerEmailThreadProcessingWfCommand>
+  implements ICommandHandler<TriggerEmailThreadProcessingWfCommand, void>
 {
   constructor(
     @Inject(ProcessEmailThreadWFPort)

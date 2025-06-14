@@ -5,43 +5,13 @@
   "root": "",
   "defaultProject": "email-workers",
   "projects": {
-    "core-service": {
+    "agent-orchestrator": {
       "type": "application",
-      "root": "apps/core-service",
+      "root": "apps/agent-orchestrator",
       "entryFile": "main",
-      "sourceRoot": "apps/core-service/src",
+      "sourceRoot": "apps/agent-orchestrator/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/core-service/tsconfig.app.json",
-        "assets": [
-          {
-            "include": "**/*.yml"
-          }
-        ]
-      }
-    },
-    "prompts": {
-      "type": "library",
-      "root": "libs/prompts",
-      "entryFile": "index",
-      "sourceRoot": "libs/prompts/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/prompts/tsconfig.lib.json",
-        "assets": [
-          {
-            "include": "llmPrompts/**/*.hbs",
-            "outDir": "dist/libs/prompts",
-            "watchAssets": true
-          }
-        ]
-      }
-    },
-    "tenants": {
-      "type": "library",
-      "root": "libs/tenants",
-      "entryFile": "index",
-      "sourceRoot": "libs/tenants/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/tenants/tsconfig.lib.json"
+        "tsConfigPath": "apps/agent-orchestrator/tsconfig.app.json"
       }
     },
     "common": {
@@ -51,38 +21,6 @@
       "sourceRoot": "libs/common/src",
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
-      }
-    },
-    "email-workers": {
-      "type": "application",
-      "root": "apps/email-workers",
-      "entryFile": "main",
-      "sourceRoot": "apps/email-workers/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/email-workers/tsconfig.app.json",
-        "assets": [
-          {
-            "include": "**/*.yml"
-          }
-        ]
-      }
-    },
-    "whatsapp-workers": {
-      "type": "application",
-      "root": "apps/whatsapp-workers",
-      "entryFile": "main",
-      "sourceRoot": "apps/whatsapp-workers/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/whatsapp-workers/tsconfig.app.json"
-      }
-    },
-    "telegram-workers": {
-      "type": "application",
-      "root": "apps/telegram-workers",
-      "entryFile": "main",
-      "sourceRoot": "apps/telegram-workers/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/telegram-workers/tsconfig.app.json"
       }
     },
     "config": {
@@ -104,22 +42,46 @@
         ]
       }
     },
-    "tooling-cli": {
+    "core-service": {
       "type": "application",
-      "root": "apps/tooling-cli",
+      "root": "apps/core-service",
       "entryFile": "main",
-      "sourceRoot": "apps/tooling-cli/src",
+      "sourceRoot": "apps/core-service/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/tooling-cli/tsconfig.app.json"
+        "tsConfigPath": "apps/core-service/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "**/*.yml"
+          }
+        ]
       }
     },
-    "agent-orchestrator": {
+    "document-worker": {
       "type": "application",
-      "root": "apps/agent-orchestrator",
+      "root": "apps/document-worker",
       "entryFile": "main",
-      "sourceRoot": "apps/agent-orchestrator/src",
+      "sourceRoot": "apps/document-worker/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/agent-orchestrator/tsconfig.app.json"
+        "tsConfigPath": "apps/document-worker/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "**/*.yml"
+          }
+        ]
+      }
+    },
+    "email-workers": {
+      "type": "application",
+      "root": "apps/email-workers",
+      "entryFile": "main",
+      "sourceRoot": "apps/email-workers/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/email-workers/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "**/*.yml"
+          }
+        ]
       }
     },
     "langchain": {
@@ -131,6 +93,22 @@
         "tsConfigPath": "libs/langchain/tsconfig.lib.json"
       }
     },
+    "prompts": {
+      "type": "library",
+      "root": "libs/prompts",
+      "entryFile": "index",
+      "sourceRoot": "libs/prompts/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/prompts/tsconfig.lib.json",
+        "assets": [
+          {
+            "include": "llmPrompts/**/*.hbs",
+            "outDir": "dist/libs/prompts",
+            "watchAssets": true
+          }
+        ]
+      }
+    },
     "schema-validation": {
       "type": "library",
       "root": "libs/schema-validation",
@@ -138,6 +116,42 @@
       "sourceRoot": "libs/schema-validation/src",
       "compilerOptions": {
         "tsConfigPath": "libs/schema-validation/tsconfig.lib.json"
+      }
+    },
+    "telegram-workers": {
+      "type": "application",
+      "root": "apps/telegram-workers",
+      "entryFile": "main",
+      "sourceRoot": "apps/telegram-workers/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/telegram-workers/tsconfig.app.json"
+      }
+    },
+    "tenants": {
+      "type": "library",
+      "root": "libs/tenants",
+      "entryFile": "index",
+      "sourceRoot": "libs/tenants/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/tenants/tsconfig.lib.json"
+      }
+    },
+    "tooling-cli": {
+      "type": "application",
+      "root": "apps/tooling-cli",
+      "entryFile": "main",
+      "sourceRoot": "apps/tooling-cli/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/tooling-cli/tsconfig.app.json"
+      }
+    },
+    "whatsapp-workers": {
+      "type": "application",
+      "root": "apps/whatsapp-workers",
+      "entryFile": "main",
+      "sourceRoot": "apps/whatsapp-workers/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/whatsapp-workers/tsconfig.app.json"
       }
     }
   }

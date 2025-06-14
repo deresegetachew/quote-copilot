@@ -33,6 +33,16 @@ export const ConfigSchema = z.object({
           replicaSet: z.string().optional(),
           useSSL: z.boolean(),
         }),
+        'document-worker-db': z.object({
+          uri: z.string(),
+          authMode: z.enum(['password', 'aws-iam']),
+          username: z.string(),
+          password: z.string(),
+          database: z.string(),
+          enableMigration: z.boolean(),
+          replicaSet: z.string().optional(),
+          useSSL: z.boolean(),
+        }),
       })
       .optional(),
     postgres: z
@@ -89,6 +99,11 @@ export const ConfigSchema = z.object({
       baseUrl: z.string(),
     }),
     coreService: z.object({
+      name: z.string(),
+      port: z.number(),
+      baseUrl: z.string(),
+    }),
+    documentWorker: z.object({
       name: z.string(),
       port: z.number(),
       baseUrl: z.string(),

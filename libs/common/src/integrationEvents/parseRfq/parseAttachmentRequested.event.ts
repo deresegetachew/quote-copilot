@@ -7,7 +7,7 @@ interface TEventPayload {
   attachmentId: string;
 }
 
-export class AttachmentParseRequestedEvent extends IntegrationEvent<TEventPayload> {
+export class ParseAttachmentRequestedEvent extends IntegrationEvent<TEventPayload> {
   constructor(source: TEventSources, data: TEventPayload) {
     super(source, EvtAttachmentParseRequested, data);
   }

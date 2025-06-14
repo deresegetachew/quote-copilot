@@ -55,11 +55,9 @@ export class RFQRepositoryAdapter extends RfqRepositoryPort {
   async save(entity: RFQEntity): Promise<void> {
     const rfqData = RFQMapper.toDocument(entity);
 
-    await this.rfqModel.updateOne(
-      { _id: rfqData._id },
-      { $set: rfqData },
-      { upsert: true },
-    );
+    await this.rfqModel.replaceOne({ _id: rfqData._id }, rfqData, {
+      upsert: true,
+    });
   }
 
   private generatePaginationQuery({

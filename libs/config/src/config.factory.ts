@@ -51,6 +51,22 @@ export class EnvConfigFactory extends ConfigFactory {
             replicaSet: '',
             useSSL: false,
           },
+
+          'document-worker-db': {
+            uri: this.getEnvVarOrThrow('DB_MONGO_URI'),
+            authMode:
+              this.getEnvVarOrThrow('DB_MONGO_AUTH_MODE') === 'aws-iam'
+                ? 'aws-iam'
+                : 'password',
+            database: this.getEnvVarOrThrow('DB_MONGO_DATABASE'),
+            enableMigration: this.getBooleanFromEnv(
+              this.getEnvVarOrThrow('DB_MONGO_ENABLE_MIGRATION'),
+            ),
+            username: this.getEnvVarOrThrow('DB_MONGO_USERNAME'),
+            password: this.getEnvVarOrThrow('DB_MONGO_PASSWORD'),
+            replicaSet: '',
+            useSSL: false,
+          },
         },
       },
       apps: {
@@ -78,6 +94,11 @@ export class EnvConfigFactory extends ConfigFactory {
           name: this.getEnvVarOrThrow('APP_NAME'),
           port: parseInt(this.getEnvVarOrThrow('APP_PORT'), 10),
           baseUrl: this.getEnvVarOrThrow('CORE_SERVICE_BASE_URL'),
+        },
+        documentWorker: {
+          name: this.getEnvVarOrThrow('APP_NAME'),
+          port: parseInt(this.getEnvVarOrThrow('APP_PORT'), 10),
+          baseUrl: this.getEnvVarOrThrow('DOCUMENT_WORKER_BASE_URL'),
         },
       },
       temporalConfig: {

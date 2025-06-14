@@ -1,4 +1,10 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  NotFoundException,
+} from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import {
   GetUnreadEmailsQuery,
@@ -29,14 +35,21 @@ export class EmailWorkersController {
     );
   }
 
-  @Get('email-threads/:threadId/messages')
+  @Get('email-threads/:storageThreadID/messages')
   async getEmailThreadMessages(
     @Param(schemaPipe(GetEmailThreadMessagesParamSchema))
-    { threadId }: TGetEmailThreadMessagesParam,
+    { storageThreadID }: TGetEmailThreadMessagesParam,
   ): Promise<TGetEmailThreadMessagesResponse> {
     const result = await this.queryBus.execute(
-      new GetEmailThreadMessagesQuery(threadId),
+      new GetEmailThreadMessagesQuery(storageThreadID),
     );
+
+    if (!result) {
+      throw new NotFoundException(
+        `Email thread with ID ${storageThreadID} not found`,
+      );
+    }
+
     return EmailThreadsResponseMapper.toResponse(result);
   }
 }

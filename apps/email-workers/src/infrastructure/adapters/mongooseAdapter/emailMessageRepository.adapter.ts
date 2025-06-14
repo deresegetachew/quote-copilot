@@ -41,25 +41,23 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
     const threadData = EmailMessageMapper.toPersistenceThread(emailMessage);
     const emailsData = EmailMessageMapper.toPersistenceEmails(emailMessage);
 
-    await this.threadModel.updateOne(
+    await this.threadModel.replaceOne(
       { threadId: threadData.threadId },
-      { $set: threadData },
+      threadData,
       { upsert: true },
     );
 
     for (const email of emailsData) {
-      await this.emailModel.updateOne(
-        { messageId: email.messageId },
-        { $set: email },
-        { upsert: true },
-      );
+      await this.emailModel.replaceOne({ messageId: email.messageId }, email, {
+        upsert: true,
+      });
     }
   }
 
-  async findByThreadId(
+  async findByStorageThreadId(
     threadId: string,
   ): Promise<MessageThreadAggregate | null> {
-    const threadDoc = await this.threadModel.findOne({ threadId }).exec();
+    const threadDoc = await this.threadModel.findOne({ _id: threadId }).exec();
     if (!threadDoc) {
       return null;
     }
@@ -79,6 +77,73 @@ export class EmailMessageRepositoryAdapter extends EmailMessageRepositoryPort {
       emails,
       attachments,
     );
+  }
+
+  async findByThreadIds(
+    threadIds: string[],
+  ): Promise<Map<string, MessageThreadAggregate>> {
+    const result = new Map<string, MessageThreadAggregate>();
+
+    if (threadIds.length === 0) {
+      return result;
+    }
+
+    // Fetch all threads in one query
+    const threadDocs = await this.threadModel
+      .find({ threadId: { $in: threadIds } })
+      .exec();
+
+    if (threadDocs.length === 0) {
+      return result;
+    }
+
+    // Collect all message IDs from all threads
+    const allMessageIds = threadDocs.flatMap((thread) => thread.messageIds);
+
+    const emails = await this.emailModel
+      .find({ messageId: { $in: allMessageIds } })
+      .exec();
+
+    const attachments = await this.attachmentModel
+      .find({ threadId: { $in: threadIds } })
+      .exec();
+
+    // Group emails and attachments by thread
+    const emailsByThread = new Map<string, any[]>();
+    const attachmentsByThread = new Map<string, any[]>();
+
+    emails.forEach((email) => {
+      const threadId = email.threadId;
+      if (!emailsByThread.has(threadId)) {
+        emailsByThread.set(threadId, []);
+      }
+      emailsByThread.get(threadId)!.push(email);
+    });
+
+    attachments.forEach((attachment) => {
+      const threadId = attachment.threadId;
+      if (!attachmentsByThread.has(threadId)) {
+        attachmentsByThread.set(threadId, []);
+      }
+      attachmentsByThread.get(threadId)!.push(attachment);
+    });
+
+    // Create aggregates for each thread
+    for (const threadDoc of threadDocs) {
+      const threadEmails = emailsByThread.get(threadDoc.threadId) || [];
+      const threadAttachments =
+        attachmentsByThread.get(threadDoc.threadId) || [];
+
+      const aggregate = EmailMessageMapper.toDomainMessageThreadAgg(
+        threadDoc,
+        threadEmails,
+        threadAttachments,
+      );
+
+      result.set(threadDoc.threadId, aggregate);
+    }
+
+    return result;
   }
 
   async searchByFields(

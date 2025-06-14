@@ -95,7 +95,7 @@ export class ParseEmailIntentGraph {
       .compile();
 
     const initialState: TEmailIntentSchemaType = {
-      threadId,
+      storageThreadID: threadId,
       messages,
       requestSummary: null,
       isRFQ: null,
