@@ -8,12 +8,15 @@ import { NATS_SERVICE } from '@common';
 import { ConfigService } from '@nestjs/config';
 import { CommonClientsModule } from '@common/clients/commonClients.module';
 import { SchemaValidationModule } from '@schema-validation';
+import { CommonHealthModule } from '@common/health';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
     AppConfigModule.forRoot(),
     HttpModule,
     PromptsModule,
+    CommonHealthModule,
     ClientsModule.registerAsync([
       {
         name: NATS_SERVICE,
