@@ -428,6 +428,11 @@
   dependencies:
     lodash "^4.17.21"
 
+"@google/generative-ai@^0.24.0", "@google/generative-ai@^0.24.1":
+  version "0.24.1"
+  resolved "https://registry.npmjs.org/@google/generative-ai/-/generative-ai-0.24.1.tgz"
+  integrity sha512-MqO+MLfM6kjxcKoy0p1wRzG3b4ZZXtPI+z2IE26UogS2Cm/XHO+7gGRBh6gcJsOiIVoH93UwKvW4HdgiOZCy9Q==
+
 "@grpc/grpc-js@*", "@grpc/grpc-js@^1.10.7":
   version "1.13.3"
   resolved "https://registry.npmjs.org/@grpc/grpc-js/-/grpc-js-1.13.3.tgz"
@@ -915,23 +920,31 @@
   resolved "https://registry.npmjs.org/@jsonjoy.com/util/-/util-1.5.0.tgz"
   integrity sha512-ojoNsrIuPI9g6o8UxhraZQSyF2ByJanAY4cTFbc8Mf2AXEF4aQRGY1dJxyJpuyav8r9FGflEt/Ff3u5Nt6YMPA==
 
-"@langchain/core@^0.3.50", "@langchain/core@>=0.2.21 <0.4.0", "@langchain/core@>=0.2.31 <0.4.0", "@langchain/core@>=0.2.36 <0.3.0 || >=0.3.40 < 0.4.0", "@langchain/core@>=0.3.48 <0.4.0":
-  version "0.3.50"
-  resolved "https://registry.npmjs.org/@langchain/core/-/core-0.3.50.tgz"
-  integrity sha512-0MBVe7dZ4h3a3MJAg/YesWBvwkDg8t2rDIGg2Q11DxRBnxB7OqmvBlbZ1ftaDvoBZzxMY+8E58OsCLuay3Bk9w==
+"@langchain/core@^0.3.50", "@langchain/core@>=0.2.21 <0.4.0", "@langchain/core@>=0.2.31 <0.4.0", "@langchain/core@>=0.2.36 <0.3.0 || >=0.3.40 < 0.4.0", "@langchain/core@>=0.3.48 <0.4.0", "@langchain/core@>=0.3.58 <0.4.0":
+  version "0.3.59"
+  resolved "https://registry.npmjs.org/@langchain/core/-/core-0.3.59.tgz"
+  integrity sha512-YAvnx0z3A8z5MvyjZzjC9ZxXZYM20ivFdUeLzANSPCoPCNIQ1/EppWP82RI24PcmWkNtuXsFVaj5juWiIpZvxg==
   dependencies:
     "@cfworker/json-schema" "^4.0.2"
     ansi-styles "^5.0.0"
     camelcase "6"
     decamelize "1.2.0"
     js-tiktoken "^1.0.12"
-    langsmith "^0.3.16"
+    langsmith "^0.3.33"
     mustache "^4.2.0"
     p-queue "^6.6.2"
     p-retry "4"
     uuid "^10.0.0"
-    zod "^3.22.4"
+    zod "^3.25.32"
     zod-to-json-schema "^3.22.3"
+
+"@langchain/google-genai@^0.2.12":
+  version "0.2.12"
+  resolved "https://registry.npmjs.org/@langchain/google-genai/-/google-genai-0.2.12.tgz"
+  integrity sha512-dVfkNW3uJ2Ing4KAYPTfkdTDIA4FDrik/YK5A5bE8w7drP0J+7g0h2i8D5Mn7dDcyPuX74qd2VG9hWCyGLtZiw==
+  dependencies:
+    "@google/generative-ai" "^0.24.0"
+    uuid "^11.1.0"
 
 "@langchain/langgraph-checkpoint@~0.0.17":
   version "0.0.17"
@@ -2530,9 +2543,9 @@ consola@^3.2.3:
   integrity sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA==
 
 console-table-printer@^2.12.1:
-  version "2.12.1"
-  resolved "https://registry.npmjs.org/console-table-printer/-/console-table-printer-2.12.1.tgz"
-  integrity sha512-wKGOQRRvdnd89pCeH96e2Fn4wkbenSP6LMHfjfyNLMbGuHEFbMqQNuxXqd0oXG9caIOQ1FTvc5Uijp9/4jujnQ==
+  version "2.14.3"
+  resolved "https://registry.npmjs.org/console-table-printer/-/console-table-printer-2.14.3.tgz"
+  integrity sha512-X5OCFnjYlXzRuC8ac5hPA2QflRjJvNKJocMhlnqK/Ap7q3DHXr0NJ0TGzwmEKOiOdJrjsSwEd0m+a32JAYPrKQ==
   dependencies:
     simple-wcswidth "^1.0.1"
 
@@ -4335,10 +4348,10 @@ kleur@^3.0.3:
   resolved "https://registry.npmjs.org/kleur/-/kleur-3.0.3.tgz"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
-langsmith@^0.3.16:
-  version "0.3.23"
-  resolved "https://registry.npmjs.org/langsmith/-/langsmith-0.3.23.tgz"
-  integrity sha512-6gfotO1YS3vqznSJutdFmJXL2Vxy27/RV2JA7YTsfWoJtxlmBR/1QE7kMIyEvuoEE5KGFHyZMuAh/fVeiRffLA==
+langsmith@^0.3.33:
+  version "0.3.33"
+  resolved "https://registry.npmjs.org/langsmith/-/langsmith-0.3.33.tgz"
+  integrity sha512-imNIaBL6+ElE5eMzNHYwFxo6W/6rHlqcaUjCYoIeGdCYWlARxE3CTGKul5DJnaUgGP2CTLFeNXyvRx5HWC/4KQ==
   dependencies:
     "@types/uuid" "^10.0.0"
     chalk "^4.1.2"
@@ -5501,9 +5514,9 @@ signal-exit@^4.0.1, signal-exit@^4.1.0:
   integrity sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==
 
 simple-wcswidth@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/simple-wcswidth/-/simple-wcswidth-1.0.1.tgz"
-  integrity sha512-xMO/8eNREtaROt7tJvWJqHBDTMFN4eiQ5I4JRMuilwfnFcV5W9u7RUkueNkdw0jPqGMX36iCywelS5yilTuOxg==
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/simple-wcswidth/-/simple-wcswidth-1.1.1.tgz"
+  integrity sha512-R3q3/eoeNBp24CNTASEUrffXi0j9TwPIEvSStlvSrsFimM17sV5EHcMOc86j3K+UWZyLYvH0hRmYGCpCoaJ4vw==
 
 sisteransi@^1.0.5:
   version "1.0.5"
@@ -6048,6 +6061,11 @@ uuid@^10.0.0:
   resolved "https://registry.npmjs.org/uuid/-/uuid-10.0.0.tgz"
   integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
 
+uuid@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.npmjs.org/uuid/-/uuid-11.1.0.tgz"
+  integrity sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==
+
 uuid@^9.0.0:
   version "9.0.1"
   resolved "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz"
@@ -6347,7 +6365,7 @@ zod-to-json-schema@^3.22.3, zod-to-json-schema@^3.24.1, zod-to-json-schema@^3.24
   resolved "https://registry.npmjs.org/zod-to-json-schema/-/zod-to-json-schema-3.24.5.tgz"
   integrity sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==
 
-zod@^3.22.4, zod@^3.23.8, zod@^3.24.1, zod@^3.24.3:
-  version "3.24.3"
-  resolved "https://registry.npmjs.org/zod/-/zod-3.24.3.tgz"
-  integrity sha512-HhY1oqzWCQWuUqvBFnsyrtZRhyPeR7SUGv+C4+MsisMuVfSPx8HpwWqH8tRahSlt6M3PiFAcoeFhZAqIXTxoSg==
+zod@^3.22.4, zod@^3.23.8, zod@^3.24.1, zod@^3.24.3, zod@^3.25.32:
+  version "3.25.67"
+  resolved "https://registry.npmjs.org/zod/-/zod-3.25.67.tgz"
+  integrity sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==
