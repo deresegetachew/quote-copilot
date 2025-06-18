@@ -12,6 +12,7 @@ import {
 import { AIClientTypes } from '@common';
 import { z, ZodSchema } from 'zod';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { GeminiClient } from './gemini.client';
 
 @Injectable({
   scope: Scope.TRANSIENT,
@@ -20,6 +21,7 @@ export class LLMClient<TInput> {
   constructor(
     private readonly openAIClient: OpenAIClient,
     private readonly ollamaClient: OllamaClient,
+    private readonly geminiClient: GeminiClient,
   ) {}
 
   private logger = new Logger(LLMClient.name);
@@ -31,6 +33,8 @@ export class LLMClient<TInput> {
       this.strategy = this.openAIClient;
     } else if (strategy === 'ollama') {
       this.strategy = this.ollamaClient;
+    } else if (strategy === 'gemini') {
+      this.strategy = this.geminiClient;
     } else {
       throw new Error(`Unknown strategy: ${strategy}`);
     }

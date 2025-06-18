@@ -130,6 +130,11 @@ export const ConfigSchema = z.object({
     model: z.string(),
     temperature: z.number(),
   }),
+  geminiConfig: z.object({
+    apiKey: z.string(),
+    model: z.string(),
+    temperature: z.number(),
+  }),
 });
 
 export type TConfiguration = z.infer<typeof ConfigSchema>;

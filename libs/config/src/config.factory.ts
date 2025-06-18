@@ -125,6 +125,11 @@ export class EnvConfigFactory extends ConfigFactory {
         temperature: 0,
         serverUrl: '',
       },
+      geminiConfig: {
+        apiKey: this.getEnvVarOrThrow('GEMINI_API_KEY'),
+        model: '',
+        temperature: 0,
+      },
     };
   }
 
