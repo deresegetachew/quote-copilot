@@ -7,6 +7,7 @@ import { AttachmentDocument } from '../schemas/attachment.schema';
 import { AttachmentEntity } from '../../../../domain/entities/attachment.entity';
 import { AttachmentMapper } from './attachment.mapper';
 import { ID } from '@common';
+import { MessageThreadFactory } from '../../../../domain/factories/messageThread.factory';
 
 export class EmailMessageMapper {
   static toDomainMessageThreadAgg(
@@ -34,8 +35,8 @@ export class EmailMessageMapper {
 
     const statusVO = EmailThreadStatusVO.of(thread.status);
 
-    return MessageThreadAggregate.fromPersistence(
-      thread._id,
+    return new MessageThreadAggregate(
+      ID.of(thread._id),
       thread.threadId,
       emailEntities,
       attachmentEntities,

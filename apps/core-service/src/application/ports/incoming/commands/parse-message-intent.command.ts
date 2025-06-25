@@ -1,6 +1,6 @@
 import { Command } from '@nestjs/cqrs';
 import { z } from 'zod';
-import { TEmailIntentSchemaType } from '@tools-langchain';
+import { TEmailIntentResponseDTO } from '@common';
 
 // Schema for validating the parse message intent command payload
 export const ParseMessageIntentCommandSchema = z.object({
@@ -12,7 +12,7 @@ type ParseMessageIntentCommandSchemaType = z.infer<
   typeof ParseMessageIntentCommandSchema
 >;
 
-export class ParseMessageIntentCommand extends Command<TEmailIntentSchemaType> {
+export class ParseMessageIntentCommand extends Command<TEmailIntentResponseDTO> {
   constructor(
     public readonly payload: z.infer<typeof ParseMessageIntentCommandSchema>,
   ) {

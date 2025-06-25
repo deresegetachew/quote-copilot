@@ -1,4 +1,3 @@
-import { file } from 'googleapis/build/src/apis/file';
 import { EmailThreadStatusVO } from '../valueObjects/emailThreadStatus.vo';
 import { AttachmentEntity } from './attachment.entity';
 import { EmailEntity } from './email.entity';
@@ -66,33 +65,6 @@ export class MessageThreadAggregate extends TAggregateRoot {
     });
   }
 
-  toJSON(): {
-    threadId: string;
-    status: string;
-    messages: { id: string; subject?: string }[];
-    attachments: {
-      messageId: string;
-      attachmentId: string;
-      fileName: string;
-      mimeType: string;
-    }[];
-  } {
-    return {
-      threadId: this.threadId,
-      status: this.status.getValue(),
-      messages: this.emails.map((e) => ({
-        id: e.getMessageId(),
-        subject: e.getSubject(),
-      })),
-      attachments: this.attachments.map((att) => ({
-        messageId: att.getMessageId(),
-        attachmentId: att.getAttachmentId(),
-        fileName: att.getFileName(),
-        mimeType: att.getMimeType(),
-      })),
-    };
-  }
-
   getStatus(): EmailThreadStatusVO {
     return this.status;
   }
@@ -131,22 +103,6 @@ export class MessageThreadAggregate extends TAggregateRoot {
     this.status = newStatus;
   }
 
-  static fromPersistence(
-    id: string,
-    threadId: string,
-    emails: EmailEntity[],
-    attachments: AttachmentEntity[],
-    status: EmailThreadStatusVO,
-  ): MessageThreadAggregate {
-    return new MessageThreadAggregate(
-      ID.of(id),
-      threadId,
-      emails,
-      attachments,
-      status,
-    );
-  }
-
   static createNew(
     threadId: string,
     firstEmail: EmailEntity,
@@ -159,5 +115,14 @@ export class MessageThreadAggregate extends TAggregateRoot {
       attachments,
       EmailThreadStatusVO.initial(),
     );
+  }
+
+  protected validate(): void {
+    if (!this.threadId) {
+      throw new Error('Thread ID cannot be empty');
+    }
+    if (this.emails.length === 0) {
+      throw new Error('At least one email must be present in the thread');
+    }
   }
 }

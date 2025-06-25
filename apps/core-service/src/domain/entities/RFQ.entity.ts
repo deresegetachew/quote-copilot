@@ -1,136 +1,164 @@
-import { ID } from '@common';
+import { DateHelper, ID } from '@common';
 import { RFQStatusVO } from '../valueObjects/rfqStatus.vo';
+import { RFQLineItemEntity } from './RFQLineItem.entity';
 
-type TRFQEntityProps = {
-  id: ID | null;
+export type TRFQEntityProps = {
+  id: ID;
   threadId: string;
-  summary: string;
   status: RFQStatusVO;
-  customerDetail: {
-    name: string | null;
-    email: string;
-  };
-  expectedDeliveryDate: Date | null;
-  hasAttachments: boolean | null;
-  notes: string[] | null;
-  items: Array<{
-    id: ID;
-    itemCode: string;
-    itemDescription: string | null;
-    quantity: number | null;
-    unit: string | null;
-    notes: string[] | null;
-  }>;
-  error: string[] | null; // Changed from object to string[] for simplicity
-  reason: string | null;
-  createdAt?: Date;
-  updatedAt?: Date;
 };
 
 export class RFQEntity {
   private readonly id: ID;
   private readonly threadId: string;
-  private readonly summary: string;
-  private readonly customerDetail: {
+  private _status: RFQStatusVO;
+  private _summary: string | null;
+  private _customerDetail: {
     name: string | null;
     email: string;
-  };
-  private status: RFQStatusVO;
-  private readonly expectedDeliveryDate: Date | null;
-  private readonly hasAttachments: boolean | null;
-  private readonly notes: string[] | null;
-  private readonly items: Array<TRFQEntityProps['items'][number]>;
-  private readonly error: TRFQEntityProps['error'] | null;
-  private readonly reason: string | null;
-  private readonly createdAt: Date | undefined;
-  private readonly updatedAt: Date | undefined;
+  } | null;
 
+  private _expectedDeliveryDate: Date | null;
+  private _hasAttachments: boolean | null;
+  private _notes: string[] | null;
+  private _lineItems: RFQLineItemEntity[];
+  private _error: string[] | null;
+  private _reason: string | null;
+  private _createdAt: Date | undefined;
+  private _updatedAt: Date | undefined;
+
+  // constructor params is for fields that are required to create an RFQEntity
   constructor(props: TRFQEntityProps) {
-    this.id = props.id ?? ID.create();
+    this.id = props.id;
     this.threadId = props.threadId;
-    this.summary = props.summary;
-    this.status = props.status;
-    this.customerDetail = props.customerDetail;
-    this.expectedDeliveryDate = props.expectedDeliveryDate;
-    this.hasAttachments = props.hasAttachments;
-    this.notes = props.notes;
-    this.items = props.items;
-    this.error = props.error || null;
-    this.reason = props.reason || null;
-    this.createdAt = props.createdAt || undefined;
-    this.updatedAt = props.updatedAt || undefined;
+    this._status = props.status;
   }
 
-  getStorageId(): string {
-    return this.id.getValue();
+  getStorageId(): ID {
+    return this.id;
   }
 
   getEmailThreadRef(): string {
     return this.threadId;
   }
 
-  getSummary(): string {
-    return this.summary;
+  get summary(): string | null {
+    return this._summary;
   }
 
-  getCustomerDetail() {
-    return this.customerDetail;
+  set summary(summary: string | null) {
+    this._summary = summary;
   }
 
-  getExpectedDeliveryDate(): Date | null {
-    return this.expectedDeliveryDate;
+  get customerDetail() {
+    return this._customerDetail;
   }
 
-  getHasAttachments(): boolean | null {
-    return this.hasAttachments;
+  setCustomerDetailName(name: string | null) {
+    if (!this._customerDetail) {
+      this._customerDetail = { name, email: '' };
+    }
+    this._customerDetail.name = name;
   }
 
-  getNotes(): string[] | null {
-    return this.notes;
+  setCustomerDetailEmail(email: string) {
+    if (!this._customerDetail) {
+      this._customerDetail = { name: null, email };
+      return;
+    }
+
+    this._customerDetail.email = email;
   }
 
-  getItems(): Array<{
-    id: ID;
-    itemCode: string;
-    itemDescription: string | null;
-    quantity: number | null;
-    unit: string | null;
-    notes: string[] | null;
-  }> {
-    return this.items;
+  get expectedDeliveryDate(): Date | null {
+    return this._expectedDeliveryDate;
   }
 
-  hasError(): boolean {
-    return this.error !== null;
+  set expectedDeliveryDate(date: Date | string | null) {
+    if (!date) {
+      this._expectedDeliveryDate = null;
+    } else this._expectedDeliveryDate = DateHelper.toUTCDateTime(date);
   }
 
-  getError(): string[] | null {
-    return this.error;
+  get hasAttachments(): boolean | null {
+    return this._hasAttachments;
   }
 
-  getReason(): string | null {
-    return this.reason;
+  set hasAttachments(hasAttachments: boolean | null) {
+    this._hasAttachments = hasAttachments;
   }
 
-  getCreatedAt(): Date | undefined {
-    return this.createdAt;
+  get notes(): string[] | null {
+    return this._notes;
   }
 
-  getUpdatedAt(): Date | undefined {
-    return this.updatedAt;
+  addNote(note: string | null): void {
+    if (!note) return;
+    if (!this._notes) {
+      this._notes = [note];
+    }
+    this._notes.push(note);
   }
 
-  getStatus(): RFQStatusVO {
-    return this.status;
+  get lineItems(): RFQLineItemEntity[] {
+    return this._lineItems;
   }
 
-  updateStatus(newStatus: RFQStatusVO): void {
-    if (!this.status.canTransitionTo(newStatus.toString())) {
+  addLineItem(item: RFQLineItemEntity) {
+    if (!this._lineItems) {
+      this._lineItems = [item];
+    } else this._lineItems.push(item);
+  }
+
+  get error(): string[] | null {
+    return this._error;
+  }
+
+  addError(error: string) {
+    if (!this._error) {
+      this._error = [error];
+    } else this._error.push(error);
+  }
+
+  get reason(): string | null {
+    return this._reason;
+  }
+
+  set reason(reason: string | null) {
+    this._reason = reason;
+  }
+
+  get createdAt(): Date | undefined {
+    return this._createdAt;
+  }
+
+  set createdAt(date: Date | undefined) {
+    this._createdAt = date;
+  }
+
+  get updatedAt(): Date | undefined {
+    return this._updatedAt;
+  }
+
+  set updatedAt(date: Date | undefined) {
+    this._updatedAt = date;
+  }
+
+  get status(): RFQStatusVO {
+    return this._status;
+  }
+
+  set status(newStatus: RFQStatusVO) {
+    if (!this._status.canTransitionTo(newStatus.toString())) {
       throw new Error(
         `Cannot transition from ${this.status.getValue()} to ${newStatus.getValue()}`,
       );
-    }
+    } else this._status = newStatus;
+  }
 
-    this.status = newStatus;
+  getLineItemById(id: ID): RFQLineItemEntity | null {
+    return (
+      this._lineItems.find((item) => item.getStorageId().equals(id)) || null
+    );
   }
 }

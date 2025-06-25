@@ -1,65 +1,83 @@
 import { ObjectId } from 'bson';
-import { RFQEntity } from '../../../../domain/entities/rfq.entity';
 import { RFQDocument } from '../schemas/rfq.schema';
 import { DateHelper, ID } from '@common';
 import { RFQStatusVO } from '../../../../domain/valueObjects/rfqStatus.vo';
+import { RFQAggregate } from '../../../../domain/entities/RFQ.aggregate';
+import { RFQLineItemEntity } from '../../../../domain/entities/RFQLineItem.entity';
 
 export class RFQMapper {
-  static toDomain(rfqDoc: RFQDocument): RFQEntity {
-    const rfqEntity: RFQEntity = new RFQEntity({
-      id: ID.of(rfqDoc.id),
-      threadId: rfqDoc.threadId,
-      summary: rfqDoc.summary,
-      status: RFQStatusVO.of(rfqDoc.status),
-      expectedDeliveryDate: rfqDoc.expectedDeliveryDate,
-
-      notes: rfqDoc.notes ?? null,
-      hasAttachments: rfqDoc.hasAttachments,
-      error: rfqDoc.error || null,
-      reason: rfqDoc.reason || null,
-
-      customerDetail: {
-        email: rfqDoc.customerDetail?.email,
-        name: rfqDoc.customerDetail?.name || null,
-      },
-      items: rfqDoc.lineItems.map((item) => ({
-        id: ID.of(item._id),
-        itemCode: item.itemCode,
-        itemDescription: item.itemDescription,
-        quantity: item.quantity,
-        unit: item.unit,
-        notes: item.notes,
-      })),
-    });
-
-    return rfqEntity;
+  // Domain to Persistence
+  static toPersistenceRFQ(rfq: RFQAggregate): Partial<RFQDocument> {
+    return {
+      id: rfq.getStorageId().toString(),
+      threadId: rfq.getEmailThreadRef(),
+      summary: rfq.summary || undefined,
+      status: rfq.status.getValue(),
+      customerDetail: rfq.customerDetail || undefined,
+      expectedDeliveryDate: rfq.expectedDeliveryDate,
+      hasAttachments: rfq.hasAttachments,
+      notes: rfq.notes,
+      error: rfq.error,
+      reason: rfq.reason,
+      createdAt: rfq.createdAt,
+      updatedAt: rfq.updatedAt,
+    };
   }
 
-  static toDocument(rfq: RFQEntity): Partial<RFQDocument> {
-    return {
-      _id: rfq.getStorageId(),
-      threadId: rfq.getEmailThreadRef(),
-      status: rfq.getStatus().getValue(),
-      summary: rfq.getSummary(),
-      customerDetail: {
-        name: rfq.getCustomerDetail().name,
-        email: rfq.getCustomerDetail().email,
-      },
-      expectedDeliveryDate: rfq.getExpectedDeliveryDate(),
-      hasAttachments: rfq.getHasAttachments(),
-      notes: rfq.getNotes(),
-      lineItems: rfq.getItems().map((item) => ({
-        _id: item.id.getValue(),
-        itemCode: item.itemCode,
-        itemDescription: item.itemDescription,
-        quantity: item.quantity,
-        unit: item.unit,
-        notes: item.notes,
-      })),
-      reason: rfq.getReason(),
-      error: rfq.hasError() ? rfq.getError() : null,
-      createdAt: rfq.getStorageId() ? rfq.getCreatedAt() : new Date(),
-      updatedAt: DateHelper.getNowAsDate(),
-    };
+  // Persistence to Domain
+  static toDomainAggregate(
+    rfqDoc: Omit<RFQDocument, 'lineItems'>,
+    lineItems: RFQDocument['lineItems'] = [],
+  ): RFQAggregate {
+    // Create aggregate with required props
+    const rfqAgg = new RFQAggregate({
+      id: ID.of(rfqDoc.id),
+      threadId: rfqDoc.threadId,
+      status: RFQStatusVO.of(rfqDoc.status),
+    });
+
+    // Set optional properties using fluent interface
+    rfqAgg
+      .setRFQSummary(rfqDoc.summary)
+      .setCustomerDetail({
+        name: rfqDoc.customerDetail?.name || null,
+        email: rfqDoc.customerDetail?.email || '',
+      })
+      .setExpectedDeliveryDate(
+        rfqDoc.expectedDeliveryDate
+          ? DateHelper.toUTCDateTime(rfqDoc.expectedDeliveryDate)
+          : null,
+      )
+      .setHasAttachments(rfqDoc.hasAttachments || false)
+      .setNotes(rfqDoc.notes || null)
+      .setReason(rfqDoc.reason || null)
+      .setError(rfqDoc.error || null)
+      .setCreatedAt(rfqDoc.createdAt)
+      .setUpdatedAt(rfqDoc.updatedAt);
+
+    // Map line items
+    lineItems.forEach((item) => {
+      const lineItem = new RFQLineItemEntity(
+        ID.of(item._id),
+        item.itemCode,
+        item.quantity || 0,
+      );
+
+      // Set optional properties (removed redundant || null)
+      lineItem.description = item.itemDescription;
+      lineItem.unit = item.unit;
+
+      // Add notes if they exist
+      item.notes?.forEach((note) => {
+        if (note) {
+          // Only add non-null/empty notes
+          lineItem.addNote(note);
+        }
+      });
+
+      rfqAgg.addRFQLineItem(lineItem);
+    });
+
+    return rfqAgg;
   }
 }
