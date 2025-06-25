@@ -9,10 +9,10 @@ export abstract class IntegrationEvent {
   protected isRpc: boolean = false; // Default to false, can be overridden in subclasses
 
   constructor(
-    protected readonly source: TEventSources,
-    protected readonly evtTopic: TEvtTopic,
-    protected readonly payloadSchema: z.ZodSchema,
-    protected readonly data: z.infer<typeof payloadSchema>,
+    public readonly source: TEventSources,
+    public readonly evtTopic: TEvtTopic,
+    public readonly payloadSchema: z.ZodSchema,
+    public readonly data: z.infer<typeof payloadSchema>,
   ) {
     this.id = crypto.randomUUID();
     this.timestamp = DateHelper.getNowAsString();

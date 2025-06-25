@@ -21,8 +21,8 @@ export function parseTopic(topicTxt: string): TEvtTopic | null {
   const parts = topicTxt.split('.');
   if (parts.length !== 3) return null;
 
-  const [integration, subject, eventType] = parts;
-  return { subject, eventType };
+  const [subject, eventType] = parts;
+  return { subject: subject as TIntegEvtSubj, topic: eventType as TIntegEvts };
 }
 
 // Wildcard-safe builders

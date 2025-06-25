@@ -16,6 +16,9 @@ export class ParseAttachmentUseCase
   ) {}
 
   execute(command: ParseAttachmentCommand): Promise<void> {
-    this.parseDocClientFactory.getParserClient(command.payload.mimeType);
+    this.logger.debug(`Parsing attachment`, {
+      attachment: command,
+    });
+    return Promise.resolve();
   }
 }
