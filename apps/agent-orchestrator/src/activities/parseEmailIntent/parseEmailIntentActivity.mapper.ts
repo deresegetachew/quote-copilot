@@ -1,4 +1,3 @@
-import { TEmailIntentSchemaType } from '@tools-langchain';
 import { TParseEmailActivityResponse } from './type';
 import { TMessageIntentResponseDTO } from '@common';
 

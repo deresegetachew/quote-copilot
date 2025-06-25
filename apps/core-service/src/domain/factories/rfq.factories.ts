@@ -1,81 +1,105 @@
-import { DateHelper, ID, RFQStatus } from '@common';
-import { RFQEntity } from '../entities/rfq.entity';
+import { DateHelper, ID } from '@common';
 import { RFQStatusVO } from '../valueObjects/rfqStatus.vo';
-import { TEmailIntentSchemaType } from '@tools-langchain'; //this is a library we dont have dep on langchain just schema
+import { RFQLineItemEntity } from '../entities/RFQLineItem.entity';
+import { TEmailIntentResponseDTO } from '@common/dtos'; //this is a library we dont have dep on langchain just schema
+import { RFQAggregate } from '../entities/RFQ.aggregate';
 
-type TCreateNewParams = {
-  threadId: string;
-  summary: string;
-  customerDetail: { name: string | null; email: string };
-  expectedDeliveryDate?: Date | null;
-  notes?: string[] | null;
-  reason?: string | null;
-  hasAttachments?: boolean | null;
-  error?: string[] | null;
-  items: Array<{
-    id: ID;
-    itemCode: string;
-    itemDescription: string | null;
-    quantity: number;
-    unit: string | null;
-    notes: string[] | null;
-  }>;
-};
+export class RFQFactory {
+  static CUFromEmailIntentDTO(
+    emailIntent: TEmailIntentResponseDTO, // use DTO here
+    existingRFQ?: RFQAggregate,
+  ): RFQAggregate {
+    const isUpdate = !!existingRFQ;
+    const rfq = existingRFQ || this.createBaseRFQ(emailIntent);
+    this.applyEmailIntentData(rfq, emailIntent, isUpdate);
 
-export class RfqFactory {
-  static crateFromEmailIntentResponse(
-    response: TEmailIntentSchemaType,
-  ): RFQEntity {
-    return RfqFactory.createNew({
-      threadId: response?.storageThreadID,
-      summary: response?.requestSummary || '',
-      expectedDeliveryDate: response?.expectedDeliveryDate
-        ? DateHelper.toUTCDateTime(response.expectedDeliveryDate)
-        : null,
-      hasAttachments: response.hasAttachments || null,
-      customerDetail: {
-        name: response?.customerDetail?.name || null,
-        email: response?.customerDetail?.email || '',
-      },
-      error: response?.error,
-      notes: response?.notes || null,
-      reason: response?.reason || null,
-      items: response?.items
-        ? response.items?.map((item) => ({
-            id: ID.create(),
-            itemCode: item?.itemCode,
-            itemDescription: item?.itemDescription || null,
-            quantity: item?.quantity,
-            unit: item?.unit || null,
-            notes: item?.notes || null,
-          }))
-        : [],
+    rfq.addRFQParsedEvt();
+
+    return rfq;
+  }
+
+  private static createBaseRFQ(
+    emailIntent: TEmailIntentResponseDTO,
+  ): RFQAggregate {
+    return new RFQAggregate({
+      id: ID.create(),
+      threadId: emailIntent?.storageThreadID || '',
+      status: RFQStatusVO.initial(),
     });
   }
 
-  static createNew(params: TCreateNewParams): RFQEntity {
-    const { threadId, summary, customerDetail, error = null, items } = params;
+  private static applyEmailIntentData(
+    rfq: RFQAggregate,
+    emailIntent: TEmailIntentResponseDTO,
+    isUpdate: boolean = false,
+  ): void {
+    const updates = [
+      {
+        condition: emailIntent.requestSummary,
+        action: () => rfq.setRFQSummary(emailIntent.requestSummary),
+      },
+      {
+        condition: emailIntent.customerDetail,
+        action: () =>
+          rfq.setCustomerDetail({
+            name: emailIntent.customerDetail?.name || null,
+            email:
+              emailIntent.customerDetail?.email ||
+              (isUpdate ? rfq.customerDetail?.email : '') ||
+              '',
+          }),
+      },
+      {
+        condition: emailIntent.expectedDeliveryDate !== undefined,
+        action: () =>
+          rfq.setExpectedDeliveryDate(
+            emailIntent.expectedDeliveryDate != null
+              ? DateHelper.toUTCDateTime(emailIntent.expectedDeliveryDate)
+              : null,
+          ),
+      },
+      {
+        condition: emailIntent.hasAttachments !== undefined,
+        action: () =>
+          rfq.setHasAttachments(emailIntent.hasAttachments || false),
+      },
+      {
+        condition: emailIntent.notes,
+        action: () => rfq.setNotes(emailIntent.notes),
+      },
+      {
+        condition: emailIntent.reason,
+        action: () => rfq.setReason(emailIntent.reason),
+      },
+      {
+        condition: emailIntent.error,
+        action: () => rfq.setError(emailIntent.error),
+      },
+      {
+        condition: emailIntent.items,
+        action: () => {
+          if (isUpdate) rfq.clearRFQLineItems();
+          this.addLineItemsToRFQ(rfq, emailIntent.items || []);
+        },
+      },
+    ];
 
-    const rfq = new RFQEntity({
-      id: ID.create(),
-      threadId,
-      summary,
-      status: RFQStatusVO.initial(),
-      customerDetail,
-      expectedDeliveryDate: null,
-      hasAttachments: null,
-      notes: null,
-      items,
-      error: error,
-      reason: params.reason || null,
-      createdAt: DateHelper.getNowAsDate(),
-      updatedAt: DateHelper.getNowAsDate(),
+    updates
+      .filter((update) => update.condition)
+      .forEach((update) => update.action());
+  }
+
+  private static addLineItemsToRFQ(rfq: RFQAggregate, items: any[]): void {
+    items.forEach((item) => {
+      const lineItem = new RFQLineItemEntity(
+        ID.create(),
+        item.itemCode,
+        item.quantity,
+      );
+      lineItem.description = item.itemDescription;
+      lineItem.unit = item.unit;
+      item.notes?.forEach?.((note) => lineItem.addNote(note));
+      rfq.addRFQLineItem(lineItem);
     });
-
-    if (rfq.hasError()) {
-      rfq.updateStatus(RFQStatusVO.of(RFQStatus.PROCESSING_FAILED));
-    }
-
-    return rfq;
   }
 }

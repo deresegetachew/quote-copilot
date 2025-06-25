@@ -7,14 +7,13 @@ import {
   RfqRepositoryPort,
   TSearchFields,
 } from '../../../application/ports/outgoing/rfqRepository.port';
-import { RFQEntity } from '../../../domain/entities/rfq.entity';
 import { RFQ, RFQDocument } from '../../database/mongo/schemas/rfq.schema';
 import { RFQMapper } from '../../database/mongo/mappers/rfq.mapper';
-import { ObjectId } from 'bson';
 import {
   buildPaginatedAggregationPipeline,
   PaginatedQueryOptions,
 } from './helper';
+import { RFQAggregate } from '../../../domain/entities/RFQ.aggregate';
 
 @Injectable()
 export class RFQRepositoryAdapter extends RfqRepositoryPort {
@@ -25,16 +24,20 @@ export class RFQRepositoryAdapter extends RfqRepositoryPort {
     super();
   }
 
-  async findById(id: string): Promise<RFQEntity | null> {
-    const _id = new ObjectId(id);
-    const rfq = await this.rfqModel.findById(_id).exec();
+  async findById(id: string): Promise<RFQAggregate | null> {
+    const rfq = await this.rfqModel.findById(id).exec();
 
-    return rfq ? RFQMapper.toDomain(rfq) : null;
+    return rfq ? RFQMapper.toDomainAggregate(rfq) : null;
+  }
+
+  async findByThreadId(threadId: string): Promise<RFQAggregate | null> {
+    const rfq = await this.rfqModel.findOne({ threadId }).exec();
+    return rfq ? RFQMapper.toDomainAggregate(rfq) : null;
   }
 
   async searchByFields(
     filters: PaginatedDataFilters<TSearchFields>,
-  ): Promise<PaginatedData<RFQEntity>> {
+  ): Promise<PaginatedData<RFQAggregate>> {
     const query: any = this.generatePaginationQuery(filters);
     const pipeLineStages = buildPaginatedAggregationPipeline(query);
 
@@ -42,7 +45,9 @@ export class RFQRepositoryAdapter extends RfqRepositoryPort {
     const rfqs = result?.data || [];
     const totalCount = result?.totalCount || 0;
 
-    const rfqEntities = rfqs.map((doc: RFQDocument) => RFQMapper.toDomain(doc));
+    const rfqEntities = rfqs.map((doc: RFQDocument) =>
+      RFQMapper.toDomainAggregate(doc),
+    );
 
     return {
       data: rfqEntities,
@@ -52,8 +57,8 @@ export class RFQRepositoryAdapter extends RfqRepositoryPort {
     };
   }
 
-  async save(entity: RFQEntity): Promise<void> {
-    const rfqData = RFQMapper.toDocument(entity);
+  async save(entity: RFQAggregate): Promise<void> {
+    const rfqData = RFQMapper.toPersistenceRFQ(entity);
 
     await this.rfqModel.replaceOne({ _id: rfqData._id }, rfqData, {
       upsert: true,
