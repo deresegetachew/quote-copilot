@@ -1,5 +1,4 @@
-import { TMessageIntentResponseDTO } from '@common';
-import { TEmailIntentResponseDTO } from '@tools-langchain';
+import { TEmailIntentResponseDTO, TMessageIntentResponseDTO } from '@common';
 
 export type ToResponseParams = {
   llmResponse: TEmailIntentResponseDTO;

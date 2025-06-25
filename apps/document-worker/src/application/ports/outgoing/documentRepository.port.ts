@@ -1,4 +1,4 @@
-import { DocumentEntity } from '../../domain/entities/document.entity';
+import { DocumentEntity } from '../../../domain/entities/document.entity';
 
 export abstract class DocumentRepositoryPort {
   abstract save(document: DocumentEntity): Promise<void>;
