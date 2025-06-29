@@ -42,6 +42,7 @@ export class MessageThreadFactory {
           mimeType: att.mimeType || 'application/octet-stream',
         }),
     );
+
     return new MessageThreadAggregate(
       ID.create(),
       threadId,

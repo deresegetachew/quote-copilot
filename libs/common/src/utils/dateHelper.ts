@@ -19,8 +19,11 @@ export class DateHelper {
     return DateTime.fromISO(date, { zone: 'utc' }) > DateTime.utc();
   }
 
-  static toUTCDateTime(date: string): DateTime {
-    return DateTime.fromISO(date, { zone: 'utc' });
+  static toUTCDateTime(date: string | Date): DateTime {
+    if (typeof date === 'string') {
+      return DateTime.fromISO(date, { zone: 'utc' });
+    }
+    return DateTime.fromJSDate(date).toUTC();
   }
 
   static fromDateToUTC(date: Date): DateTime {

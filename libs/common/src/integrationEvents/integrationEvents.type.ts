@@ -1,18 +1,31 @@
+import z from 'zod';
 import { DateHelper } from '../utils/dateHelper';
+import { buildTopic, TEvtTopic } from './topic.helper';
+import { validateWithSchema } from '@schema-validation';
 
-export abstract class IntegrationEvent<T = any> {
-  readonly source: string;
+export abstract class IntegrationEvent {
   readonly id: string;
+  readonly evtTopic: string;
+  private readonly payloadSchema: z.ZodSchema;
+  readonly data: z.infer<typeof this.payloadSchema>;
+  readonly source: string;
   readonly timestamp: string; // move to metadata in the future
-  readonly eventType: string;
-  readonly data: T;
 
-  constructor(source: TEventSources, eventType: string, data: T) {
+  constructor(
+    source: TEventSources,
+    evtTopic: TEvtTopic,
+    payloadSchema: z.ZodSchema,
+    payload: z.infer<typeof payloadSchema>,
+  ) {
     this.id = crypto.randomUUID();
     this.source = source;
-    this.eventType = eventType;
-    this.data = data;
+    this.evtTopic = buildTopic(evtTopic);
+    this.data = payload;
     this.timestamp = DateHelper.getNowAsString();
+  }
+
+  validateEvt() {
+    validateWithSchema(this.payloadSchema, this.data);
   }
 }
 

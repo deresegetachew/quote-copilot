@@ -1,1 +1,1 @@
-export const NATS_SERVICE = Symbol('NATS_SERVICE');
+export const INTEGRATION_EVENT_CLIENT = Symbol('INTEGRATION_EVENT_CLIENT');

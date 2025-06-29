@@ -12,7 +12,6 @@ import { ClassifyMessageAsRFQNode } from '../../nodes/classifyMessageAsRFQ/class
 import { ExtractRFQDetailsNode } from '../../nodes/extractRFQDetails/extractRFQDetails.node';
 import { nextOrErrorNode } from '../../util';
 import { HandleErrorNode } from '../../nodes/handleError/handleError.node';
-import { z } from 'zod';
 import {
   EmailIntentSchema,
   TEmailIntentSchemaType,

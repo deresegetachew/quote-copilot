@@ -1,8 +1,8 @@
 import { TMessageIntentResponseDTO } from '@common';
-import { TEmailIntentSchemaType } from '@tools-langchain';
+import { TEmailIntentResponseDTO } from '@tools-langchain';
 
 export type ToResponseParams = {
-  llmResponse: TEmailIntentSchemaType;
+  llmResponse: TEmailIntentResponseDTO;
 };
 
 export class MessageIntentResponseMapper {

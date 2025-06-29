@@ -4,7 +4,7 @@ import { AppConfigModule, TConfiguration } from '@app-config/config';
 import { HttpModule } from '@nestjs/axios';
 import { PromptsModule } from '@prompts';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_SERVICE } from '@common';
+import { INTEGRATION_EVENT_CLIENT } from '@common';
 import { ConfigService } from '@nestjs/config';
 import { CommonClientsModule } from '@common/clients/commonClients.module';
 import { SchemaValidationModule } from '@schema-validation';
@@ -19,7 +19,7 @@ import { HealthController } from './health.controller';
     CommonHealthModule,
     ClientsModule.registerAsync([
       {
-        name: NATS_SERVICE,
+        name: INTEGRATION_EVENT_CLIENT,
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,

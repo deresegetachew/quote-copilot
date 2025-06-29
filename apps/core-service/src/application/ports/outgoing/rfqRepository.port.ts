@@ -1,6 +1,5 @@
 import { PaginatedData, PaginatedDataFilters } from '@common';
-import { RFQEntity } from '../../../domain/entities/rfq.entity';
-import { RFQDocument } from '../../../infrastructure/database/mongo/schemas/rfq.schema';
+import { RFQAggregate } from '../../../domain/entities/RFQ.aggregate';
 
 export type TSearchFields = {
   threadId: string;
@@ -12,10 +11,11 @@ export type TSearchFields = {
 };
 
 export abstract class RfqRepositoryPort {
-  abstract findById(id: string): Promise<RFQEntity | null>;
-  abstract save(entity: RFQEntity): Promise<void>;
+  abstract findById(id: string): Promise<RFQAggregate | null>;
+  abstract findByThreadId(threadId: string): Promise<RFQAggregate | null>;
+  abstract save(entity: RFQAggregate): Promise<void>;
 
   abstract searchByFields(
     filters: PaginatedDataFilters<TSearchFields>,
-  ): Promise<PaginatedData<RFQEntity>>;
+  ): Promise<PaginatedData<RFQAggregate>>;
 }
