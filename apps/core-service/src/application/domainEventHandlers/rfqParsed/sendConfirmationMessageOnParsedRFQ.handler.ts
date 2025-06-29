@@ -1,15 +1,25 @@
-import { CommandBus, EventsHandler } from '@nestjs/cqrs';
-import { RFQParsedEvent } from '../../../domain/events';
-import { ClientProvider, ClientProxy } from '@nestjs/microservices';
+import { EventsHandler } from '@nestjs/cqrs';
+import { RFQParsedDomainEvt } from '../../../domain/events';
+import { ClientProxy } from '@nestjs/microservices';
+import { Inject, Logger } from '@nestjs/common';
+import { INTEGRATION_EVENT_CLIENT } from '@common';
 
-@EventsHandler(RFQParsedEvent)
+@EventsHandler(RFQParsedDomainEvt)
 export class sendConfirmationEmailOnParsedRFQHandler {
-  constructor(private readonly natsClient: ClientProxy) {}
+  private logger = new Logger(sendConfirmationEmailOnParsedRFQHandler.name);
 
-  async handle(event: RFQParsedEvent): Promise<void> {
+  constructor(
+    @Inject(INTEGRATION_EVENT_CLIENT) private readonly natsClient: ClientProxy,
+  ) {}
+
+  async handle(event: RFQParsedDomainEvt): Promise<void> {
     try {
-      console.log(`RFQ parsed for thread ID: ${event.threadId}`, event.rfq);
+      this.logger.debug(
+        `RFQ parsed for thread ID: ${event.threadId}`,
+        event.rfq,
+      );
 
+      // build confirmation email payload and send it to  email-workers service
       // postRFQParsedUseCase
 
       await this.natsClient.emit(

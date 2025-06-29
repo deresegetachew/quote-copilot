@@ -14,6 +14,7 @@ async function bootstrap() {
   const name = configService.getOrThrow<string>('apps.coreService.name');
   const natsURL = configService.getOrThrow<string>('natsConfig.url');
 
+  // connect and listen to the NATS microservice
   app.connectMicroservice<MicroserviceOptions>(
     {
       transport: Transport.NATS,

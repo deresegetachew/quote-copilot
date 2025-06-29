@@ -1,1 +1,1 @@
-export * from './rfqParsed.event';
+export * from './rfqParsed.domainEvt';

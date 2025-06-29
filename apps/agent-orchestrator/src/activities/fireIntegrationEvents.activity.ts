@@ -1,5 +1,5 @@
 import { ClientProxy } from '@nestjs/microservices';
-import { NATS_SERVICE } from '../../../../libs/common/src';
+import { INTEGRATION_EVENT_CLIENT } from '../../../../libs/common/src';
 import { AppContext } from '../appContext';
 import { Logger } from '@nestjs/common';
 import { z, ZodSchema } from 'zod';
@@ -20,7 +20,7 @@ export async function fireIntegrationEventsActivity<T>(
     'Running Activity::fireIntegrationEvents::' + subject,
   );
 
-  const { natsService } = await initActivity();
+  const { evtClient } = await initActivity();
 
   try {
     logger.debug(
@@ -31,7 +31,7 @@ export async function fireIntegrationEventsActivity<T>(
 
     // validateWithSchema(schema, eventPayload);
 
-    // await natsService.emit(subject, eventPayload);
+    // await evtClient.emit(subject, eventPayload);
   } catch (error) {
     logger.error('Error firing integration events:', error);
     throw error;
@@ -40,9 +40,9 @@ export async function fireIntegrationEventsActivity<T>(
 
 async function initActivity() {
   const app = AppContext.get();
-  const natsService = app.get<ClientProxy>(NATS_SERVICE);
+  const evtClient = app.get<ClientProxy>(INTEGRATION_EVENT_CLIENT);
 
-  return { natsService };
+  return { evtClient };
 }
 
 function validateWithSchema<T>(schema: z.ZodSchema<T>, payload: unknown): T {

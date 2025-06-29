@@ -15,6 +15,7 @@ async function bootstrap() {
   const name = configService.getOrThrow<string>('apps.emailWorker.name');
   const natsURL = configService.getOrThrow<string>('natsConfig.url');
 
+  // listening to NATS microservice
   app.connectMicroservice<MicroserviceOptions>(
     {
       transport: Transport.NATS,
