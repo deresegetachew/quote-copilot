@@ -1,5 +1,5 @@
 import { DateHelper, ID, TAggregateRoot } from '../../../../../libs/common/src';
-import { RFQParsedEvent } from '../events';
+import { RFQParsedDomainEvt } from '../events';
 import { RFQStatusVO } from '../valueObjects/rfqStatus.vo';
 import { RFQEntity, TRFQEntityProps } from './rfq.entity';
 import { RFQLineItemEntity } from './RFQLineItem.entity';
@@ -212,6 +212,6 @@ export class RFQAggregate extends TAggregateRoot {
 
   addRFQParsedEvt(): void {
     this.clearDomainEvents();
-    this.addDomainEvent(new RFQParsedEvent(this.getEmailThreadRef(), this));
+    this.addDomainEvent(new RFQParsedDomainEvt(this.getEmailThreadRef(), this));
   }
 }

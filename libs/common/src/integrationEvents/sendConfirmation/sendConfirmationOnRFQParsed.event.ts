@@ -2,18 +2,16 @@ import z from 'zod';
 import { IntegrationEvent, TEventSources } from '../integrationEvents.type';
 
 const PayloadSchema = z.object({
-  threadId: z.string(),
-  messageId: z.string(),
-  attachmentId: z.string(),
+  rfqId: z.string(),
 });
 
-export class ParseAttachmentRequestedEvent extends IntegrationEvent {
+export class sendConfirmationOnRFQParsedEvent extends IntegrationEvent {
   constructor(source: TEventSources, payload: z.infer<typeof PayloadSchema>) {
     super(
       source,
       {
         subject: 'email',
-        topic: 'parse-attachment',
+        topic: 'send-rfq-received-confirmation',
       },
       PayloadSchema,
       payload,
