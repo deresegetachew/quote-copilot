@@ -1,15 +1,12 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern } from '@nestjs/microservices';
-import {
-  EvtAttachmentParseRequested,
-  ParseAttachmentRequestedEvent,
-} from '@common';
+import { AttachmentParsingRequestedEvt } from '@common/events';
 
 @Controller()
 export class ParseDocumentController {
-  @EventPattern(EvtAttachmentParseRequested)
-  async handleParseDocument(data: ParseAttachmentRequestedEvent) {
-    console.log('📄 Document parsing request received:', data.data);
+  @EventPattern(AttachmentParsingRequestedEvt.EvtTopicKey)
+  async handleParseDocument(evt: AttachmentParsingRequestedEvt) {
+    console.log('📄 Document parsing request received:', evt);
     // Here you would call your ParseDocumentUseCase or similar service
     // For example:
     // return this.parseDocumentUseCase.execute(data);

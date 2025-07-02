@@ -3,13 +3,15 @@ import { RFQParsedDomainEvt } from '../../../domain/events';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Logger } from '@nestjs/common';
 import { INTEGRATION_EVENT_CLIENT } from '@common';
+import { EventPublisher } from '@common/eventPublishers';
 
 @EventsHandler(RFQParsedDomainEvt)
 export class sendConfirmationEmailOnParsedRFQHandler {
   private logger = new Logger(sendConfirmationEmailOnParsedRFQHandler.name);
 
   constructor(
-    @Inject(INTEGRATION_EVENT_CLIENT) private readonly natsClient: ClientProxy,
+    @Inject(INTEGRATION_EVENT_CLIENT)
+    private readonly eventBusClient: EventPublisher,
   ) {}
 
   async handle(event: RFQParsedDomainEvt): Promise<void> {
@@ -22,10 +24,10 @@ export class sendConfirmationEmailOnParsedRFQHandler {
       // build confirmation email payload and send it to  email-workers service
       // postRFQParsedUseCase
 
-      await this.natsClient.emit(
-        rfqConfirmationEmailRequestedSubject,
-        confirmationEmailPayload,
-      );
+      // await this.eventBusClient.emit(
+      //   rfqConfirmationEmailRequestedSubject,
+      //   confirmationEmailPayload,
+      // );
     } catch (error) {
       console.error('Error handling RFQParsedEvent:', error);
     }

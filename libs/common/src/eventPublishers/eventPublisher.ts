@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { INTEGRATION_EVENT_CLIENT } from '../constants';
-import { IntegrationEvent } from '../integrationEvents/integrationEvents.type';
+import { IntegrationEvent } from '../events/integrationEvents.type';
 import { timeout, retry, catchError } from 'rxjs/operators';
 import { lastValueFrom } from 'rxjs';
 import { PublishEventException } from './publishEvent.exception';
