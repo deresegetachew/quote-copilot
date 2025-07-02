@@ -89,25 +89,8 @@ export async function processEmailThreadWorkflow(): Promise<void> {
           isRFQ: true,
         };
         state.summary = parsed.summary;
-
-        // Step 2: Send email
-        // fire call fireIntegrationEventActivity to save the parsed data details and send  confirmation email to the user
-        // await fireIntegrationEventsActivity<TMessageParsedSubjectPayload>({
-        //   subject: messageParsedSubject,
-        //   schema: messageParsedSubjectPayloadSchema,
-        //   eventPayload: {},
-        // });
       } else {
-        console.log('Not an RFQ, checking');
-        // await fireIntegrationEventsActivity<TMessageParsedUnprocessableSubjectPayload>(
-        //   {
-        //     subject: messageParsedUnprocessableSubject,
-        //     schema: messageParsedUnprocessableSubjectPayloadSchema,
-        //     eventPayload: {},
-        //   },
-        // );
-
-        // step 2 fire integration event to update the thread and message record
+        console.log('Not an RFQ');
 
         state.isDone = true; //this thread is done and should close it
       }

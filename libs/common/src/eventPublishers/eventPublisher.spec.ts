@@ -1,7 +1,7 @@
 import { ClientProxy } from '@nestjs/microservices';
 import { EventPublisher } from './eventPublisher';
 import { createMock } from '@golevelup/ts-jest';
-import { IntegrationEvent } from '../integrationEvents/integrationEvents.type';
+import { IntegrationEvent } from '../events/integrationEvents.type';
 import { PublishEventException } from './publishEvent.exception';
 import { of, throwError } from 'rxjs';
 

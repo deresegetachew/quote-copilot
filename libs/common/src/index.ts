@@ -2,7 +2,7 @@ export * from './types';
 export * from './workFlows';
 export * from './valueObjects';
 export * from './dtos';
-export * from './integrationEvents';
+export * from './events';
 export * from './health';
 
 export * from './utils';

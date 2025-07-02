@@ -8,9 +8,9 @@ export type TIntegEvtSubj =
   (typeof IntegEvtSubjects)[keyof typeof IntegEvtSubjects];
 
 export const IntegEvtKeys = {
-  sendRfqReceivedConfirmation: 'send-rfq-received-confirmation',
-
   parseAttachment: 'parse-attachment',
+  rfqParsed: 'rfq-parsed',
+  attachmentParseRequested: 'attachment-parsing-requested',
 } as const;
 
 export type TIntegEvts = (typeof IntegEvtKeys)[keyof typeof IntegEvtKeys];

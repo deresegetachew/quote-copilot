@@ -1,5 +1,5 @@
 import z from 'zod';
-import { IntegrationEvent, TEventSources } from '../integrationEvents.type';
+import { IntegrationEvent, TEventSources } from '../../integrationEvents.type';
 
 const PayloadSchema = z.object({
   threadId: z.string(),
@@ -7,7 +7,9 @@ const PayloadSchema = z.object({
   attachmentId: z.string(),
 });
 
-export class ParseAttachmentRequestedEvent extends IntegrationEvent {
+export class ParseAttachmentRPC extends IntegrationEvent {
+  isRpc = true; // Set the RPC flag to true
+
   constructor(source: TEventSources, payload: z.infer<typeof PayloadSchema>) {
     super(
       source,
