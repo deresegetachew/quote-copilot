@@ -16,7 +16,7 @@ export class RFQFactory {
     rfq.addRFQParsedEvt();
 
     if (emailIntent.hasAttachments) {
-      rfq.addParseRFQAttachmentsEvt();
+      rfq.addParseRFQAttachmentsFoundEvt();
     }
 
     return rfq;

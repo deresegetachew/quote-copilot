@@ -1,11 +1,11 @@
 import { EventsHandler } from '@nestjs/cqrs';
-import { RFQAttachmentsParsingRequestedDomainEvt } from '../../../domain/events';
+import { RFQAttachmentsFoundDomainEvt } from '../../../domain/events';
 import { Inject, Logger } from '@nestjs/common';
 import { AttachmentParsingRequestedEvt } from '@common/events';
 import { EventPublisher } from '@common/eventPublishers';
 import { INTEGRATION_EVENT_CLIENT } from '@common/constants';
 
-@EventsHandler(RFQAttachmentsParsingRequestedDomainEvt)
+@EventsHandler(RFQAttachmentsFoundDomainEvt)
 export class RFQAttachmentsParsingRequestedHandler {
   private logger = new Logger(RFQAttachmentsParsingRequestedHandler.name);
   constructor(
@@ -13,7 +13,7 @@ export class RFQAttachmentsParsingRequestedHandler {
     private readonly eventBusClient: EventPublisher,
   ) {}
 
-  async handle(event: RFQAttachmentsParsingRequestedDomainEvt): Promise<void> {
+  async handle(event: RFQAttachmentsFoundDomainEvt): Promise<void> {
     try {
       const evt = new AttachmentParsingRequestedEvt('core-service', {
         threadId: event.threadId,

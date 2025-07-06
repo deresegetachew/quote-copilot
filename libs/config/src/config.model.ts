@@ -1,5 +1,3 @@
-import { url } from 'inspector';
-import { coreKnownTags } from 'yaml/dist/schema/tags';
 import { z } from 'zod';
 
 export const ConfigSchema = z.object({
