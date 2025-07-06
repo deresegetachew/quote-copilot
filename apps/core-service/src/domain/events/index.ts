@@ -1,2 +1,2 @@
 export * from './rfqParsed.domainEvt';
-export * from './rfqAttachmentsParsingRequestedDomainEvt';
+export * from './rfqAttachmentsFound.domainEvt';

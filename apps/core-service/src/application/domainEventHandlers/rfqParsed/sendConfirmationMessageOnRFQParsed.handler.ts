@@ -1,18 +1,13 @@
-import { EventsHandler } from '@nestjs/cqrs';
+import { EventsHandler, CommandBus } from '@nestjs/cqrs';
 import { RFQParsedDomainEvt } from '../../../domain/events';
-import { ClientProxy } from '@nestjs/microservices';
-import { Inject, Logger } from '@nestjs/common';
-import { INTEGRATION_EVENT_CLIENT } from '@common';
-import { EventPublisher } from '@common/eventPublishers';
+import { Logger } from '@nestjs/common';
+import { SendConfirmationMessageCommand } from '../../ports/incoming/commands/sendConfirmationMessage.command';
 
 @EventsHandler(RFQParsedDomainEvt)
 export class sendConfirmationEmailOnParsedRFQHandler {
   private logger = new Logger(sendConfirmationEmailOnParsedRFQHandler.name);
 
-  constructor(
-    @Inject(INTEGRATION_EVENT_CLIENT)
-    private readonly eventBusClient: EventPublisher,
-  ) {}
+  constructor(private readonly commandBus: CommandBus) {}
 
   async handle(event: RFQParsedDomainEvt): Promise<void> {
     try {
@@ -21,15 +16,11 @@ export class sendConfirmationEmailOnParsedRFQHandler {
         event.rfq,
       );
 
-      // build confirmation email payload and send it to  email-workers service
-      // postRFQParsedUseCase
-
-      // await this.eventBusClient.emit(
-      //   rfqConfirmationEmailRequestedSubject,
-      //   confirmationEmailPayload,
-      // );
+      await this.commandBus.execute(
+        new SendConfirmationMessageCommand(event.threadId, event.rfq),
+      );
     } catch (error) {
-      console.error('Error handling RFQParsedEvent:', error);
+      this.logger.error('Error handling RFQParsedEvent:', error);
     }
   }
 }

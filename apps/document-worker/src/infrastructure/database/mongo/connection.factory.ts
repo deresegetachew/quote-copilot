@@ -11,9 +11,9 @@ export class MongooseConnectionFactory implements MongooseOptionsFactory {
   constructor(private readonly configService: ConfigService) {}
 
   createMongooseOptions(): MongooseModuleOptions {
-    const dbConfig = this.configService.getOrThrow<
-      TConfiguration['dbConfig']['mongo']['document-worker-db']
-    >('dbConfig.mongo.document-worker-db');
+    const dbConfig = this.configService.getOrThrow(
+      'dbConfig.mongo["document-worker-db"]',
+    );
 
     if (dbConfig.authMode === 'password') {
       return {

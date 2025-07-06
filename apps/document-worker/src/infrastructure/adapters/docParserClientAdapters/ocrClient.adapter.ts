@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { OcrServicePort } from '../../../application/ports/outgoing/ocrClient.port';
 import { ProcessingResult } from '../../../application/services/documentProcessing.service';
 import { DocumentParserClientPort } from '../../../application/ports/outgoing/documentParserClient/documentParserClient.port';
+import { DocumentEntity } from '../../../domain/entities/document.entity';
 
 @Injectable()
 export class OcrClientAdapter extends DocumentParserClientPort {

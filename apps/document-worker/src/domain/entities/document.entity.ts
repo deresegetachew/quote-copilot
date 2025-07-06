@@ -76,6 +76,12 @@ export class DocumentEntity {
   getUpdatedAt(): Date {
     return this.updatedAt;
   }
+
+  getSize(): number {
+    return Buffer.isBuffer(this.content)
+      ? this.content.length
+      : Buffer.from(this.content).length;
+  }
 }
 
 export interface DocumentMetadata {
