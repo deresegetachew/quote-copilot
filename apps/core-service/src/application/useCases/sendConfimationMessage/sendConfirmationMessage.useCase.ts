@@ -20,13 +20,5 @@ export class SendConfirmationMessageUseCase
       `Sending confirmation message for thread ID: ${threadId}`,
       { rfq },
     );
-
-    // Generate email content using template service
-    // const emailContent = await this.generateEmailContent(
-    //   emailType as EmailType,
-    //   customerName,
-    //   rfqSummary,
-    //   items,
-    // );
   }
 }

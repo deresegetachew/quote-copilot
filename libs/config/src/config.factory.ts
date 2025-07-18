@@ -130,6 +130,24 @@ export class EnvConfigFactory extends ConfigFactory {
         model: '',
         temperature: 0,
       },
+      eventInboxConfig: {
+        db: {
+          uri: this.getEnvVarOrThrow('EVENT_INBOX_DB_URI'),
+          authMode:
+            this.getEnvVarOrThrow('EVENT_INBOX_DB_AUTH_MODE') === 'aws-iam'
+              ? 'aws-iam'
+              : 'password',
+          database: this.getEnvVarOrThrow('EVENT_INBOX_DB_DATABASE'),
+          username: this.getEnvVarOrThrow('EVENT_INBOX_DB_USERNAME'),
+          password: this.getEnvVarOrThrow('EVENT_INBOX_DB_PASSWORD'),
+          enableMigration: this.getBooleanFromEnv(
+            this.getEnvVarOrThrow('EVENT_INBOX_DB_ENABLE_MIGRATION'),
+          ),
+          useSSL: this.getBooleanFromEnv(
+            this.getEnvVarOrThrow('EVENT_INBOX_DB_USE_SSL'),
+          ),
+        },
+      },
     };
   }
 

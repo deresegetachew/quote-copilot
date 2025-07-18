@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import DateTime from 'luxon';
 
 // this class is used to standardize our date usage
 // it relies on luxon library and always returns dates in UTC formatted as ISO 8601
@@ -28,5 +28,9 @@ export class DateHelper {
 
   static fromDateToUTC(date: Date): DateTime {
     return DateTime.fromJSDate(date).toUTC();
+  }
+
+  static addSecondsToDate(date: Date, seconds: number): Date {
+    return DateTime.fromJSDate(date).plus({ seconds }).toJSDate();
   }
 }

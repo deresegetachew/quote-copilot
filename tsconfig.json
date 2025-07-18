@@ -37,11 +37,23 @@
       "@db/*": [
         "libs/db/src/*"
       ],
+      "@event-inbox/event-inbox": [
+        "libs/event-inbox/src"
+      ],
+      "@event-inbox/event-inbox/*": [
+        "libs/event-inbox/src/*"
+      ],
       "@prompts": [
         "libs/prompts/src"
       ],
       "@prompts/*": [
         "libs/prompts/src/*"
+      ],
+      "@schema-validation": [
+        "libs/schema-validation/src"
+      ],
+      "@schema-validation/*": [
+        "libs/schema-validation/src/*"
       ],
       "@tenants": [
         "libs/tenants/src"
@@ -54,12 +66,6 @@
       ],
       "@tools-langchain/*": [
         "libs/langchain/src/*"
-      ],
-      "@schema-validation": [
-        "libs/schema-validation/src"
-      ],
-      "@schema-validation/*": [
-        "libs/schema-validation/src/*"
       ]
     }
   }

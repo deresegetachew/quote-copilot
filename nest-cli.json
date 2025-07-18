@@ -84,6 +84,15 @@
         ]
       }
     },
+    "event-inbox": {
+      "type": "library",
+      "root": "libs/event-inbox",
+      "entryFile": "index",
+      "sourceRoot": "libs/event-inbox/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/event-inbox/tsconfig.lib.json"
+      }
+    },
     "langchain": {
       "type": "library",
       "root": "libs/langchain",
@@ -154,5 +163,8 @@
         "tsConfigPath": "apps/whatsapp-workers/tsconfig.app.json"
       }
     }
+  },
+  "compilerOptions": {
+    "webpack": true
   }
 }

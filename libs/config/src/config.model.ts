@@ -133,6 +133,17 @@ export const ConfigSchema = z.object({
     model: z.string(),
     temperature: z.number(),
   }),
+  eventInboxConfig: z.object({
+    db: z.object({
+      uri: z.string(),
+      authMode: z.enum(['password', 'aws-iam']),
+      username: z.string(),
+      password: z.string(),
+      database: z.string(),
+      enableMigration: z.boolean(),
+      useSSL: z.boolean(),
+    }),
+  }),
 });
 
 export type TConfiguration = z.infer<typeof ConfigSchema>;

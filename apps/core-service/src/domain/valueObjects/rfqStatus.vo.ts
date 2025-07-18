@@ -37,4 +37,8 @@ export class RFQStatusVO {
   toString() {
     return this.value;
   }
+
+  equals(other: RFQStatusVO): boolean {
+    return this.value === other.value;
+  }
 }

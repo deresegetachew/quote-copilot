@@ -32,6 +32,9 @@
     "@langchain/langgraph": "^0.2.67",
     "@langchain/ollama": "^0.2.0",
     "@langchain/openai": "^0.5.8",
+    "@mikro-orm/core": "^6.4.16",
+    "@mikro-orm/nestjs": "^6.1.1",
+    "@mikro-orm/postgresql": "^6.4.16",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^11.1.0",
     "@nestjs/config": "^4.0.2",
@@ -40,6 +43,7 @@
     "@nestjs/microservices": "^11.1.0",
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^11.1.0",
+    "@nestjs/schedule": "^6.0.0",
     "@nestjs/terminus": "^11.0.0",
     "@temporalio/client": "^1.11.7",
     "@temporalio/common": "^1.11.7",
@@ -50,6 +54,8 @@
     "glob": "^11.0.2",
     "googleapis": "^148.0.0",
     "handlebars": "^4.7.8",
+    "ioredis": "^5.6.1",
+    "lodash": "^4.17.21",
     "luxon": "^3.6.1",
     "mongoose": "^8.14.1",
     "nats": "^2.29.3",
@@ -105,12 +111,13 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@db/db(|/.*)$": "<rootDir>/libs/db/src/$1",
       "^@agents/agents(|/.*)$": "<rootDir>/libs/agents/src/$1",
+      "^@app-config/config(|/.*)$": "<rootDir>/libs/config/src/$1",
+      "^@common/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@db/db(|/.*)$": "<rootDir>/libs/db/src/$1",
+      "^@event-inbox/event-inbox(|/.*)$": "<rootDir>/libs/event-inbox/src/$1",
       "^@prompts/prompts(|/.*)$": "<rootDir>/libs/prompts/src/$1",
       "^@tenants/tenants(|/.*)$": "<rootDir>/libs/tenants/src/$1",
-      "^@common/common(|/.*)$": "<rootDir>/libs/common/src/$1",
-      "^@app-config/config(|/.*)$": "<rootDir>/libs/config/src/$1",
       "^@tools-langchain/langchain(|/.*)$": "<rootDir>/libs/langchain/src/$1"
     }
   }
